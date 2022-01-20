@@ -8,14 +8,14 @@
       "steps": [
         {
           "id": "extract_csv",
-          "type": "extract",
+          "uses": "extract",
           "properties": {
             "source": "employee"
           }
         },
         {
           "id": "load_snowflake",
-          "type": "load",
+          "uses": "load",
           "properties": {
             "table_name": "tab"
           },
@@ -28,6 +28,11 @@
   ],
   "required": ["steps"],
   "properties": {
+    "runs-on": {
+      "type": "string",
+      "description": "Which runner to use to process this pipeline. `pyspark` uses pyspark with the dataframe API. `pysql` uses Python and SQLAlchemy and is suited to an ELT approach. `jssql` uses Javascript and Knex and is suited to an ELT approach",
+      "enum": ["pyspark", "pysql", "jssql"]
+    },
     "steps": {
       "type": "array",
       "description": "List of blocks. These will be run in order, where each step's output is the next step's input, unless the 'inputs' clause is specified",
@@ -36,14 +41,14 @@
         [
           {
             "id": "extract_csv",
-            "type": "extract",
+            "uses": "extract",
             "properties": {
               "source": "employee"
             }
           },
           {
             "id": "load_snowflake",
-            "type": "load",
+            "uses": "load",
             "properties": {
               "table_name": "tab"
             },

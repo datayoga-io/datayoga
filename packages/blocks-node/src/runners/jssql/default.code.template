@@ -1,1 +1,12 @@
-{{#if (output 'df')}}let {{output 'df'}} = {{/if}}blocks.{{type}}(runner,logger,{{json props}},{"df":{{input 'df'}} })
+{{#if (output 'df')}}let {{output 'df'}} = {{/if}}await blocks.{{type}}(
+    runner,
+    logger,
+    {{json props}},
+    { {{#each @root.inputs}}
+        "{{@key}}":"{{this}}",
+    {{/each}} },
+    { {{#each @root.outputs}}
+        "{{@key}}":"{{this}}",
+    {{/each}} }
+
+)

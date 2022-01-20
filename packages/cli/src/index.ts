@@ -140,7 +140,11 @@ try {
     .fail(function (msg, err, yargs) {
       if (err && process.env.NODE_ENV == "development") throw err; // preserve stack
       if (err instanceof ValidationError) {
-        console.log(`Error while validating step ${err.blockId}:`);
+        if (err.blockId) {
+          console.log(`Error while validating step ${err.blockId}:`);
+        } else {
+          console.log("Validation error:");
+        }
         console.error(err.message);
       } else if (err) {
         console.log("Error while running command:");

@@ -149,21 +149,28 @@ export async function executeLocal({
   pipelineName,
   loglevel,
   distDir,
+  dataDir,
   logger,
   args,
 }: {
   pipelineName: string;
   loglevel: string;
   distDir: string;
+  dataDir: string;
   logger: Logger;
   args: { [name: string]: string };
 }) {
   // dynamically load the class
   const extension = "js";
-  const pipelineDir = utils.toPosix(path.join(distDir, "pipelines"));
-  const pipelineFileName = path.join(
+  let pipelineModule = pipelineName.split(".");
+  let pipelineFileName = pipelineModule.pop();
+
+  const pipelineDir = utils.toPosix(
+    path.join(distDir, "pipelines", ...pipelineModule)
+  );
+  const pipelineFullFileName = path.join(
     pipelineDir,
-    pipelineName + "." + extension
+    pipelineFileName + "." + extension
   );
   const catalogDir = utils.toPosix(path.join(distDir, "catalog"));
 
@@ -186,9 +193,13 @@ export async function executeLocal({
         )
       );
     });
-  const env = yaml.load(path.join(distDir, "..", "env.yaml"));
-
-  const pipeline = require(pipelineFileName);
+  const env: any = yaml.load(
+    fs.readFileSync(path.join(distDir, "..", "env.yaml"), "utf8")
+  );
+  env.folders = {
+    data: dataDir,
+  };
+  const pipeline = require(pipelineFullFileName);
   const runner = new Runner(catalogMap, env);
   pipeline.run(runner, args);
 }

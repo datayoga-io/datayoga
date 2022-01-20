@@ -1,17 +1,29 @@
-id: hello
-description: this is the most basic job
-# each job is a series of steps
-steps:
-  # every step has an id that can be used to reference from other steps
-  - id: extract_sample_csv
-    # steps run reusable logic, called blocks. each block is of a certain type
-    type: extract
-    properties:
-      # the source references the entry in the catalog located under src/catalog
-      source: sample_raw_input
-      type: file
-  - id: load
-    type: load
-    properties:
-      # use stdout to just print out to terminal. another option is to use trace:true property, which can be used on any step
-      target_type: stdout
+jobs:
+  hello-job:
+    description: this is the most basic job
+    runs-on: pyspark
+    # each job is a series of steps
+    steps:
+      # every step has an id that can be used to reference from other steps
+      - id: extract_sample_csv
+        # steps run reusable logic, called blocks. each block is of a certain type
+        uses: extract
+        properties:
+          # the source references the entry in the catalog located under src/catalog
+          source: sample.sample_raw_input
+          type: file
+          target:
+            connection: demo
+            table: _raw_input
+      - id: expression
+        trace: true
+        uses: expression
+        properties:
+          columns:
+            - name: fullname
+              expression: id || name
+      - id: load
+        uses: load
+        properties:
+          # use stdout to just print out to terminal. another option is to use trace:true property, which can be used on any step
+          target_type: stdout

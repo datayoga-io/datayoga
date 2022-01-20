@@ -3,9 +3,11 @@ export class DyQuery {
   ctes: DyQuery[] = [];
   query;
   alias;
-  constructor(alias: string, query: string) {
+  connection?: Knex;
+  constructor(alias: string, query: string, connection?: Knex) {
     this.query = query;
     this.alias = alias;
+    this.connection = connection;
   }
   with(query: DyQuery) {
     this.ctes.push(
@@ -14,6 +16,7 @@ export class DyQuery {
       ),
       new DyQuery(query.alias, query.query)
     );
+    this.connection = query.connection;
     return this;
   }
   toSQL() {
@@ -26,21 +29,11 @@ export class DyQuery {
   }
 }
 export class Runner {
-  processor: Knex;
+  processor?: Knex;
   catalog: Map<string, any>;
   env: any;
   constructor(catalog: Map<string, any>, env: any) {
     this.catalog = catalog;
     this.env = env;
-    this.processor = knex({
-      client: "mssql",
-      connection: {
-        host: "127.0.0.1",
-        port: 1433,
-        user: "sa",
-        password: "Wizdi@123",
-        database: "wizdi_preprod",
-      },
-    });
   }
 }

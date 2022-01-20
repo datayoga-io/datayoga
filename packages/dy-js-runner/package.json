@@ -16,6 +16,7 @@
     "@types/node": "^16.4.10"
   },
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "knex": "^0.95.14",
     "tedious": "^14.0.0"
   }
