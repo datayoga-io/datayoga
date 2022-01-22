@@ -71,7 +71,7 @@ export async function load(runner: any, logger: any, props: any, inputs: any) {
     logger.info(`inserting using load strategy ${props.load_strategy}`);
     logger.debug(update.toSQL());
 
-    const result = await runner.processor.raw(update.toSQL());
+    const result = await update.execute();
 
     logger.debug(result);
     logger.info("done");
