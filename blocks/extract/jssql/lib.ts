@@ -1,3 +1,4 @@
+import { createConnection, getConnection, Table, TableIndex } from "typeorm";
 import * as path from "path";
 import * as csv from "csv-parser";
 import * as fs from "fs";
@@ -13,46 +14,76 @@ export async function extract(
   outputs: any
 ) {
   const connDetails = runner.env.connections[props.target.connection];
+  const typeOrmProps = {};
+  if (connDetails["host"]) typeOrmProps["host"] = connDetails["host"];
+  if (connDetails["port"]) typeOrmProps["port"] = connDetails["port"];
+  if (connDetails["user"]) typeOrmProps["username"] = connDetails["user"];
+  if (connDetails["password"])
+    typeOrmProps["password"] = connDetails["password"];
+  if (connDetails["database"])
+    typeOrmProps["database"] = connDetails["database"];
+  typeOrmProps["name"] = props.target.connection;
+
   // connect to DB
-  const connection = knex({
-    client: connDetails.subtype,
-    connection: {
-      host: connDetails["host"],
-      port: connDetails["port"],
-      user: connDetails["user"],
-      password: connDetails["password"],
-      database: connDetails["database"],
-      filename:
-        connDetails["subtype"] == "sqlite3" ? connDetails["database"] : "",
-    },
-  });
+  // see if we have an open connection. if not, return one.
+  const connection =
+    getConnection(props.target.connection) ||
+    (await createConnection(typeOrmProps));
+
   // fetch the metadata from the catalog
   const sourceCatalogEntry = runner.catalog.get(props.source);
   // create table if not exists
   var tableName = props.target.table;
-  await connection.schema.createTableIfNotExists(tableName, (table: any) => {
-    for (const column of sourceCatalogEntry.columns) {
-      table.string(column.name);
-    }
-  });
+
+  const queryRunner = connection.createQueryRunner();
+  if (!queryRunner.getTable(tableName)) {
+    await queryRunner.createTable(
+      new Table({
+        name: "question",
+        columns: [
+          ...sourceCatalogEntry.columns.map((column) => ({
+            name: column.name,
+            type: "string",
+          })),
+          {
+            name: "_load_timestamp",
+            type: "timestamp",
+          },
+        ],
+      }),
+      true
+    );
+    await queryRunner.createIndex(
+      tableName,
+      new TableIndex({ columnNames: ["_load_timestamp"] })
+    );
+  } else {
+    // clear table
+    // TODO: add a flag whether to truncate or not
+    await queryRunner.clearTable(tableName);
+  }
   // read file stream and load into DB
   await new Promise<void>((resolve, reject) => {
+    let totalLoaded = 0;
     fs.createReadStream(
       path.join(runner.env.folders["data"], sourceCatalogEntry.filename)
     )
       .pipe(csv())
       .on("end", () => {
-        console.log("done");
+        console.log("done loading");
+        console.log(`loaded ` + totalLoaded + ` rows`);
         resolve();
       })
       .pipe(
         new Transform({
           objectMode: true,
           transform: function (chunk, _, next) {
-            console.log(chunk);
+            if (totalLoaded % 1000)
+              console.log(`loaded ` + totalLoaded + ` rows`);
             connection(tableName)
               .insert(chunk)
               .then(function () {
+                totalLoaded++;
                 next();
               }, next);
           },
