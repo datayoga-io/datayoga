@@ -34,7 +34,7 @@ async function run(runner,args={},options={}) {
     logger.debug("tracing step expression port df")
     logger.debug(df_expression_df.toSQL())
     console.table(
-        await df_expression_df.connection.raw(df_expression_df.toSQL())
+        await df_expression_df.execute()
     );
     
     
@@ -44,15 +44,27 @@ async function run(runner,args={},options={}) {
         runner,
         logger,
         {
-      "target_type": "stdout"
+      "target_type": "database",
+      "target": "demo_output",
+      "load_strategy": "APPEND",
+      "mapping": [
+        {
+          "source": "id"
+        },
+        {
+          "source": "name"
+        },
+        {
+          "source": "fullname"
+        }
+      ]
     },
         { 
-            "df":"df_expression_df",
+            "df":df_expression_df,
          },
         {  }
     
     )
-    process.exit(0);
 
 }
 exports.run=run

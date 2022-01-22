@@ -1,10 +1,10 @@
-import { knex, Knex } from "knex";
+import { Connection, createConnection, getConnection } from "typeorm";
 export class DyQuery {
   ctes: DyQuery[] = [];
   query;
   alias;
-  connection?: Knex;
-  constructor(alias: string, query: string, connection?: Knex) {
+  connection?: Connection;
+  constructor(alias: string, query: string, connection?: Connection) {
     this.query = query;
     this.alias = alias;
     this.connection = connection;
@@ -27,9 +27,11 @@ export class DyQuery {
       this.query
     );
   }
+  execute() {
+    return this.connection?.query(this.toSQL());
+  }
 }
 export class Runner {
-  processor?: Knex;
   catalog: Map<string, any>;
   env: any;
   constructor(catalog: Map<string, any>, env: any) {

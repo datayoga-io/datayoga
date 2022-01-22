@@ -3,7 +3,7 @@
     logger,
     {{json props}},
     { {{#each @root.inputs}}
-        "{{@key}}":"{{this}}",
+        "{{@key}}":{{this}},
     {{/each}} },
     { {{#each @root.outputs}}
         "{{@key}}":"{{this}}",

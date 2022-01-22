@@ -1,8 +1,14 @@
-import { createConnection, getConnection, Table, TableIndex } from "typeorm";
+import {
+  Connection,
+  ConnectionNotFoundError,
+  createConnection,
+  getConnection,
+  Table,
+  TableIndex,
+} from "typeorm";
 import * as path from "path";
 import * as csv from "csv-parser";
 import * as fs from "fs";
-import { knex, Knex } from "knex";
 import { DyQuery } from "../../index";
 import { Transform } from "stream";
 
@@ -14,7 +20,7 @@ export async function extract(
   outputs: any
 ) {
   const connDetails = runner.env.connections[props.target.connection];
-  const typeOrmProps = {};
+  const typeOrmProps: { [key: string]: any } = {};
   if (connDetails["host"]) typeOrmProps["host"] = connDetails["host"];
   if (connDetails["port"]) typeOrmProps["port"] = connDetails["port"];
   if (connDetails["user"]) typeOrmProps["username"] = connDetails["user"];
@@ -26,9 +32,17 @@ export async function extract(
 
   // connect to DB
   // see if we have an open connection. if not, return one.
-  const connection =
-    getConnection(props.target.connection) ||
-    (await createConnection(typeOrmProps));
+  let connection: Connection;
+  try {
+    connection = getConnection(props.target.connection);
+  } catch (e) {
+    if (e instanceof ConnectionNotFoundError)
+      connection = await createConnection({
+        type: connDetails["subtype"],
+        ...typeOrmProps,
+      });
+    else throw e;
+  }
 
   // fetch the metadata from the catalog
   const sourceCatalogEntry = runner.catalog.get(props.source);
@@ -41,7 +55,7 @@ export async function extract(
       new Table({
         name: "question",
         columns: [
-          ...sourceCatalogEntry.columns.map((column) => ({
+          ...sourceCatalogEntry.columns.map((column: any) => ({
             name: column.name,
             type: "string",
           })),
@@ -62,6 +76,8 @@ export async function extract(
     // TODO: add a flag whether to truncate or not
     await queryRunner.clearTable(tableName);
   }
+  // release the connection back to the pool
+  queryRunner.release();
   // read file stream and load into DB
   await new Promise<void>((resolve, reject) => {
     let totalLoaded = 0;
@@ -77,15 +93,16 @@ export async function extract(
       .pipe(
         new Transform({
           objectMode: true,
-          transform: function (chunk, _, next) {
+          transform: async function (chunk, _, next) {
             if (totalLoaded % 1000)
               console.log(`loaded ` + totalLoaded + ` rows`);
-            connection(tableName)
-              .insert(chunk)
-              .then(function () {
-                totalLoaded++;
-                next();
-              }, next);
+            await connection
+              .createQueryBuilder()
+              .insert()
+              .into(tableName)
+              .values(chunk)
+              .execute();
+            next();
           },
         })
       );

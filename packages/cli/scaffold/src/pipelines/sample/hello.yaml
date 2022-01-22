@@ -26,4 +26,11 @@ jobs:
         uses: load
         properties:
           # use stdout to just print out to terminal. another option is to use trace:true property, which can be used on any step
-          target_type: stdout
+          #target_type: stdout
+          target_type: database
+          target: demo_output
+          load_strategy: APPEND
+          mapping:
+            - source: id
+            - source: name
+            - source: fullname
