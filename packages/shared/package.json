@@ -1,6 +1,6 @@
 {
   "name": "@datayoga-io/shared",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "repository": "git@github.com:datayoga-io/datayoga.git",
   "types": "./dist/types/index.d.ts",
   "scripts": {
