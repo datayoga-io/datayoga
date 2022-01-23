@@ -1,7 +1,6 @@
 // rendered with love by YogaBot
 
-const blocks = require("@datayoga-io/dy-js-runner/dist/common/blocks");
-const { DyQuery } = require("@datayoga-io/dy-js-runner");
+const { DyQuery, blocks } = require("@datayoga-io/dy-js-runner");
 let logger = console;
 
 async function run(runner,args={},options={}) {

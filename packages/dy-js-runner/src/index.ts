@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as blocks from "./common/blocks";
 import {
   Connection,
   ConnectionNotFoundError,
@@ -51,6 +52,7 @@ export class DyQuery {
     }
   }
 }
+export { blocks };
 export class Runner {
   catalog: Map<string, any>;
   env: any;
