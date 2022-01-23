@@ -81,7 +81,7 @@ try {
             },
             local: {
               describe: "whether to run locally or remote",
-              default: false,
+              default: true,
               type: "boolean",
             },
             loglevel: {

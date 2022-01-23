@@ -67,4 +67,4 @@ dy-cli run sample.customer
 
 That's it! You've created your first job that loads data from CSV, runs it through a basic transformation, and upserts the data into a target table.
 
-Read the guide for a more detailed tutorial or check out the reference to see various blocks types currently available.
+Read the [guide](https://datayoga.io/docs/guide/) for a more detailed tutorial or check out the [reference](https://datayoga.io/docs/reference/CLI.html) to see various blocks types currently available.

@@ -21,7 +21,8 @@ async function main() {
       NODE_PATH: `${globalPath}${fileDelimiter}${path.join(
         globalPath,
         "@datayoga-io",
-        "datayoga"
+        "datayoga",
+        "node_modules"
       )}`,
       NODE_ENV: "production",
     },
