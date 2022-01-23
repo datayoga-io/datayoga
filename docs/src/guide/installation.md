@@ -31,8 +31,8 @@ dy-cli --version
 To create a new datayoga project, use the `init` command.
 
 ```
-dy-cli init hello_world
-cd hello_world
+dy-cli init myproject
+cd myproject
 ```
 
 You will see a folder structure that scaffolds a new datayoga enviornment.
@@ -55,7 +55,7 @@ We are mapping the volume of `/opt/dy/data` to the folder named `data`. If you a
 Let's run our first job. It is pre-defined in the samples folder as part of the `init` command.
 
 ```
-dy-cli run sample.hello
+dy-cli run sample.customer
 ```
 
 If all goes well, you should see some startup logs, and eventually:
