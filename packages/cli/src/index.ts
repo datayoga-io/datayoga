@@ -143,7 +143,6 @@ try {
     .showHelpOnFail(true)
     .demandCommand(1, "")
     .fail(function (msg, err, yargs) {
-      console.log("fail");
       if (err && process.env.NODE_ENV == "development") throw err; // preserve stack
       if (err instanceof ValidationError) {
         if (err.blockId) {

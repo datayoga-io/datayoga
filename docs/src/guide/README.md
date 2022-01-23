@@ -34,7 +34,7 @@ https://nodejs.org/en/download/package-manager/
 
 ## Install Docker
 
-This is needed for running a local job runner
+This is needed for running a local Spark job runner
 
 https://docs.docker.com/get-docker/
 
@@ -84,14 +84,4 @@ Let's run our first job. It is pre-defined in the samples folder as part of the 
 dy-cli run sample.customer
 ```
 
-If all goes well, you should see some startup logs, and eventually:
-
-```
-+-----+-----+
-|   id| name|
-+-----+-----+
-|hello|world|
-+-----+-----+
-```
-
-That's it! You've created your first job that loads data from CSV, runs it through Spark, and shows the data to the standard output. Not very useful, but a good start. Read on for a more detailed tutorial or check out the reference to see the different block types currently available.
+That's it! You've created your first job that loads data from CSV, runs it through a basic transformation, and upserts the data into a target table.
