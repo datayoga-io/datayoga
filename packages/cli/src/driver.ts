@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // this class is needed to spawn node with support for global packages
 // needed for dy-js-runner so TypeORM can find globally installed drivers
 import * as path from "path";

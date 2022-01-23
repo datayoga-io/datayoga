@@ -18,7 +18,6 @@
   "dependencies": {
     "csv-parser": "^3.0.0",
     "sqlite3": "^5.0.2",
-    "tedious": "^14.0.0",
     "typeorm": "^0.2.41"
   }
 }
