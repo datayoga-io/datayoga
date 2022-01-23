@@ -2,6 +2,8 @@
 
 DataYoga is a framwork for building and generating data pipelines. The DataYoga CLI helps define data pipelines using a semantic markup language using yaml files. These pipeline definitions are then used to generate executable artifacts running on a variety of Processing engines such as PySpark.
 
+![DataYoga concept](https://github.com/datayoga-io/datayoga/blob/main/docs/datayoga_concept.png?raw=true)
+
 # Data Entities
 
 DataYoga models the data ecosystem using the following entities:
