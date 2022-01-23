@@ -48,7 +48,6 @@ export class CodeTemplate {
       "columnNames",
       function (this: Handlebars.HelperDelegate, obj: any) {
         const val = obj;
-        console.log(val);
         const retVal: string = [...val.matchAll(/F\.col\(['"](.*?)['"]\)/g)]
           .map((x) => x[1])
           .join(", ");

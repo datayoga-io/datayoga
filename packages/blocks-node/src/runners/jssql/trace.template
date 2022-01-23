@@ -2,5 +2,5 @@ logger = console
 logger.debug("tracing step {{id}} port {{port}}")
 logger.debug({{df}}.toSQL())
 console.table(
-    await {{df}}.execute()
+    (await {{df}}.execute()).records
 );

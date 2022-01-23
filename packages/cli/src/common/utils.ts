@@ -2,7 +2,12 @@ import Logger from "./logger";
 import axios, { AxiosError } from "axios";
 import formdata from "form-data";
 import archiver from "archiver";
-import { jobRenderer } from "@datayoga-io/blocks-node";
+import {
+  jobRenderer,
+  runners,
+  models,
+  ValidationError,
+} from "@datayoga-io/blocks-node";
 import { Pipeline } from "@datayoga-io/shared";
 import yaml from "js-yaml";
 import * as glob from "fast-glob";
@@ -65,22 +70,30 @@ export function getDyFolderRoot(folder: string): string {
  * @param {moduleName} string - Name of module (corresponds to subfolder in jobs folder)
  * @param {pipelineName} string - Name of pipeline
  * @param {runner} string - Runner to use to render the code
- * @return {string} Runnable code
  */
 export function renderPipeline(
   moduleName: string,
-  pipelineName: string,
-  runner: string
-): string {
-  //TODO: runner should be taken from the code
+  pipelineName: string
+): { code: string; runner: string } {
   const src = readPipeline(moduleName, pipelineName);
   jobRenderer.validate(src);
   const pipeline = <Pipeline>src;
+
+  // determine the target runner
+  let runner = getRunner(Object.values(pipeline.jobs)[0].runs_on);
+
   // TODO: handle multi-job pipelies
   const job = Object.values((<Pipeline>src).jobs)[0];
   const { blocks, links } = jobRenderer.jobStepsToGraph(job.steps);
-  const formattedCode = jobRenderer.renderCode(blocks, links, runner);
-  return formattedCode;
+  const formattedCode = jobRenderer.renderCode(
+    blocks,
+    links,
+    runner.properties.name
+  );
+  return {
+    code: formattedCode,
+    runner: runner.properties.name,
+  };
 
   /**
    * Read a job yaml file
@@ -179,4 +192,34 @@ export async function fetchLogs(
     else logger.info(log);
   });
   return logs.length;
+}
+
+export function getRunner(runnerName: string) {
+  // search the runners in case this is an alias
+  let runner: models.Runner;
+  if (!(runnerName in runners)) {
+    for (let runnerInstance of Object.values(runners)) {
+      if (runnerInstance.properties.aliases.includes(runnerName)) {
+        runner = runnerInstance;
+        return runnerInstance;
+      }
+    }
+    // this is an unknown runner
+    throw new ValidationError(`Unknown runner ${runnerName}`);
+  } else return runners[runnerName];
+}
+
+export function parseExtraArgs() {
+  // we get an array. and convert to an object where each input is its own name
+  const firstIndex = process.argv.findIndex((arg) => arg == "--");
+  if (firstIndex == -1) return {};
+
+  return process.argv
+    .slice(firstIndex + 1)
+    .reduce((map: { [name: string]: string }, obj) => {
+      let [key, value] = obj.split("=");
+      key = key.replace("--", "");
+      map[key] = value;
+      return map;
+    }, {});
 }

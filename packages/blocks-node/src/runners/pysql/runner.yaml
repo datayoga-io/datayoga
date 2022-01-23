@@ -1,0 +1,4 @@
+name: pysql
+language: "python"
+extension: "py"
+aliases: ["python"]

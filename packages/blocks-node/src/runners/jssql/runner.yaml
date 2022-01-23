@@ -1,1 +1,4 @@
-language: js
+name: jssql
+language: "javascript"
+extension: "js"
+aliases: ["nodejs", "javascript"]

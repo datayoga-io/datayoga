@@ -1,3 +1,4 @@
+import path from "path";
 import * as services from "../services";
 import * as utils from "../common/utils";
 import Logger from "../common/logger";
@@ -11,20 +12,42 @@ async function run(argv: any) {
   await services.buildCatalog(logger, distDir);
 
   // build the pipeline
-  await services.build(moduleName, pipelineName, distDir, argv.runner);
+  const { filename, code, runner } = await services.build(
+    moduleName,
+    pipelineName,
+    distDir
+  );
 
-  await services.deploy({
-    distDir,
-    host: argv.host,
-  });
+  if (argv.local) {
+    // fetch extra arguments
+    const args = utils.parseExtraArgs();
 
-  await services.execute({
-    pipelineName: argv.pipeline,
-    loglevel: argv.loglevel,
-    host: argv.host,
-    port: argv.port,
-    logger,
-  });
+    const dataDir = utils.toPosix(
+      path.join(utils.getDyFolderRoot(path.resolve(".")), "data")
+    );
+
+    await services.executeLocal({
+      pipelineName: argv.pipeline,
+      loglevel: argv.loglevel,
+      distDir,
+      dataDir,
+      logger,
+      args,
+    });
+  } else {
+    await services.deploy({
+      distDir,
+      host: argv.host,
+    });
+
+    await services.execute({
+      pipelineName: argv.pipeline,
+      loglevel: argv.loglevel,
+      host: argv.host,
+      port: argv.port,
+      logger,
+    });
+  }
 }
 
 export default run;

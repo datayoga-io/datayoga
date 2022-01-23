@@ -10,6 +10,10 @@ export interface Job {
   /**
    * Description of the job
    */
+  runs_on: string;
+  /**
+   * Description of the job
+   */
   description?: string;
   /**
    * date created

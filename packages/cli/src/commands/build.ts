@@ -16,13 +16,7 @@ async function build(argv: any) {
   // copy the catalog
   await services.buildCatalog(logger, distDir);
   if (argv.pipeline) {
-    await buildPipeline(
-      argv.pipeline,
-      logger,
-      distDir,
-      argv.runner,
-      argv.console
-    );
+    await buildPipeline(argv.pipeline, logger, distDir, argv.console);
   } else {
     logger.info("building all pipelines");
     const rootDir = utils.getDyFolderRoot(path.resolve("."));
@@ -45,13 +39,7 @@ async function build(argv: any) {
         .slice(0, -1)
         .join(".");
       try {
-        await buildPipeline(
-          pipeline,
-          logger,
-          distDir,
-          argv.runner,
-          argv.console
-        );
+        await buildPipeline(pipeline, logger, distDir, argv.console);
         builtFiles++;
       } catch (e) {
         logger.error(`${pipeline} failed: ${e}`);
@@ -69,23 +57,21 @@ async function buildPipeline(
   pipeline: string,
   logger: Logger,
   distDir: string,
-  runner: string,
   toConsole: boolean = false
 ) {
   // copy the catalog
   await services.buildCatalog(logger, distDir);
-  process.stdout.write(`building ${pipeline} for target ${runner}...`);
+  process.stdout.write(`building ${pipeline}...`);
   const { moduleName, pipelineName } = utils.getPipelineProps(pipeline);
   try {
     // build the pipeline
-    const { pipelineFileName, code } = await services.build(
+    const { filename, code } = await services.build(
       moduleName,
       pipelineName,
-      distDir,
-      runner
+      distDir
     );
     logger.success("done");
-    logger.info(`${pipeline} - code rendered to ${pipelineFileName}`);
+    logger.info(`${pipeline} - code rendered to ${filename}`);
     if (toConsole) {
       logger.info(`Code of ${pipeline}:`);
       logger.info(`${code}`);

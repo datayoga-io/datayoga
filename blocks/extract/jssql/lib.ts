@@ -1,11 +1,4 @@
-import {
-  Connection,
-  ConnectionNotFoundError,
-  createConnection,
-  getConnection,
-  Table,
-  TableIndex,
-} from "typeorm";
+import { Table, TableIndex } from "typeorm";
 import * as path from "path";
 import * as csv from "csv-parser";
 import * as fs from "fs";
@@ -19,30 +12,7 @@ export async function extract(
   inputs: any,
   outputs: any
 ) {
-  const connDetails = runner.env.connections[props.target.connection];
-  const typeOrmProps: { [key: string]: any } = {};
-  if (connDetails["host"]) typeOrmProps["host"] = connDetails["host"];
-  if (connDetails["port"]) typeOrmProps["port"] = connDetails["port"];
-  if (connDetails["user"]) typeOrmProps["username"] = connDetails["user"];
-  if (connDetails["password"])
-    typeOrmProps["password"] = connDetails["password"];
-  if (connDetails["database"])
-    typeOrmProps["database"] = connDetails["database"];
-  typeOrmProps["name"] = props.target.connection;
-
-  // connect to DB
-  // see if we have an open connection. if not, return one.
-  let connection: Connection;
-  try {
-    connection = getConnection(props.target.connection);
-  } catch (e) {
-    if (e instanceof ConnectionNotFoundError)
-      connection = await createConnection({
-        type: connDetails["subtype"],
-        ...typeOrmProps,
-      });
-    else throw e;
-  }
+  const connection = await runner.getConnection(props.target.connection);
 
   // fetch the metadata from the catalog
   const sourceCatalogEntry = runner.catalog.get(props.source);
@@ -50,18 +20,20 @@ export async function extract(
   var tableName = props.target.table;
 
   const queryRunner = connection.createQueryRunner();
-  if (!queryRunner.getTable(tableName)) {
+  if (!(await queryRunner.getTable(tableName))) {
     await queryRunner.createTable(
       new Table({
-        name: "question",
+        name: tableName,
         columns: [
           ...sourceCatalogEntry.columns.map((column: any) => ({
             name: column.name,
             type: "string",
+            isNullable: true,
           })),
           {
             name: "_load_timestamp",
             type: "timestamp",
+            isNullable: true,
           },
         ],
       }),
@@ -85,11 +57,6 @@ export async function extract(
       path.join(runner.env.folders["data"], sourceCatalogEntry.filename)
     )
       .pipe(csv())
-      .on("end", () => {
-        console.log("done loading");
-        console.log(`loaded ` + totalLoaded + ` rows`);
-        resolve();
-      })
       .pipe(
         new Transform({
           objectMode: true,
@@ -102,10 +69,16 @@ export async function extract(
               .into(tableName)
               .values(chunk)
               .execute();
+            totalLoaded++;
             next();
           },
         })
-      );
+      )
+      .on("finish", () => {
+        console.log("done loading");
+        console.log(`loaded ` + totalLoaded + ` rows`);
+        resolve();
+      });
   });
   // connection.destroy();
   return new DyQuery(

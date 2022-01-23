@@ -25,18 +25,20 @@ export async function load(runner: any, logger: any, props: any, inputs: any) {
     const result = await insert.execute();
 
     logger.debug(result);
-    logger.info("done");
+    if (result.affected) logger.info(`${result.affected} rows affected`);
   }
   //
   // update strategy
   //
   else if (props.load_strategy == "UPDATE") {
+    // get database type. UPDATE with join varies between database.
+    let dbType = inputs["df"].connection.options.type;
     const columnsClause = props.mapping
       .map(
         (m: { source: string; target: string }) =>
-          `${props.target}.${m.target || m.source} = incoming.${
-            m.target || m.source
-          }`
+          `${
+            dbType == "sqljs" || dbType == "sqlite" ? "" : props.target + "."
+          }${m.target || m.source} = incoming.${m.target || m.source}`
       )
       .join(",");
 
@@ -74,6 +76,6 @@ export async function load(runner: any, logger: any, props: any, inputs: any) {
     const result = await update.execute();
 
     logger.debug(result);
-    logger.info("done");
+    if (result.affected) logger.info(`${result.affected} rows affected`);
   }
 }

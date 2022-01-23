@@ -3,20 +3,6 @@ import * as services from "../services";
 import * as utils from "../common/utils";
 import Logger from "../common/logger";
 
-function parseExtraArgs() {
-  // we get an array. and convert to an object where each input is its own name
-  const firstIndex = process.argv.findIndex((arg) => arg == "--");
-  if (firstIndex == -1) return {};
-
-  return process.argv
-    .slice(firstIndex + 1)
-    .reduce((map: { [name: string]: string }, obj) => {
-      let [key, value] = obj.split("=");
-      key = key.replace("--", "");
-      map[key] = value;
-      return map;
-    }, {});
-}
 async function exec(argv: any) {
   const logger = new Logger();
   const pipelineName = argv.pipeline;
@@ -25,8 +11,8 @@ async function exec(argv: any) {
     path.join(utils.getDyFolderRoot(path.resolve(".")), "data")
   );
   // fetch extra arguments
-  const args = parseExtraArgs();
-  if (argv.runner == "js") {
+  const args = utils.parseExtraArgs();
+  if (argv.runner == "js" || argv.runner == "nodejs") {
     // execute locally using js
     await services.executeLocal({
       pipelineName,

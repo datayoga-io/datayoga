@@ -1,10 +1,11 @@
-- id: sample_raw_input
+- id: sample_raw_customers
   delimiter: ","
-  filename: sample.csv
+  filename: sample_customers.csv
   filetype: delimited
   header: true
-  description: "sample file for demo"
+  description: "sample customers for demo"
   type: file
   columns:
     - name: id
-    - name: name
+    - name: first_name
+    - name: last_name

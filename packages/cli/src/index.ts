@@ -79,6 +79,11 @@ try {
               default: 8998,
               type: "number",
             },
+            local: {
+              describe: "whether to run locally or remote",
+              default: false,
+              type: "boolean",
+            },
             loglevel: {
               describe: "Logging level",
               default: "INFO",
@@ -138,6 +143,7 @@ try {
     .showHelpOnFail(true)
     .demandCommand(1, "")
     .fail(function (msg, err, yargs) {
+      console.log("fail");
       if (err && process.env.NODE_ENV == "development") throw err; // preserve stack
       if (err instanceof ValidationError) {
         if (err.blockId) {

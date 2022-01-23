@@ -1,9 +1,11 @@
 import { CodeTemplate } from "@/core/template";
 import BlockType from "@/models/BlockType";
+import Runner from "@/models/Runner";
 import * as glob from "fast-glob";
 import fs from "fs";
 import path from "path";
 import ValidationError from "./core/ValidationError";
+import * as yaml from "js-yaml";
 
 const blockDescriptors: { [component: string]: BlockType } = {};
 const jsonSchemas: { [component: string]: object } = {};
@@ -12,13 +14,7 @@ const jsonSchemas: { [component: string]: object } = {};
 // load default templates
 //
 const runners: {
-  [runner: string]: {
-    defaultBlockTemplate: CodeTemplate;
-    defaultSqlTemplate: CodeTemplate;
-    traceTemplate: CodeTemplate;
-    initTemplate: CodeTemplate;
-    alterSchemaTemplate: CodeTemplate;
-  };
+  [runner: string]: Runner;
 } = {};
 
 const runnersFolder = path.join(module.path, "..", "assets", "runners");
@@ -56,6 +52,10 @@ for (const runnerFolder of allRunnerFolders) {
     path.join(templatePath, "default.sql.template"),
     "utf8"
   );
+  // runner properties
+  const runnerProps = yaml.load(
+    fs.readFileSync(path.join(templatePath, "runner.yaml"), "utf8")
+  );
 
   runners[runnerFolder.name] = {
     defaultBlockTemplate: new CodeTemplate(defaultTemplateText),
@@ -63,6 +63,7 @@ for (const runnerFolder of allRunnerFolders) {
     traceTemplate: new CodeTemplate(traceTemplateText),
     initTemplate: new CodeTemplate(initTemplateText),
     alterSchemaTemplate: new CodeTemplate(alterSchemaTemplateText),
+    properties: runnerProps,
   };
 }
 

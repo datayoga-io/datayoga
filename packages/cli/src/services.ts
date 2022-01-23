@@ -11,23 +11,27 @@ import { Runner } from "@datayoga-io/dy-js-runner";
 export async function build(
   moduleName: string,
   pipelineName: string,
-  distDir: string,
-  runner: string
-) {
-  const formattedCode = utils.renderPipeline(moduleName, pipelineName, runner);
+  distDir: string
+): Promise<{
+  filename: string;
+  code: string;
+  runner: string;
+}> {
+  const { code, runner } = utils.renderPipeline(moduleName, pipelineName);
   const pipelineDir = path.join(distDir, "pipelines", ...moduleName.split("."));
   fs.mkdirSync(pipelineDir, { recursive: true });
-  //TODO: change not to be hardcoded
-  let extension = "py";
-  if (runner == "jssql") extension = "js";
+
+  // find the extension based on the runner properties
+  const runnerInstance = utils.getRunner(runner);
+  const extension = runnerInstance.properties.extension;
   const pipelineFileName = path.join(
     pipelineDir,
     pipelineName + "." + extension
   );
-  fs.writeFileSync(pipelineFileName, formattedCode);
+  fs.writeFileSync(pipelineFileName, code);
   fs.closeSync(fs.openSync(path.join(pipelineDir, "__init__.py"), "w"));
 
-  return { pipelineFileName, code: formattedCode };
+  return { filename: pipelineFileName, code: code, runner: runner };
 }
 
 export async function buildCatalog(logger: Logger, distDir: string) {

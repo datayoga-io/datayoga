@@ -1,4 +1,13 @@
-import { Connection, createConnection, getConnection } from "typeorm";
+import * as fs from "fs";
+import {
+  Connection,
+  ConnectionNotFoundError,
+  createConnection,
+  getConnection,
+  InsertValuesMissingError,
+  Table,
+  TableIndex,
+} from "typeorm";
 export class DyQuery {
   ctes: DyQuery[] = [];
   query;
@@ -27,8 +36,19 @@ export class DyQuery {
       this.query
     );
   }
-  execute() {
-    return this.connection?.query(this.toSQL());
+  async execute(): Promise<any> {
+    const queryRunner = this.connection?.createQueryRunner();
+    try {
+      const result = await queryRunner?.query(this.toSQL(), [], true);
+      return result;
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(`Error running statement: ${e.message}`);
+        process.exit(1);
+      } else throw e;
+    } finally {
+      if (queryRunner) queryRunner.release();
+    }
   }
 }
 export class Runner {
@@ -37,5 +57,37 @@ export class Runner {
   constructor(catalog: Map<string, any>, env: any) {
     this.catalog = catalog;
     this.env = env;
+  }
+  async getConnection(connectionName: string): Promise<Connection> {
+    const connDetails = this.env.connections[connectionName];
+    const typeOrmProps: { [key: string]: any } = {};
+    if (connDetails["host"]) typeOrmProps["host"] = connDetails["host"];
+    if (connDetails["port"]) typeOrmProps["port"] = connDetails["port"];
+    if (connDetails["user"]) typeOrmProps["username"] = connDetails["user"];
+    if (connDetails["password"])
+      typeOrmProps["password"] = connDetails["password"];
+    if (connDetails["database"]) {
+      if (connDetails["subtype"] == "sqljs") {
+        // sqljs expects the binary file as the argument. load here
+        typeOrmProps["database"] = fs.readFileSync(connDetails["database"]);
+      } else {
+        typeOrmProps["database"] = connDetails["database"];
+      }
+    }
+    typeOrmProps["name"] = connectionName;
+    // connect to DB
+    // see if we have an open connection. if not, return one.
+    let connection: Connection;
+    try {
+      connection = getConnection(connectionName);
+      return connection;
+    } catch (e) {
+      if (e instanceof ConnectionNotFoundError)
+        return createConnection({
+          type: connDetails["subtype"],
+          ...typeOrmProps,
+        });
+      else throw e;
+    }
   }
 }
