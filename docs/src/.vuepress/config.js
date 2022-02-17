@@ -65,7 +65,7 @@ let config = {
       },
       {
         text: "Github",
-        link: "https://github.com/datayoga-io/downwarddog",
+        link: "https://github.com/datayoga-io/datayoga",
       },
     ],
     // displayAllHeaders: true,

@@ -73,7 +73,7 @@ Read the [guide](https://datayoga.io/docs/guide/) for a more detailed tutorial o
 
 ## Using the Spark runner
 
-In order to run a Job as an ETL (Extract-Transform-Load) job, DataYoga support Spark.
+In order to run a Job as an ETL (Extract-Transform-Load) job, DataYoga also supports Spark as a `runner`.
 
 ### Install local Spark runner
 
