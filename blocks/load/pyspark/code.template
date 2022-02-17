@@ -8,7 +8,7 @@ common.blocks.load.load(
     {{input 'df'}},
     spark=spark,
     connection_name={{str @root.props.connection 'python'}},
-    table_name={{str @root.props.table_name 'python'}},
+    table_name={{str @root.props.target 'python'}},
     table_schema={{str @root.props.table_schema 'python'}},
     business_keys={{json @root.props.business_keys}},
     df_schema=column_mappings

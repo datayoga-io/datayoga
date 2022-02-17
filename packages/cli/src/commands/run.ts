@@ -18,7 +18,7 @@ async function run(argv: any) {
     distDir
   );
 
-  if (argv.local) {
+  if (argv.local && runner == "nodejs") {
     // fetch extra arguments
     const args = utils.parseExtraArgs();
 

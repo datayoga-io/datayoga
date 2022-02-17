@@ -42,7 +42,7 @@ def flatfile(spark, source, filename_column: str = None):
         # locate all files
         file_limit = properties.get("limit", 1)
         file_locations = common.utils.get_file_locations(
-            common.utils.get_datafolder("raw"),
+            common.utils.get_datafolder({}, "raw"),
             properties["filename"],
             limit=file_limit,
             sort=properties.get("sort", 'last_modified'),
@@ -80,7 +80,7 @@ def flatfile(spark, source, filename_column: str = None):
         #     df = common.utils.repartition_by_size(df)
 
     elif properties["filetype"] == "parquet":
-        file_location = os.path.join(common.utils.get_datafolder("raw"), properties["filename"])
+        file_location = os.path.join(common.utils.get_datafolder({}, "raw"), properties["filename"])
         df = spark.read.parquet(file_location)
 
     # logging
@@ -133,7 +133,7 @@ def jdbc(spark,
     """
     column_mapping - 'order' means map the columns by order they appear in the SQL query. 'name' match by name in the columns list
     """
-    connection = common.utils.get_connection(connection_name)
+    connection = common.utils.get_connection({}, connection_name)
     # this is an APPEND operation. load using spark
     jdbcUrl = common.db_utils.get_jdbc_url(connection)
     logger.debug(f"connecting to {jdbcUrl}")

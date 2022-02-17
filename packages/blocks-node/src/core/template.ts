@@ -110,6 +110,7 @@ export class CodeTemplate {
           language = "python";
         }
         const doubleQuot = language == "python" ? `"""` : "`";
+        if (typeof text == "undefined") return `""`;
 
         return typeof text == "string" && text.match(/(\r\n|\n|\r)/)
           ? `${doubleQuot}${text}${doubleQuot}`

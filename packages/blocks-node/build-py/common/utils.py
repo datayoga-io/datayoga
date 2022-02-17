@@ -1,3 +1,4 @@
+import pyspark.files
 import zipfile
 import yaml
 from typing import Dict, List, Any, Tuple, Pattern, Match, Optional, Set
@@ -80,14 +81,19 @@ def get_file_locations(folder, path, limit=1, sort='last_modified', ascending=Tr
         raise FileNotFoundError("can't find input file %s at %s" % (path, folder))
 
 
+def get_catalog(source: str) -> Dict[str, Any]:
+    return get_source(os.path.join(pyspark.files.SparkFiles.getRootDirectory(), "catalog.zip"), source)
+
+
 def get_source(catalog, source: str) -> Dict[str, Any]:
     catalog_zip = zipfile.ZipFile(catalog)
-    all_files = filter(lambda f: f.endswith("yaml"), catalog_zip.namelist())
-    for filename in all_files:
-        with catalog_zip.open(filename) as yamlfile:
-            catalog_entries = yaml.safe_load(yamlfile)
+    source_parts = source.split(".")
+    module = source_parts[0]
+    source_name = source_parts[1]
+    with catalog_zip.open(module+".yaml") as yamlfile:
+        catalog_entries = yaml.safe_load(yamlfile)
         for entry in catalog_entries:
-            if entry["id"] == source:
+            if entry["id"] == source_name:
                 return entry
     raise ValueError(f"no catalog entry found for {source}")
 
@@ -96,8 +102,9 @@ def get_datafolder(env, foldertype) -> str:
     env_defaults = {
         "raw": "/opt/dy/data"
     }
-    if foldertype in env["datafolders"]:
-        return env.get("datafolders", {}).get(foldertype, env_defaults.get(foldertype))
+    datafolder = env.get("datafolders", {}).get(foldertype, env_defaults.get(foldertype))
+    if datafolder:
+        return datafolder
     else:
         raise ValueError(f"no datafolder found for {foldertype}")
 

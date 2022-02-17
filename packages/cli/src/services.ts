@@ -58,8 +58,11 @@ export async function deploy({
   const catalogZipFile = await utils.zipDir(catalogDir, distDir);
 
   // deploy jobs artifact
+  // TODO: change python job runner to use new pipeline.zip instead of jobs.zip
+  const jobsZipFile = utils.toPosix(path.join(distDir, "jobs.zip"));
+  fs.copyFileSync(pipelineZipFile, jobsZipFile);
   process.stdout.write("deploying pipelines...");
-  await utils.uploadFile(pipelineZipFile, host);
+  await utils.uploadFile(jobsZipFile, host);
   console.log("done");
 
   // deploy catalog

@@ -71,16 +71,16 @@ That's it! You've created your first job that loads data from CSV, runs it throu
 
 Read the [guide](https://datayoga.io/docs/guide/) for a more detailed tutorial or check out the [reference](https://datayoga.io/docs/reference/CLI.html) to see various blocks types currently available.
 
-# Using the Spark runner
+## Using the Spark runner
 
 In order to run a Job as an ETL (Extract-Transform-Load) job, DataYoga support Spark.
 
-## Install local Spark runner
+### Install local Spark runner
 
 To run jobs locally, datayoga uses data processing technologies called `runners`. We provide a packaged docker container with a pre-installed Spark runner.
 
 ```bash
-docker run -it --name dy-spark-runner --add-host host.docker.internal:host-gateway -p 8998:8998 -p 8000:8000 -v $(pwd)/data:/opt/dy/data zalmane/dy-runner-spark:latest
+docker run -it --name dy-spark-runner --add-host host.docker.internal:host-gateway -p 8998:8998 -p 8000:8000 -v $(pwd)/data:/opt/dy/data datayoga/dy-runner-spark:latest
 ```
 
 ::: warning Note
@@ -88,9 +88,33 @@ We are mapping the volume of `/opt/dy/data` to the folder named `data`. If you a
 
 :::
 
-## Validating the install
+### Updating the job to run on pyspark
 
-Let's run our first job. It is pre-defined in the samples folder as part of the `init` command.
+To update our code to run on `pyspark` instead of `nodejs`, we will update the source yaml of our job.
+
+Open `src/pipelines/customer/sample.yaml`:
+
+On line 4, notice that `runs_on` determines the runner to use for the job:
+
+```yaml
+jobs:
+  customer-sample:
+    description: this is a basic job to load customer data from CSV file into a table
+    runs_on: nodejs
+```
+
+Change the `runs_on` key to indicate `pyspark`. Modified 4 lines should appear as:
+
+```yaml
+jobs:
+  customer-sample:
+    description: this is a basic job to load customer data from CSV file into a table
+    runs_on: pyspark
+```
+
+### Validating the install
+
+Let's re-run the sample job:
 
 ```
 dy-cli run sample.customer
@@ -106,4 +130,6 @@ If all goes well, you should see some startup logs, and eventually:
 +-----+-----+
 ```
 
-That's it! You've created your first job that loads data from CSV, runs it through Spark, and shows the data to the standard output. Not very useful, but a good start. Read on for a more detailed tutorial or check out the reference to see the different block types currently available.
+That's it! You've created your first job that loads data from CSV, runs it through Spark, and shows the data to the standard output.
+
+Read on for a more detailed tutorial or check out the reference to see the different block types currently available.
