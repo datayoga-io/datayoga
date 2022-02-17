@@ -13,6 +13,7 @@ import { ValidationError } from "@datayoga-io/blocks-node";
 yargs.usage(chalk.white.bold(figlet.textSync("DataYoga CLI")));
 try {
   yargs
+    .scriptName("dy-cli")
     .command({
       command: "init <project>",
       describe: "Scaffold a new folder with all the subdirectories",
