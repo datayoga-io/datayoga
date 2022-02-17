@@ -1,3 +1,4 @@
+import yaml
 import string
 import random
 import jaydebeapi
@@ -8,7 +9,7 @@ import pyspark.sql.types as T
 import logging
 import common.utils
 import common.db_utils
-from typing import List
+from typing import Any, List
 logger = logging.getLogger("dy_runner")
 
 
@@ -79,7 +80,9 @@ def load_jdbc(
     active_record_indicator
 ):
     # search for special _load_strategy column. This is an indication of special handling
-    connection = common.utils.get_connection(connection_name)
+    with open(os.path.join(pyspark.files.SparkFiles.getRootDirectory(), "env.yaml")) as envfile:
+        env = yaml.safe_load(envfile)
+    connection = common.utils.get_connection(env, connection_name)
     if "_load_strategy" in df.columns or load_strategy.lower() == LoadStrategy.UPDATE or load_strategy.lower() == LoadStrategy.UPSERT:
         upsert(
             df,
@@ -148,16 +151,7 @@ def upsert(
 
     # spark can only insert rows. we use a library to connect directly to JDBC sources
     # using the Jar files of Spark
-    conn = jaydebeapi.connect(
-        jdbcDriver,
-        jdbcUrl,
-        driver_args={
-            'user': connection.get('user'),
-            'password': connection.get('password'),
-            'database': connection.get('database')
-        },
-        jars=spark.sparkContext.getConf().get('spark.jars').split(",")  # spark receives a comma delimited string
-    )
+    conn = _get_jaydebe_connection(spark, connection)
     db = conn.cursor()
 
     full_table_name = common.db_utils.get_full_table_name(
@@ -253,7 +247,7 @@ def update_type2(
     table_schema: str,
     business_keys: List[str],
     df_schema,
-    inactive_record_mapping: [],
+    inactive_record_mapping: List[Any],
     active_record_indicator: str
 ):
     # bulk load to temp table
@@ -373,14 +367,19 @@ def load_to_temp_table(spark, df, table_name, table_schema, connection) -> str:
             .option("truncate", "true")
     else:
         writer = df.write.format("jdbc")
+    df.show()
+
+    if connection.get('user'):
+        writer = writer.option("user", connection.get('user'))
+    if connection.get('password'):
+        writer = writer.option("password", connection.get('password'))
+    if connection.get('database'):
+        writer = writer.option("database", connection.get('database'))
 
     writer \
         .option("driver", jdbcDriver) \
         .option("batchSize", 10000) \
         .option("dbtable", temp_table_name.upper()) \
-        .option("user", connection.get('user')) \
-        .option("password", connection.get('password')) \
-        .option("database", connection.get('database')) \
         .mode("OVERWRITE") \
         .option("url", jdbcUrl) \
         .save()
@@ -397,14 +396,17 @@ def _get_jaydebe_connection(spark, connection):
     jdbcUrl = common.db_utils.get_jdbc_url(connection)
     jdbcDriver = connection['driver']
 
+    driver_args = {}
+    if connection.get('user'):
+        driver_args['user'] = connection.get('user')
+    if connection.get('password'):
+        driver_args['password'] = connection.get('password')
+    if connection.get('database'):
+        driver_args['database'] = connection.get('database')
     conn = jaydebeapi.connect(
         jdbcDriver,
         jdbcUrl,
-        driver_args={
-            'user': connection.get('user'),
-            'password': connection.get('password'),
-            'database': connection.get('database')
-        },
+        driver_args=driver_args,
         jars=spark.sparkContext.getConf().get('spark.jars').split(",")  # spark receives a comma delimited string
     )
     return conn

@@ -33,4 +33,7 @@ def get_jdbc_url(connection) -> str:
         str: jdbc url
 
     """
-    return f"{connection['type']}:{connection['subtype']}://{connection.get('host')}:{connection.get('port')}"
+    if connection['subtype'] == 'sqlite':
+        return f"{connection['type']}:{connection['subtype']}:{connection.get('database')}"
+    else:
+        return f"{connection['type']}:{connection['subtype']}://{connection.get('host')}:{connection.get('port')}"
