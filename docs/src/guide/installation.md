@@ -69,7 +69,10 @@ dy-cli run sample.customer
 
 That's it! You've created your first job that loads data from CSV, runs it through a basic transformation, and upserts the data into a target table.
 
-Read the [guide](https://datayoga.io/docs/guide/) for a more detailed tutorial or check out the [reference](https://datayoga.io/docs/reference/CLI.html) to see various blocks types currently available.
+::: warning Note
+The samples include a copy of the SQLite northwind database. See https://github.com/jpwhite3/northwind-SQLite3 for a list of tables and data structure
+
+:::
 
 ## Using the Spark runner
 
@@ -88,28 +91,49 @@ We are mapping the volume of `/opt/dy/data` to the folder named `data`. If you a
 
 :::
 
-### Updating the job to run on pyspark
+### Running the sample pyspark pipeline
 
-To update our code to run on `pyspark` instead of `nodejs`, we will update the source yaml of our job.
+The pyspark sample is almost identical to that of nodejs.
 
-Open `src/pipelines/customer/sample.yaml`:
-
-On line 4, notice that `runs_on` determines the runner to use for the job:
+On line 4, notice that `runs_on` determines the runner to use for the job. Other than that, we will use a different source that points to the northwind sample sqlite db. Here is the contents of `src/pipelines/sample_pyspark/customer.yaml`:
 
 ```yaml
 jobs:
   customer-sample:
     description: this is a basic job to load customer data from CSV file into a table
-    runs_on: nodejs
-```
-
-Change the `runs_on` key to indicate `pyspark`. Modified 4 lines should appear as:
-
-```yaml
-jobs:
-  customer-sample:
-    description: this is a basic job to load customer data from CSV file into a table
+    # specify that this pipeline runs on pyspark. will generate python artifacts
     runs_on: pyspark
+    # each job is a series of steps
+    steps:
+      # every step has an id that can be used to reference from other steps
+      - id: extract_csv
+        # steps run reusable logic, called blocks. each block is of a certain type, specified by the 'uses' property
+        uses: extract
+        properties:
+          # the source references the entry in the catalog located under src/catalog
+          source: sample.sample_raw_customers
+          type: file
+      - id: expression
+        # trace lets us see a sample of the output data written to stdout
+        trace: true
+        # an expression block can use any SQL expression
+        uses: expression
+        properties:
+          columns:
+            - name: fullname
+              expression: first_name || ' ' || last_name
+      - id: load
+        uses: load
+        properties:
+          target_type: database
+          target: Customer
+          connection: demo_pyspark
+          load_strategy: UPDATE
+          business_keys: ["ID"]
+          mapping:
+            - source: id
+            - source: fullname
+              target: ContactName
 ```
 
 ### Validating the install
@@ -117,19 +141,28 @@ jobs:
 Let's re-run the sample job:
 
 ```
-dy-cli run sample.customer
+dy-cli run sample_pyspark.customer
 ```
 
 If all goes well, you should see some startup logs, and eventually:
 
 ```
-+-----+-----+
-|   id| name|
-+-----+-----+
-|hello|world|
-+-----+-----+
+2022-02-18 11:55:23 aee1332751d5 dy_runner[5407] INFO loading into table: Customer using load_strategy: UPDATE
+2022-02-18 11:55:24 aee1332751d5 dy_runner[5407] WARNING no schema set for table Customer. Using default database schema
+2022-02-18 11:55:24 aee1332751d5 dy_runner[5407] WARNING no schema set for table temp_Customer_PYM4NJ. Using default database schema
+2022-02-18 11:55:24 aee1332751d5 dy_runner[5407] WARNING no schema set for table Customer. Using default database schema
++---+------------------+
+| ID|       CONTACTNAME|
++---+------------------+
+|  1|Alexander Hamilton|
++---+------------------+
+
+22/02/18 11:55:25 WARN JdbcUtils: Requested isolation level 1 is not supported; falling back to default isolation level 8
+2022-02-18 11:55:25 aee1332751d5 dy_runner[5407] INFO loading into table: Customer using load_strategy: UPDATE: done
+Batch 19: success
+
 ```
 
-That's it! You've created your first job that loads data from CSV, runs it through Spark, and shows the data to the standard output.
+That's it! You've created your first job that loads data from CSV, runs it through Spark, and loads into sqlite.
 
 Read on for a more detailed tutorial or check out the reference to see the different block types currently available.

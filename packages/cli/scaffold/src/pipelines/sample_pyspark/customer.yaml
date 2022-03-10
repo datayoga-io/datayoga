@@ -1,0 +1,36 @@
+jobs:
+  customer-sample:
+    description: this is a basic job to load customer data from CSV file into a table
+    # specify that this pipeline runs on pyspark. will generate python artifacts
+    runs_on: pyspark
+    # each job is a series of steps
+    steps:
+      # every step has an id that can be used to reference from other steps
+      - id: extract_csv
+        # steps run reusable logic, called blocks. each block is of a certain type, specified by the 'uses' property
+        uses: extract
+        properties:
+          # the source references the entry in the catalog located under src/catalog
+          source: sample.sample_raw_customers
+          type: file
+      - id: expression
+        # trace lets us see a sample of the output data written to stdout
+        trace: true
+        # an expression block can use any SQL expression
+        uses: expression
+        properties:
+          columns:
+            - name: fullname
+              expression: first_name || ' ' || last_name
+      - id: load
+        uses: load
+        properties:
+          target_type: database
+          target: Customer
+          connection: demo_pyspark
+          load_strategy: UPDATE
+          business_keys: ["ID"]
+          mapping:
+            - source: id
+            - source: fullname
+              target: ContactName

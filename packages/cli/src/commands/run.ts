@@ -17,8 +17,9 @@ async function run(argv: any) {
     pipelineName,
     distDir
   );
-
-  if (argv.local && runner == "nodejs") {
+  //TODO:fix
+  console.log(runner);
+  if (runner == "jssql") {
     // fetch extra arguments
     const args = utils.parseExtraArgs();
 
