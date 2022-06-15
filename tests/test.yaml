@@ -1,0 +1,12 @@
+steps:
+  - uses: expression
+    with:
+      field: total_age
+      expression: sum([people[0].age, people[1].age])
+  - uses: rename_field
+    with:
+      from_field: fname
+      to_field: first_name
+  - uses: remove_field
+    with:
+      field: credit_card_number

@@ -1,0 +1,16 @@
+{
+  "description": "block descriptor",
+  "type": "object",
+  "properties": {
+    "field": {
+      "description": "Field",
+      "type": "string"
+    },
+    "expression": {
+      "description": "Field",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["field", "expression"]
+}
