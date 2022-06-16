@@ -1,3 +1,4 @@
+import copy
 import importlib
 import logging
 import os
@@ -30,7 +31,8 @@ class Job():
         self.steps = steps
 
     def transform(self, data: List[Dict[str, Any]], context: Any = None) -> List[Dict[str, Any]]:
+        transformed_data = copy.deepcopy(data)
         for step in self.steps:
-            data = step.transform(data, context)
+            transformed_data = step.transform(transformed_data, context)
 
-        return data
+        return transformed_data
