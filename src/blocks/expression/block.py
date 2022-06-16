@@ -1,7 +1,8 @@
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-from datayoga.dy_block import Block
+import jmespath
+from datayoga.block import Block
 
 logger = logging.getLogger(__name__)
 
@@ -9,6 +10,12 @@ logger = logging.getLogger(__name__)
 class Expression(Block):
     def init(self):
         logger.info("expression: init")
+        self.expression = jmespath.compile(self.properties["expression"])
 
-    def transform(self, data: Dict[str, Any]):
-        logger.info("expression: transform")
+    def run(self, data: List[Dict[str, Any]], context: Any = None) -> List[Dict[str, Any]]:
+        logger.info("expression: run")
+
+        for record in data:
+            record[self.properties["field"]] = self.expression.search(record)
+
+        return data

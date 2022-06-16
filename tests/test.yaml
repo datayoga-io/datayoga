@@ -1,12 +1,16 @@
 steps:
   - uses: expression
     with:
-      field: total_age
-      expression: sum([people[0].age, people[1].age])
+      field: full_name
+      expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
   - uses: rename_field
     with:
       from_field: fname
       to_field: first_name
+  - uses: rename_field
+    with:
+      from_field: lname
+      to_field: last_name
   - uses: remove_field
     with:
-      field: credit_card_number
+      field: credit_card

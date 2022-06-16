@@ -1,10 +1,12 @@
 import json
-import os
-import pkgutil
-from multiprocessing.sharedctypes import Value
+import re
 from typing import Any, Dict
 
 import yaml
+
+
+def snake_to_camel(value: str) -> str:
+    return re.sub(r'(?:^|_)(\w)', lambda x: x.group(1).upper(), value)
 
 
 def read_json(filename: str) -> Any:
