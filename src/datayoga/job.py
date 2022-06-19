@@ -30,7 +30,7 @@ class Job():
 
         self.steps = steps
 
-    def transform(self, data: List[Dict[str, Any]], context: Any = None) -> List[Dict[str, Any]]:
+    def transform(self, data: Any, context: Any = None) -> Any:
         transformed_data = copy.deepcopy(data)
         for step in self.steps:
             transformed_data = step.transform(transformed_data, context)

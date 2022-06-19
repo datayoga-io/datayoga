@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from datayoga.block import Block
 
@@ -10,10 +10,8 @@ class RemoveField(Block):
     def init(self):
         logger.info("remove_field: init")
 
-    def run(self, data: List[Dict[str, Any]], context: Any = None) -> List[Dict[str, Any]]:
+    def run(self, data: Any, context: Any = None) -> Any:
         logger.info("remove_field: run")
 
-        for record in data:
-            del record[self.properties["field"]]
-
+        del data[self.properties["field"]]
         return data

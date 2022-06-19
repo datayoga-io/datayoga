@@ -10,14 +10,15 @@ from datayoga.utils import read_yaml
 
 logger = logging.getLogger(__name__)
 
-DATA_BEFORE = [
-    {"fname": "yossi", "lname": "shirizli", "credit_card": "1234-5678-0000-9999"},
-    {"fname": "oren", "lname": "elias", "country": "israel", "credit_card": "1234-5678-0000-9999"}
-]
-
-DATA_AFTER = [
-    {"first_name": "yossi", "last_name": "shirizli", "full_name": "yossi shirizli"},
-    {"first_name": "oren", "last_name": "elias", "country": "israel", "full_name": "oren elias"}
+TEST_DATA = [
+    {
+        "before": {"fname": "yossi", "lname": "shirizli", "credit_card": "1234-5678-0000-9999"},
+        "after":  {"first_name": "yossi", "last_name": "shirizli", "full_name": "yossi shirizli"}
+    },
+    {
+        "before": {"fname": "oren", "lname": "elias", "country": "israel", "credit_card": "1234-5678-0000-9999"},
+        "after":  {"first_name": "oren", "last_name": "elias", "country": "israel", "full_name": "oren elias"}
+    }
 ]
 
 
@@ -25,14 +26,17 @@ def test_transform_oo():
     job_yaml = get_job_yaml()
     logger.debug(f"job_yaml: {job_yaml}")
     job = Job(job_yaml)
-    assert job.transform(DATA_BEFORE) == DATA_AFTER
+
+    for data in TEST_DATA:
+        assert job.transform(data["before"]) == data["after"]
 
 
 def test_transform_module():
     job_yaml = get_job_yaml()
     job = dy.compile(job_yaml)
 
-    assert dy.transform(job, DATA_BEFORE) == DATA_AFTER
+    for data in TEST_DATA:
+        assert dy.transform(job, data["before"]) == data["after"]
 
 
 def get_job_yaml():

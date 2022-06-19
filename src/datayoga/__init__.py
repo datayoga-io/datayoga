@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from datayoga.job import Job
 
@@ -12,5 +12,5 @@ def compile(job_yaml: Dict[str, Any]) -> Job:
     return job
 
 
-def transform(job: Job, data: List[Dict[str, Any]], context: Any = None) -> List[Dict[str, Any]]:
+def transform(job: Job, data: Any, context: Any = None) -> Any:
     return job.transform(data, context)

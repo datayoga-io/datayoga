@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from os import path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from jsonschema import validate
 
@@ -27,10 +27,10 @@ class Block():
     def init(self):
         pass
 
-    def transform(self, data: List[Dict[str, Any]], context: Any = None) -> List[Dict[str, Any]]:
+    def transform(self, data: Any, context: Any = None) -> Any:
         logger.info("transform")
 
         return self.run(data, context)
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def run(self, data: Any) -> Any:
         pass
