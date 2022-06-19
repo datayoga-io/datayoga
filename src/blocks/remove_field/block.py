@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 class RemoveField(Block):
     def init(self):
-        logger.info("remove_field: init")
+        logger.debug(f"Initializing {self.get_block_name()}")
 
     def run(self, data: Any, context: Context = None) -> Any:
-        logger.info("remove_field: run")
+        logger.debug(f"Running {self.get_block_name()}")
 
         del data[self.properties["field"]]
         return data

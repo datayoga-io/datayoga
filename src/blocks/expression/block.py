@@ -18,7 +18,7 @@ class Language(Enum):
 
 class Expression(Block):
     def init(self):
-        logger.info("expression: init")
+        logger.debug(f"Initializing {self.get_block_name()}")
         self.language = self.properties.get("language", Language.JMESPATH.value)
         if self.language == Language.JMESPATH.value:
             self.expression = jmespath.compile(self.properties["expression"])
@@ -26,7 +26,7 @@ class Expression(Block):
             self.conn = sqlite3.connect(":memory")
 
     def run(self, data: Any, context: Context = None) -> Any:
-        logger.info("expression: run")
+        logger.debug(f"Running {self.get_block_name()}")
 
         if self.language == Language.JMESPATH.value:
             data[self.properties["field"]] = self.expression.search(data)

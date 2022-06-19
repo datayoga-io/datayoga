@@ -1,5 +1,5 @@
 {
-  "description": "DataYoga job descriptor",
+  "description": "Job descriptor",
   "type": "object",
   "properties": {
     "steps": {

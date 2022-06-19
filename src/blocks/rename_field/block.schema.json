@@ -1,5 +1,5 @@
 {
-  "description": "block descriptor",
+  "description": "Block descriptor",
   "type": "object",
   "properties": {
     "from_field": {

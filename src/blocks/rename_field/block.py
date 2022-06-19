@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 class RenameField(Block):
     def init(self):
-        logger.info("rename_field: init")
+        logger.debug(f"Initializing {self.get_block_name()}")
 
     def run(self, data: Any, context: Context = None) -> Any:
-        logger.info("rename_field: run")
+        logger.debug(f"Running {self.get_block_name()}")
 
         data[self.properties["to_field"]] = data.pop(self.properties["from_field"])
         return data

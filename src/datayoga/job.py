@@ -15,8 +15,20 @@ logger = logging.getLogger(__name__)
 
 
 class Job():
+    """
+    Job
+
+    Attributes:
+        steps List[Block]: List of steps
+    """
 
     def __init__(self, job_yaml: Dict[str, Any]):
+        """
+        Constructs a job and its blocks
+
+        Args:
+            job_yaml (Dict[str, Any]): Job YAML
+        """
         validate(instance=job_yaml, schema=utils.read_json(
             path.join(os.path.dirname(__file__), "schemas", "job.schema.json")))
 
@@ -32,6 +44,16 @@ class Job():
         self.steps = steps
 
     def transform(self, data: Any, context: Context = None) -> Any:
+        """
+        Transforms data
+
+        Args:
+            data (Any): Data
+            context (Context, optional): Context. Defaults to None.
+
+        Returns:
+            Any: Transformed data
+        """
         transformed_data = copy.deepcopy(data)
         for step in self.steps:
             transformed_data = step.transform(transformed_data, context)
