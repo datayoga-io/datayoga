@@ -22,17 +22,18 @@ def compile(job_yaml: Dict[str, Any]) -> Job:
     return job
 
 
-def transform(job: Job, data: Any, context: Context = None) -> Any:
+def transform(job_yaml: Dict[str, Any], data: Any, context: Context = None) -> Any:
     """
     Transforms data against a certain job
 
     Args:
-        job (Job): Job to transform against
+        job_yaml (Dict[str, Any]): Job in YAML format
         data (Any): Data to transform
         context (Context, optional): Context. Defaults to None.
 
     Returns:
         Any: Transformed data
     """
+    job = compile(job_yaml)
     logger.debug("Transforming data")
     return job.transform(data, context)

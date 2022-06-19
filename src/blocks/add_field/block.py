@@ -4,7 +4,7 @@ from enum import Enum, unique
 from typing import Any
 
 import jmespath
-from datayoga.block import Block
+from datayoga.block import Block as DyBlock
 from datayoga.context import Context
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class Language(Enum):
     SQL = "sql"
 
 
-class Expression(Block):
+class Block(DyBlock):
     def init(self):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.language = self.properties.get("language", Language.JMESPATH.value)

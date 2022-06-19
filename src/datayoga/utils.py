@@ -1,21 +1,7 @@
 import json
-import re
 from typing import Any, Dict
 
 import yaml
-
-
-def snake_to_camel(value: str) -> str:
-    """
-    Converts string in snake format to camel case format
-
-    Args:
-        value (str): String in snake format
-
-    Returns:
-        str: String in camel case format
-    """
-    return re.sub(r'(?:^|_)(\w)', lambda x: x.group(1).upper(), value)
 
 
 def read_json(filename: str) -> Any:

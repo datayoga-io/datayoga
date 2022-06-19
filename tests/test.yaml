@@ -1,5 +1,5 @@
 steps:
-  - uses: expression
+  - uses: add_field
     with:
       field: full_name
       language: jmespath
@@ -15,7 +15,7 @@ steps:
   - uses: remove_field
     with:
       field: credit_card
-  - uses: expression
+  - uses: add_field
     with:
       field: country
       language: sql

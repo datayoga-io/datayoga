@@ -31,12 +31,19 @@ def test_transform_oo():
         assert job.transform(data["before"]) == data["after"]
 
 
-def test_transform_module():
+def test_compile_and_transform_module():
     job_yaml = get_job_yaml()
     job = dy.compile(job_yaml)
 
     for data in TEST_DATA:
-        assert dy.transform(job, data["before"]) == data["after"]
+        assert job.transform(data["before"]) == data["after"]
+
+
+def test_transform_module():
+    job_yaml = get_job_yaml()
+
+    for data in TEST_DATA:
+        assert dy.transform(job_yaml, data["before"]) == data["after"]
 
 
 def get_job_yaml():

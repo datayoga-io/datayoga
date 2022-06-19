@@ -38,7 +38,7 @@ class Job():
             module_name = "blocks" + "." + block_name + "." + "block"
             module = importlib.import_module(module_name)
 
-            block: Block = getattr(module, utils.snake_to_camel(block_name))(step["with"])
+            block: Block = getattr(module, "Block")(step["with"])
             steps.append(block)
 
         self.steps = steps
