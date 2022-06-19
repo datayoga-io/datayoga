@@ -7,7 +7,7 @@
       "type": "string"
     },
     "expression": {
-      "description": "Field",
+      "description": "Expression",
       "type": "string"
     },
     "language": {
@@ -17,5 +17,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["field", "language", "expression"]
+  "required": ["field", "expression", "language"]
 }
