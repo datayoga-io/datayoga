@@ -9,8 +9,13 @@
     "expression": {
       "description": "Field",
       "type": "string"
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "pattern": "jmespath|sql"
     }
   },
   "additionalProperties": false,
-  "required": ["field", "expression"]
+  "required": ["field", "language", "expression"]
 }

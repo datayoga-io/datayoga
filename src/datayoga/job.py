@@ -9,6 +9,7 @@ from jsonschema import validate
 
 from datayoga import utils
 from datayoga.block import Block
+from datayoga.context import Context
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class Job():
 
         self.steps = steps
 
-    def transform(self, data: Any, context: Any = None) -> Any:
+    def transform(self, data: Any, context: Context = None) -> Any:
         transformed_data = copy.deepcopy(data)
         for step in self.steps:
             transformed_data = step.transform(transformed_data, context)

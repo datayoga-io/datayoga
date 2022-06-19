@@ -2,6 +2,7 @@ steps:
   - uses: expression
     with:
       field: full_name
+      language: jmespath
       expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
   - uses: rename_field
     with:
@@ -14,3 +15,14 @@ steps:
   - uses: remove_field
     with:
       field: credit_card
+  - uses: expression
+    with:
+      field: country
+      language: sql
+      expression: country_code || ' - ' || UPPER(country_name)
+  - uses: remove_field
+    with:
+      field: country_name
+  - uses: remove_field
+    with:
+      field: country_code

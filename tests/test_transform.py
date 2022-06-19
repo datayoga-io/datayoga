@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 TEST_DATA = [
     {
-        "before": {"fname": "yossi", "lname": "shirizli", "credit_card": "1234-5678-0000-9999"},
-        "after":  {"first_name": "yossi", "last_name": "shirizli", "full_name": "yossi shirizli"}
+        "before": {"fname": "yossi", "lname": "shirizli", "country_code": 972, "country_name": "israel", "credit_card": "1234-5678-0000-9999"},
+        "after":  {"first_name": "yossi", "last_name": "shirizli", "country": "972 - ISRAEL", "full_name": "yossi shirizli"}
     },
     {
-        "before": {"fname": "oren", "lname": "elias", "country": "israel", "credit_card": "1234-5678-0000-9999"},
-        "after":  {"first_name": "oren", "last_name": "elias", "country": "israel", "full_name": "oren elias"}
+        "before": {"fname": "oren", "lname": "elias", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999"},
+        "after":  {"first_name": "oren", "last_name": "elias", "country": "1 - USA", "full_name": "oren elias"}
     }
 ]
 
