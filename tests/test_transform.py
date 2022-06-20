@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 TEST_DATA = [
     {
-        "before": {"fname": "yossi", "lname": "shirizli", "country_code": 972, "country_name": "israel", "credit_card": "1234-5678-0000-9999"},
-        "after":  {"first_name": "yossi", "last_name": "shirizli", "country": "972 - ISRAEL", "full_name": "yossi shirizli"}
+        "before": {"fname": "yossi", "lname": "shirizli", "country_code": 972, "country_name": "israel", "credit_card": "1234-5678-0000-9999", "gender": "M"},
+        "after":  {"first_name": "yossi", "last_name": "shirizli", "country": "972 - ISRAEL", "full_name": "yossi shirizli", "greeting": "Hello Mr. yossi shirizli"}
     },
     {
-        "before": {"fname": "oren", "lname": "elias", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999"},
-        "after":  {"first_name": "oren", "last_name": "elias", "country": "1 - USA", "full_name": "oren elias"}
+        "before": {"fname": "jane", "lname": "smith", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999", "gender": "F"},
+        "after":  {"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"}
     }
 ]
 

@@ -16,16 +16,20 @@ class Block(DyBlock):
         self.language = self.properties["language"]
 
         if self.language == Language.JMESPATH.value:
-            self.expression = jmespath.compile(self.properties["expression"])
+            self.expressions = {}
+            for field in self.properties["object"]:
+                self.expressions[field] = jmespath.compile(self.properties["object"][field])
         elif self.language == Language.SQL.value:
             self.conn = get_connection()
 
     def run(self, data: Any, context: Context = None) -> Any:
         logger.debug(f"Running {self.get_block_name()}")
 
-        if self.language == Language.JMESPATH.value:
-            data[self.properties["field"]] = self.expression.search(data)
-        elif self.language == Language.SQL.value:
-            data[self.properties["field"]] = exec_sql(self.conn, data.items(), self.properties["expression"])
+        new_data = {}
+        for field in self.properties["object"]:
+            if self.language == Language.JMESPATH.value:
+                new_data[field] = self.expressions[field].search(data)
+            elif self.language == Language.SQL.value:
+                new_data[field] = exec_sql(self.conn, data.items(), self.properties["object"][field])
 
-        return data
+        return new_data
