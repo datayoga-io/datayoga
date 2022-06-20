@@ -1,0 +1,29 @@
+name: dy-unit-tests
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      # Setup Python (faster than using Python container)
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          cd src
+          pip install . 
+          pip install .[test]
+
+      - name: Run tests
+        run: |
+          PYTHONPATH=src python -m pytest --log-cli-level=DEBUG

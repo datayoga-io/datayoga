@@ -1,0 +1,16 @@
+{
+  "description": "Block descriptor",
+  "type": "object",
+  "properties": {
+    "from_field": {
+      "description": "From field",
+      "type": "string"
+    },
+    "to_field": {
+      "description": "To field",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["from_field", "to_field"]
+}
