@@ -1,0 +1,17 @@
+{
+  "description": "Block descriptor",
+  "type": "object",
+  "properties": {
+    "object": {
+      "description": "Object",
+      "type": "object"
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "pattern": "jmespath|sql"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["object", "language"]
+}
