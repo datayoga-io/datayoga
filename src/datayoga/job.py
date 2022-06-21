@@ -35,7 +35,7 @@ class Job():
         steps: List[Block] = []
         for step in job_settings["steps"]:
             block_name = step["uses"]
-            module_name = "blocks" + "." + block_name + "." + "block"
+            module_name = f"datayoga.blocks.{block_name}.block"
             module = importlib.import_module(module_name)
 
             block: Block = getattr(module, "Block")(step["with"])
