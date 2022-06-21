@@ -1,6 +1,6 @@
 import sqlite3
 from sqlite3 import Connection
-from typing import Any
+from typing import Any, List, Tuple
 
 
 def get_connection() -> Connection:
@@ -12,12 +12,12 @@ def get_connection() -> Connection:
     return sqlite3.connect(":memory")
 
 
-def exec_sql(conn: Connection, fields: Any, expression: str) -> Any:
+def exec_sql(conn: Connection, fields: List[Tuple], expression: str) -> Any:
     """Executes an SQL statement
 
     Args:
         conn (Connection): Connection
-        fields (Any): Fields
+        fields (List[Tuple]): Fields
         expression (str): Expression
 
     Returns:
