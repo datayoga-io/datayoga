@@ -75,6 +75,15 @@ class JMESPathExpression(Expression):
 
 
 def get_expression_class(language: Language, expression: str) -> Expression:
+    """Gets a compiled expression class based on the language
+
+    Args:
+        language (Language): Language
+        expression (str): Expression
+
+    Returns:
+        Expression: Expression class
+    """
     if language == Language.JMESPATH.value:
         expression_class = JMESPathExpression()
     elif language == Language.SQL.value:
