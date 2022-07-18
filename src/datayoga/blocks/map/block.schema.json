@@ -2,8 +2,8 @@
   "description": "Block descriptor",
   "type": "object",
   "properties": {
-    "object": {
-      "description": "Object",
+    "expression": {
+      "description": "Expression",
       "type": "object"
     },
     "language": {
@@ -13,5 +13,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["object", "language"]
+  "required": ["expression", "language"]
 }
