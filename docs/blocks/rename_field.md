@@ -1,6 +1,6 @@
 ---
 parent: Blocks Reference
-layout: default
+layout: page
 ---
 
 # Rename field
