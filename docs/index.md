@@ -91,12 +91,7 @@ As can be seen, the record has been transformed based on the job:
 
 ## Block reference
 
-`datayoga-py` contains these blocks out of the box:
-
-- add_field
-- map
-- removed_field
-- rename_field
+For a full list of supported block types [see reference](blocks.md).
 
 ### Examples
 
