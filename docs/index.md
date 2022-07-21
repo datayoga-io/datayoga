@@ -1,6 +1,7 @@
 ---
 title: Quickstart
 layout: page
+nav_order: 3
 ---
 
 # datayoga-py

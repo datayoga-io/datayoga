@@ -32,7 +32,7 @@ jobs:
           echo 
           for schema in ./src/datayoga/blocks/**/*.schema.json; \
             do npx jsonschema2mk@latest --schema $schema --extension yaml-examples \
-              --extension front-matter --fm.parent "Blocks Reference" --fm.layout default > \
+              --extension front-matter --fm.parent "Blocks Reference" --fm.layout page > \
             ./docs/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
           sed -i '/<a name="root"><\/a>/d' ./docs/blocks/*.md
       - name: push to repo
