@@ -1,5 +1,6 @@
 {
-  "description": "Block descriptor",
+  "title": "Remove field",
+  "description": "Remove a field",
   "type": "object",
   "properties": {
     "field": {
