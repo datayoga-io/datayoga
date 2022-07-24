@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd src
+          cd datayoga
           pip install . 
           pip install .[test]
 
