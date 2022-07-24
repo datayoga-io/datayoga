@@ -36,7 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
-          SOURCE: cli
+          SOURCE: src
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
       - name: Set output with new version tag with v prefix
         id: vars
@@ -44,7 +44,7 @@ jobs:
       - name: update pyproject.toml
         run: |
           pip install bump2version
-          cd cli
+          cd src
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
       #
       # build
