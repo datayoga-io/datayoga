@@ -83,15 +83,6 @@ As can be seen, the record has been transformed based on the job:
 - `full_name` field added based on a [JMESPath](https://jmespath.org/) expression.
 - `greeting` field added based on an SQL expression.
 
-## Block reference
-
-`datayoga-py` contains these blocks out of the box:
-
-- add_field
-- map
-- removed_field
-- rename_field
-
 ### Examples
 
 - Add a new field `country` out of an SQL expression that concatenates `country_code` and `country_name` fields after upper case the later:
@@ -120,3 +111,5 @@ As can be seen, the record has been transformed based on the job:
   with:
     field: credit_card
   ```
+
+For a full list of supported block types [see reference](https://datayoga-io.github.io/datayoga-py/).
