@@ -13,6 +13,14 @@ back_to_top_text: "Back to top"
 
 footer_content: "Copyright DataYoga"
 
+# Aux links for the upper right navigation
+aux_links:
+  "DataYoga on GitHub":
+    - "//github.com/datayoga-io"
+
+# Makes Aux links open in a new tab. Default is false
+aux_links_new_tab: false
+
 # variables exposed in the markdown files as {{ site.<VARIABLE_NAME> }}
 titles_from_headings:
   enabled:     true
