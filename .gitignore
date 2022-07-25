@@ -119,9 +119,8 @@ venv.bak/
 
 # mkdocs documentation
 /site
-/_site
-.jekyll-cache
-
+_site/
+.jekyll-cache/
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -129,3 +128,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+:memory
