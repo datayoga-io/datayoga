@@ -32,11 +32,40 @@ class Expression():
         """
         pass
 
+    def test(self, data: Any) -> bool:
+        """Test a where clause for an SQL statement
+
+        Args:
+            data (Any): Data
+
+        Returns:
+            boolean: True if matches, else False
+        """
+        pass
+
 
 class SQLExpression(Expression):
     def compile(self, expression: str):
         self.conn = sqlite3.connect(":memory")
         self.expression = expression
+
+    def test(self, data: Any) -> bool:
+        """Test a where clause for an SQL statement
+
+        Args:
+            data (Any): Data
+
+        Returns:
+            boolean: True if matches, else False
+        """
+        clauses = []
+        for k, v in data.items():
+            clauses.append(f"{json.dumps(v)} as '{k}'")
+
+        from_clause = f"select {','.join(clauses)}"
+        print(f"select 1 from ({from_clause}) where {self.expression}")
+        print(self.conn.execute(f"select 1 from ({from_clause}) where {self.expression}").fetchone())
+        return self.conn.execute(f"select 1 from ({from_clause}) where {self.expression}").fetchone() is not None
 
     def search(self, data: Any) -> Any:
         try:
@@ -59,7 +88,7 @@ class SQLExpression(Expression):
         """
         clauses = []
         for k, v in data.items():
-            clauses.append(f"'{v}' as '{k}'")
+            clauses.append(f"{json.dumps(v)} as '{k}'")
 
         from_clause = f"select {','.join(clauses)}"
 
@@ -69,6 +98,10 @@ class SQLExpression(Expression):
 class JMESPathExpression(Expression):
     def compile(self, expression: str):
         self.expression = jmespath.compile(expression)
+        self.filter_expression = jmespath.compile(f"[?{expression}]")
+
+    def test(self, data: Any) -> bool:
+        return len(self.filter_expression.search(data)) > 0
 
     def search(self, data: Any) -> Any:
         return self.expression.search(data)

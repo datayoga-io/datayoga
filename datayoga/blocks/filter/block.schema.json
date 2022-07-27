@@ -1,0 +1,24 @@
+{
+  "description": "Filter records",
+  "title": "Filter records",
+  "type": "object",
+  "properties": {
+    "expression": {
+      "description": "Expression",
+      "type": "string"
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "enum": ["jmespath","sql"]
+    }
+  },
+  "additionalProperties": false,
+  "required": ["expression", "language"],
+  "examples": [
+    {
+      "language": "sql",
+      "expression": "age>20"
+    }
+  ]
+}
