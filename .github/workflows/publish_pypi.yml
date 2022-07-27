@@ -36,7 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
-          SOURCE: src
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
       - name: Set output with new version tag with v prefix
         id: vars
@@ -44,18 +43,16 @@ jobs:
       - name: update pyproject.toml
         run: |
           pip install bump2version
-          cd src
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
       #
       # build
       #
       - name: Build
         run: |
-          cd src
           poetry build
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
-          packages_dir: src/dist/
+          packages_dir: dist/

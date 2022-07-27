@@ -1,3 +1,9 @@
+---
+title: Quickstart
+layout: page
+nav_order: 3
+---
+
 # datayoga-py
 
 ## Introduction
@@ -7,7 +13,7 @@
 ## Installation
 
 ```bash
-pip install datayoga
+pip install datayoga-py
 ```
 
 ## Quick start
@@ -83,6 +89,10 @@ As can be seen, the record has been transformed based on the job:
 - `full_name` field added based on a [JMESPath](https://jmespath.org/) expression.
 - `greeting` field added based on an SQL expression.
 
+## Block reference
+
+For a full list of supported block types [see reference](blocks.md).
+
 ### Examples
 
 - Add a new field `country` out of an SQL expression that concatenates `country_code` and `country_name` fields after upper case the later:
@@ -111,5 +121,3 @@ As can be seen, the record has been transformed based on the job:
   with:
     field: credit_card
   ```
-
-For a full list of supported block types [see reference](https://datayoga-io.github.io/datayoga-py/).
