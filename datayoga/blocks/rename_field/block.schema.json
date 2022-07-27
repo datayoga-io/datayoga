@@ -1,5 +1,6 @@
 {
-  "description": "Block descriptor",
+  "title": "Rename field",
+  "description": "Renames a field. All other fields remain unchanged",
   "type": "object",
   "properties": {
     "from_field": {

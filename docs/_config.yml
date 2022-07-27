@@ -1,0 +1,28 @@
+# Jekyll configuration file (used by GitHub Pages)
+remote_theme: just-the-docs/just-the-docs
+source: docs
+title: DataYoga
+name: DataYoga
+description: DataYoga transformation engine
+
+markdown: kramdown
+search_enabled: false
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+footer_content: "Copyright DataYoga"
+
+# Aux links for the upper right navigation
+aux_links:
+  "DataYoga on GitHub":
+    - "//github.com/datayoga-io"
+
+# Makes Aux links open in a new tab. Default is false
+aux_links_new_tab: false
+
+# variables exposed in the markdown files as {{ site.<VARIABLE_NAME> }}
+titles_from_headings:
+  enabled:     true
+  strip_title: false
+  collections: false

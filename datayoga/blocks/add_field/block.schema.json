@@ -1,5 +1,6 @@
 {
-  "description": "Block descriptor",
+  "description": "Add a field to a record",
+  "title": "Add a field",
   "type": "object",
   "properties": {
     "field": {
@@ -13,7 +14,7 @@
     "language": {
       "description": "Language",
       "type": "string",
-      "pattern": "jmespath|sql"
+      "enum": ["jmespath","sql"]
     }
   },
   "additionalProperties": false,
