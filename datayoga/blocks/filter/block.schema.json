@@ -1,6 +1,6 @@
 {
-  "description": "Filter records",
   "title": "Filter records",
+  "description": "Filter records",
   "type": "object",
   "properties": {
     "expression": {
