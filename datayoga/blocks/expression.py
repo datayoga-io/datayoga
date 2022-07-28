@@ -124,8 +124,8 @@ class JMESPathExpression(Expression):
         self.expression = jmespath.compile(expression)
         self.filter_expression = jmespath.compile(f"[?{expression}]")
 
-    def test(self, data: Any) -> bool:
-        return len(self.filter_expression.search(data)) > 0
+    def filter(self, data: Any) -> bool:
+        return self.filter_expression.search(data)
 
     def search(self, data: Any) -> Any:
         return self.expression.search(data)

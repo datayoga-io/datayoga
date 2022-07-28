@@ -16,7 +16,4 @@ class Block(DyBlock):
 
     def run(self, data: Any, context: Context = None) -> Any:
         logger.debug(f"Running {self.get_block_name()}")
-        if self.language == expression.Language.SQL.value:
-            return self.expression.filter(data)
-        else:
-            return self.expression.test(data[0])
+        return self.expression.filter(data)
