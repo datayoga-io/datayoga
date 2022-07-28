@@ -12,11 +12,11 @@ class Block(DyBlock):
     def init(self):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.language = self.properties["language"]
-        self.expression = expression.get_expression_class(self.language, self.properties["expression"])
+        self.expression = expression.compile(self.language, self.properties["expression"])
 
     def run(self, data: Any, context: Context = None) -> Any:
         logger.debug(f"Running {self.get_block_name()}")
-        if self.expression.test(data[0] if self.language == expression.Language.SQL.value else data):
-            return data
+        if self.language == expression.Language.SQL.value:
+            return self.expression.filter(data)
         else:
-            return []
+            return self.expression.test(data[0])

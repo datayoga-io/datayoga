@@ -14,5 +14,6 @@ class Block(DyBlock):
     def run(self, data: Any, context: Context = None) -> Any:
         logger.debug(f"Running {self.get_block_name()}")
 
-        del data[self.properties["field"]]
+        for row in data:
+            del row[self.properties["field"]]
         return data

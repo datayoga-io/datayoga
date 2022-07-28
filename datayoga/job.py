@@ -57,5 +57,4 @@ class Job():
         transformed_data = copy.deepcopy(data)
         for step in self.steps:
             transformed_data = step.transform(transformed_data, context)
-
         return transformed_data

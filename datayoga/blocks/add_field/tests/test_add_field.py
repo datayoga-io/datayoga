@@ -5,4 +5,5 @@ def test_add_field():
     block = Block({"field": "full_name",
                    "language": "jmespath",
                    "expression": "[fname,lname] | join(' ', @)"})
-    assert block.run({"fname": "john", "lname": "doe"}) == {"fname": "john", "lname": "doe", "full_name": "john doe"}
+    assert block.run([{"fname": "john", "lname": "doe"}]) == [
+        {"fname": "john", "lname": "doe", "full_name": "john doe"}]
