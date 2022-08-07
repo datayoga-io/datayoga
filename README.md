@@ -55,7 +55,7 @@ steps:
           last_name: last_name,
           greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
           country: country,
-          full_name: full_name
+          full_name: full_name,
         }
       language: sql
 ```
@@ -113,3 +113,25 @@ As can be seen, the record has been transformed based on the job:
   ```
 
 For a full list of supported block types [see reference](https://datayoga-io.github.io/datayoga-py/).
+
+## Expression language
+
+DataYoga supports both SQL and [JMESPath](https://jmespath.org/) expressions. JMESPath are especially useful to handle nested JSON data, while SQL is more suited to flat row-like structures.
+
+### JMESPath custom functions
+
+DataYoga adds the following custom functions to the standard JMESPath library:
+
+** concat **
+
+description: concatenate an array of variables or literals
+
+example:
+
+input: `{fname: "john", lname: "doe"}`
+
+expression: `concat([fname,' ',lname])`
+
+output: `john doe`
+
+note: this is equivalent to the more verbose built-in expression: `' '.join([fname,lname])`
