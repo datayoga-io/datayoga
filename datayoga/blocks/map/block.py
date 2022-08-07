@@ -18,9 +18,6 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
         return_data = []
         for row in data:
-            print(row)
-            print(self.properties)
-            print(self.expression)
             return_data.append(self.expression.search(row))
 
         return return_data
