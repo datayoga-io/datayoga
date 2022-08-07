@@ -1,7 +1,7 @@
 import json
 import sqlite3
 from enum import Enum, unique
-from typing import Any, List
+from typing import Any, Dict, List
 
 import jmespath
 
@@ -32,24 +32,13 @@ class Expression():
         """
         pass
 
-    def test(self, data: Any) -> bool:
-        """Test a where clause for an SQL statement
-
-        Args:
-            data (Any): Data
-
-        Returns:
-            boolean: True if matches, else False
-        """
-        pass
-
 
 class SQLExpression(Expression):
     def compile(self, expression: str):
         self.conn = sqlite3.connect(":memory")
         self.expression = expression
 
-    def filter(self, data: List[Any]) -> List[Any]:
+    def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Test a where clause for an SQL statement
 
         Args:
@@ -84,7 +73,7 @@ class SQLExpression(Expression):
         # use a CTE to create the in memory data structure
         return f"with data({columns_clause}) as (values {values_clause})"
 
-    def search(self, data: Any) -> Any:
+    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         try:
             fields = json.loads(self.expression)
             new_data = {}

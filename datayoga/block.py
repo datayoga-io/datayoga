@@ -46,7 +46,7 @@ class Block():
         """
         pass
 
-    def transform(self, data: List[Dict[str, Any]], context: Context = None) -> Any:
+    def transform(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         """
         Transforms data
 
