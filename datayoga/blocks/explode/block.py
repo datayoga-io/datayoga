@@ -1,9 +1,7 @@
-import json
 import logging
 from typing import Any, Dict, List
 
 from datayoga.block import Block as DyBlock
-from datayoga.blocks import expression
 from datayoga.context import Context
 
 logger = logging.getLogger(__name__)
@@ -12,12 +10,17 @@ logger = logging.getLogger(__name__)
 class Block(DyBlock):
     def init(self):
         logger.debug(f"Initializing {self.get_block_name()}")
-        self.expression = expression.compile(self.properties["language"], json.dumps(self.properties["expression"]))
+        self.target_field = self.properties.get("target_field", self.properties.get("field"))
+        self.delimiter = self.properties.get("delimiter", ",")
+        self.field = self.properties["field"]
 
     def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
         return_data = []
         for row in data:
-            return_data.append(self.expression.search(row))
+            # explode the field
+            split_values = row[self.properties["field"]].split(self.properties["delimiter"])
+            # add a list of the items with the new field
+            return_data.extend([dict({self.target_field: value}, **row,) for value in split_values])
 
         return return_data

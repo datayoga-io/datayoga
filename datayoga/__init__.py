@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from datayoga.context import Context
 from datayoga.job import Job
@@ -22,7 +22,9 @@ def compile(job_settings: Dict[str, Any]) -> Job:
     return job
 
 
-def transform(job_settings: Dict[str, Any], data: Any, context: Context = None) -> Any:
+def transform(job_settings: Dict[str, Any],
+              data: List[Dict[str, Any]],
+              context: Context = None) -> List[Dict[str, Any]]:
     """
     Transforms data against a certain job
 

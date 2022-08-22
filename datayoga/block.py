@@ -64,14 +64,14 @@ class Block():
 
         return transformed_data
 
-    def run(self, data: Any) -> Any:
+    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """ Transforms data (abstract, should be implemented by the sub class)
 
         Args:
-            data (Any): Data
+            data (List[Dict[str, Any]]): Data
 
         Returns:
-            Any: Transformed data
+            List[Dict[str, Any]]: Transformed data
         """
         pass
 
