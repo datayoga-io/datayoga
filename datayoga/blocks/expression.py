@@ -22,14 +22,14 @@ class Expression():
         """
         pass
 
-    def search(self, data: Any) -> Any:
+    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Executes the expression on a given data
 
         Args:
-            data (Any): data
+            data (List[Dict[str, Any]]): Data
 
         Returns:
-            Any: transformed data
+            List[Dict[str, Any]]: Transformed data
         """
         pass
 
@@ -43,10 +43,10 @@ class SQLExpression(Expression):
         """Tests a where clause for an SQL statement
 
         Args:
-            data (Any): Data
+            data (List[Dict[str, Any]]): Data
 
         Returns:
-            boolean: True if matches, else False
+            List[Dict[str, Any]]: Filtered data
         """
         # use a CTE to create the in memory data structure
         cte_clause = self._get_cte(data)
@@ -84,14 +84,14 @@ class SQLExpression(Expression):
         except:
             return self.exec_sql(data, self.expression)
 
-    def exec_sql(self, data: Any, expression: str) -> Any:
+    def exec_sql(self, data: List[Dict[str, Any]], expression: str) -> List[Dict[str, Any]]:
         """Executes an SQL statement
 
         Args:
-            data (Any): Data
+            data (List[Dict[str, Any]]): Data
 
         Returns:
-            Any: Query result
+            List[Dict[str, Any]]: Query result
         """
         # use a CTE to create the in memory data structure
         data_inner = data if isinstance(data, list) else [data]

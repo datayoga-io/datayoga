@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any
+from typing import Any, Dict, List
 
 from datayoga.block import Block as DyBlock
 from datayoga.blocks import expression
@@ -14,7 +14,7 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.expression = expression.compile(self.properties["language"], json.dumps(self.properties["expression"]))
 
-    def run(self, data: Any, context: Context = None) -> Any:
+    def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
         return_data = []
         for row in data:

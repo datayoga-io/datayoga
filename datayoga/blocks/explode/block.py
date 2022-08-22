@@ -1,8 +1,7 @@
 import logging
-from typing import Any
+from typing import Any, Dict, List
 
 from datayoga.block import Block as DyBlock
-from datayoga.blocks import expression
 from datayoga.context import Context
 
 logger = logging.getLogger(__name__)
@@ -15,7 +14,7 @@ class Block(DyBlock):
         self.delimiter = self.properties.get("delimiter", ",")
         self.field = self.properties["field"]
 
-    def run(self, data: Any, context: Context = None) -> Any:
+    def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
         return_data = []
         for row in data:
