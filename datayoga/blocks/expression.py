@@ -4,7 +4,6 @@ from enum import Enum, unique
 from typing import Any, Dict, List
 
 import jmespath
-
 from datayoga.blocks.jmespath_custom_functions import JmespathCustomFunctions
 
 
@@ -41,7 +40,7 @@ class SQLExpression(Expression):
         self.expression = expression
 
     def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Test a where clause for an SQL statement
+        """Tests a where clause for an SQL statement
 
         Args:
             data (Any): Data
@@ -118,10 +117,10 @@ class JMESPathExpression(Expression):
         self.expression = jmespath.compile(expression)
         self.filter_expression = jmespath.compile(f"[?{expression}]")
 
-    def filter(self, data: Any) -> bool:
+    def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         return self.filter_expression.search(data, options=self.options)
 
-    def search(self, data: Any) -> Any:
+    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         return self.expression.search(data, options=self.options)
 
 
