@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Dict, List
 
 from datayoga.block import Block as DyBlock
 from datayoga.context import Context
@@ -11,8 +11,9 @@ class Block(DyBlock):
     def init(self):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-    def run(self, data: Any, context: Context = None) -> Any:
+    def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
 
-        del data[self.properties["field"]]
+        for row in data:
+            del row[self.properties["field"]]
         return data

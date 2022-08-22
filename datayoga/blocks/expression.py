@@ -1,7 +1,7 @@
 import json
 import sqlite3
 from enum import Enum, unique
-from typing import Any
+from typing import Any, Dict, List
 
 import jmespath
 
@@ -38,7 +38,42 @@ class SQLExpression(Expression):
         self.conn = sqlite3.connect(":memory")
         self.expression = expression
 
-    def search(self, data: Any) -> Any:
+    def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Tests a where clause for an SQL statement
+
+        Args:
+            data (Any): Data
+
+        Returns:
+            boolean: True if matches, else False
+        """
+        # use a CTE to create the in memory data structure
+        cte_clause = self._get_cte(data)
+
+        column_names = data[0].keys()
+        # fetch the CTE and bind the variables
+        data_values = [row.get(colname) for row in data for colname in column_names]
+        self.conn.row_factory = sqlite3.Row
+
+        cursor = self.conn.execute(
+            f"{cte_clause} select * from data where {self.expression}", data_values
+        )
+        return [dict(row) for row in cursor.fetchall()]
+
+    def _get_cte(self, data: List[Any]) -> str:
+        # builds a CTE expression for fetching in memory data
+
+        column_names = data[0].keys()
+        columns_clause = ','.join(f"`{col}`" for col in column_names)
+
+        # values in the form of (?,?), (?,?)
+        values_clause_row = f"({','.join('?'*len(column_names))})"
+        values_clause = ','.join([values_clause_row]*len(data))
+
+        # use a CTE to create the in memory data structure
+        return f"with data({columns_clause}) as (values {values_clause})"
+
+    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         try:
             fields = json.loads(self.expression)
             new_data = {}
@@ -57,24 +92,35 @@ class SQLExpression(Expression):
         Returns:
             Any: Query result
         """
-        clauses = []
-        for k, v in data.items():
-            clauses.append(f"'{v}' as '{k}'")
+        # use a CTE to create the in memory data structure
+        data_inner = data if isinstance(data, list) else [data]
+        cte_clause = self._get_cte(data_inner)
 
-        from_clause = f"select {','.join(clauses)}"
+        column_names = data_inner[0].keys()
 
-        return self.conn.execute(f"select {expression} from ({from_clause})").fetchone()[0]
+        # fetch the CTE and bind the variables
+        data_values = [row.get(colname) for row in data_inner for colname in column_names]
+        self.conn.row_factory = sqlite3.Row
+        cursor = self.conn.execute(
+            f"{cte_clause} select {expression} from data", data_values
+        )
+
+        return cursor.fetchone()[0]
 
 
 class JMESPathExpression(Expression):
     def compile(self, expression: str):
         self.expression = jmespath.compile(expression)
+        self.filter_expression = jmespath.compile(f"[?{expression}]")
 
-    def search(self, data: Any) -> Any:
+    def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        return self.filter_expression.search(data)
+
+    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         return self.expression.search(data)
 
 
-def get_expression_class(language: Language, expression: str) -> Expression:
+def compile(language: Language, expression: str) -> Expression:
     """Gets a compiled expression class based on the language
 
     Args:

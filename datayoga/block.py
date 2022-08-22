@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from os import path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from jsonschema import validate
 
@@ -46,7 +46,7 @@ class Block():
         """
         pass
 
-    def transform(self, data: Any, context: Context = None) -> Any:
+    def transform(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         """
         Transforms data
 
