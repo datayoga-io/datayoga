@@ -10,7 +10,7 @@
 pip install datayoga
 ```
 
-## Quick start
+## Quick Start
 
 This demonstrates how to transform data using a DataYoga job.
 
@@ -60,7 +60,7 @@ steps:
       language: sql
 ```
 
-### Transform data using `datayoga-py`
+### Transform Data Using `datayoga-py`
 
 Use this code snippet to transform a data record using the job defined [above](#create-a-job):
 
@@ -113,3 +113,15 @@ As can be seen, the record has been transformed based on the job:
   ```
 
 For a full list of supported block types [see reference](https://datayoga-io.github.io/datayoga-py/).
+
+## Expression Language
+
+DataYoga supports both SQL and [JMESPath](https://jmespath.org/) expressions. JMESPath are especially useful to handle nested JSON data, while SQL is more suited to flat row-like structures.
+
+### JMESPath Custom Functions
+
+DataYoga adds the following custom functions to the standard JMESPath library:
+
+| Function | Description                                     | Example                                                                                                         | Comments                                                                               |
+| -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `concat` | Concatenates an array of variables or literals. | Input: `{fname: "john", lname: "doe"}` <br /> Expression: `concat([fname,' ',lname])` <br /> Output: `john doe` | This is equivalent to the more verbose built-in expression: `' '.join([fname,lname])`. |
