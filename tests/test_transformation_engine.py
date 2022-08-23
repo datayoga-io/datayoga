@@ -45,6 +45,23 @@ def test_transform_module():
         assert dy.transform(job_settings, data["before"]) == data["after"]
 
 
+def test_validate_valid_job():
+    job_settings = get_job_settings_from_test_yaml()
+    (is_job_valid, validation_error) = dy.validate(job_settings)
+
+    assert is_job_valid == True
+    assert validation_error is None
+
+
+def test_validate_invalid_job():
+    # `with` key is missing in this block
+    job_settings = {"steps": [{"uses": "add_field"}]}
+    (is_job_valid, validation_error) = dy.validate(job_settings)
+
+    assert is_job_valid == False
+    assert validation_error is not None
+
+
 def get_job_settings_from_test_yaml():
     job_settings = read_yaml(path.join(os.path.dirname(os.path.realpath(__file__)), "test.yaml"))
     logger.debug(f"job_settings: {job_settings}")
