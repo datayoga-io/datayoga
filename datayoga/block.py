@@ -51,11 +51,11 @@ class Block():
         Transforms data
 
         Args:
-            data (Any): Data
+            data (List[Dict[str, Any]]): Data
             context (Context, optional): Context. Defaults to None.
 
         Returns:
-            Any: Transformed data
+            List[Dict[str, Any]]: Transformed data
         """
         logger.debug(f"Transforming data, data before: {data}")
 
