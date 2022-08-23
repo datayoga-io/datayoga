@@ -17,8 +17,10 @@
             "type": "object"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": ["uses", "with"]
       }
     }
-  }
+  },
+  "required": ["steps"]
 }
