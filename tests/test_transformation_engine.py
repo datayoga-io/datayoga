@@ -5,6 +5,7 @@ import os
 from os import path
 
 import datayoga as dy
+import pytest
 from datayoga.job import Job
 from datayoga.utils import read_yaml
 
@@ -43,6 +44,19 @@ def test_transform_module():
 
     for data in TEST_DATA:
         assert dy.transform(job_settings, data["before"]) == data["after"]
+
+
+def test_validate_valid_job():
+    job_settings = get_job_settings_from_test_yaml()
+    dy.validate(job_settings)
+
+
+def test_validate_invalid_job():
+    # `with` key is missing in this block
+    job_settings = {"steps": [{"uses": "add_field"}]}
+
+    with pytest.raises(ValueError):
+        dy.validate(job_settings)
 
 
 def get_job_settings_from_test_yaml():

@@ -11,12 +11,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: "0"
-      - uses: actions/checkout@v2
+      - name: Check out repository code
+        uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
       - name: Install dependencies
@@ -24,10 +22,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel poetry twine
       # bump version type based on branch
-      - if: github.ref=='refs/heads/main'
+      - if: github.ref == 'refs/heads/main'
         run: |
           echo "BUMP_TYPE=minor" >> $GITHUB_ENV
-      - if: github.ref!='refs/heads/main'
+      - if: github.ref != 'refs/heads/main'
         run: |
           echo "BUMP_TYPE=patch" >> $GITHUB_ENV
 
