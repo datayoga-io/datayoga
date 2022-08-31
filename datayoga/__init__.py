@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from datayoga.context import Context
 from datayoga.job import Job
@@ -21,26 +21,21 @@ def compile(job_settings: Dict[str, Any]) -> Job:
     return Job(job_settings)
 
 
-def validate(job_settings: Dict[str, Any]) -> Tuple[bool, str]:
+def validate(job_settings: Dict[str, Any]):
     """
     Validates a job in YAML 
 
     Args:
         job_settings (Dict[str, Any]): Job settings
 
-    Returns:
-        Tuple[bool, str]: Indication if the job is valid or not. If not, specify the validation error.
+    Raises:
+        ValueError: when the job is invalid
     """
     logger.debug("Validating job")
-    is_job_valid = True
-    validation_error = None
     try:
         Job(job_settings)
     except Exception as e:
-        is_job_valid = False
-        validation_error = e
-
-    return (is_job_valid, validation_error)
+        raise ValueError(e)
 
 
 def transform(job_settings: Dict[str, Any],
