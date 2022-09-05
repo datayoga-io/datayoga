@@ -14,14 +14,15 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.properties = utils.format_block_properties(self.properties)
 
+        self.compiled_expressions = []
         for property in self.properties["fields"]:
-            property["compiled_expression"] = expression.compile(property["language"], property["expression"])
+            self.compiled_expressions.append(expression.compile(property["language"], property["expression"]))
 
     def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
 
         for row in data:
-            for property in self.properties["fields"]:
-                row[property["field"]] = property["compiled_expression"].search(row)
+            for index, property in enumerate(self.properties["fields"]):
+                row[property["field"]] = self.compiled_expressions[index].search(row)
 
         return data
