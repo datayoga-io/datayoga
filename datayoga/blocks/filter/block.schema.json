@@ -1,29 +1,24 @@
 {
   "title": "Filter records",
   "description": "Filter records",
-  "type": "array",
+  "type": "object",
   "properties": {
-    "items": {
-      "type": "object",
-      "properties": {
-        "expression": {
-          "description": "Expression",
-          "type": "string"
-        },
-        "language": {
-          "description": "Language",
-          "type": "string",
-          "enum": ["jmespath", "sql"]
-        }
-      },
-      "additionalProperties": false,
-      "required": ["expression", "language"],
-      "examples": [
-        {
-          "language": "sql",
-          "expression": "age>20"
-        }
-      ]
+    "expression": {
+      "description": "Expression",
+      "type": "string"
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "enum": ["jmespath", "sql"]
     }
-  }
+  },
+  "additionalProperties": false,
+  "required": ["expression", "language"],
+  "examples": [
+    {
+      "language": "sql",
+      "expression": "age>20"
+    }
+  ]
 }

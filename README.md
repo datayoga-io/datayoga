@@ -22,23 +22,26 @@ Use this `example.yaml`:
 steps:
   - uses: add_field
     with:
-      - field: full_name
-        language: jmespath
-        expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
-      - field: country
-        language: sql
-        expression: country_code || ' - ' || UPPER(country_name)
+      fields:
+        - field: full_name
+          language: jmespath
+          expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
+        - field: country
+          language: sql
+          expression: country_code || ' - ' || UPPER(country_name)
   - uses: rename_field
     with:
-      - from_field: fname
-        to_field: first_name
-      - from_field: lname
-        to_field: last_name
+      fields:
+        - from_field: fname
+          to_field: first_name
+        - from_field: lname
+          to_field: last_name
   - uses: remove_field
     with:
-      - field: credit_card
-      - field: country_name
-      - field: country_code
+      fields:
+        - field: credit_card
+        - field: country_name
+        - field: country_code
   - uses: map
     with:
       expression:
@@ -92,10 +95,11 @@ As can be seen, the record has been transformed based on the job:
   ```yaml
   uses: rename_field
   with:
-    - from_field: fname
-      to_field: first_name
-    - from_field: lname
-      to_field: last_name
+    fields:
+      - from_field: fname
+        to_field: first_name
+      - from_field: lname
+        to_field: last_name
   ```
 
 - Remove `credit_card` field:

@@ -1,18 +1,30 @@
 {
-  "title": "Remove field",
-  "description": "Remove a field",
-  "type": "array",
+  "title": "Remove fields",
+  "description": "Remove fields",
+  "type": "object",
   "properties": {
-    "items": {
-      "type": "object",
+    "fields": {
+      "type": "array",
+      "description": "Fields",
       "properties": {
-        "field": {
-          "description": "Field",
-          "type": "string"
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "description": "Field",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": ["field"]
         }
-      },
-      "additionalProperties": false,
-      "required": ["field"]
+      }
+    },
+    "field": {
+      "description": "Field",
+      "type": "string"
     }
-  }
+  },
+  "additionalProperties": false,
+  "oneOf": [{ "required": ["fields"] }, { "required": ["field"] }]
 }

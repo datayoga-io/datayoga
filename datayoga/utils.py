@@ -36,3 +36,15 @@ def read_yaml(filename: str) -> Dict[str, Any]:
             return yaml.safe_load(stream)
     except Exception as e:
         raise ValueError(f"Malformed YAML: {e}")
+
+
+def format_block_properties(properties: Dict[str, Any]) -> Dict[str, Any]:
+    """Adds fields array with the passed properties in case ir's missing
+
+    Args:
+        properties (Dict[str, Any]): properties
+
+    Returns:
+        Dict[str, Any]: formatted properties with `fields` array
+    """
+    return {"fields": [properties]} if not "fields" in properties else properties

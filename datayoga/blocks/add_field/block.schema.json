@@ -1,27 +1,51 @@
 {
-  "description": "Add a field to a record",
-  "title": "Add a field",
-  "type": "array",
+  "description": "Add fields to a record",
+  "title": "Add fields",
+  "type": "object",
   "properties": {
-    "items": {
-      "type": "object",
+    "fields": {
+      "type": "array",
+      "description": "Fields",
       "properties": {
-        "field": {
-          "description": "Field",
-          "type": "string"
-        },
-        "expression": {
-          "description": "Expression",
-          "type": "string"
-        },
-        "language": {
-          "description": "Language",
-          "type": "string",
-          "enum": ["jmespath", "sql"]
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "description": "Field",
+              "type": "string"
+            },
+            "expression": {
+              "description": "Expression",
+              "type": "string"
+            },
+            "language": {
+              "description": "Language",
+              "type": "string",
+              "enum": ["jmespath", "sql"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["field", "expression", "language"]
         }
-      },
-      "additionalProperties": false,
-      "required": ["field", "expression", "language"]
+      }
+    },
+    "field": {
+      "description": "Field",
+      "type": "string"
+    },
+    "expression": {
+      "description": "Expression",
+      "type": "string"
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "enum": ["jmespath", "sql"]
     }
-  }
+  },
+  "additionalProperties": false,
+  "oneOf": [
+    { "required": ["fields"] },
+    { "required": ["field", "expression", "language"] }
+  ]
 }
