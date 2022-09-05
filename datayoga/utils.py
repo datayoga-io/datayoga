@@ -39,7 +39,7 @@ def read_yaml(filename: str) -> Dict[str, Any]:
 
 
 def format_block_properties(properties: Dict[str, Any]) -> Dict[str, Any]:
-    """Adds fields array with the passed properties in case ir's missing
+    """Adds `fields` array with the passed properties in case it's missing
 
     Args:
         properties (Dict[str, Any]): properties
