@@ -3,18 +3,35 @@ parent: Blocks Reference
 layout: page
 ---
 
-# Add a field
+# Add fields
 
-Add a field to a record
+Add fields to a record
 
 
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**field**|`string`|Field<br/>|yes|
-|**expression**|`string`|Expression<br/>|yes|
-|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
+|[**fields**](#fields)|`array`|Fields<br/>||
+|**field**|`string`|Field<br/>||
+|**expression**|`string`|Expression<br/>||
+|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>||
 
 **Additional Properties:** not allowed  
+   
+**Option 1 (alternative):** 
+**No properties.**
+
+
+   
+**Option 2 (alternative):** 
+**No properties.**
+
+
+<a name="fields"></a>
+## fields\[\]: array
+
+Fields
+
+
 

@@ -1,8 +1,34 @@
 {
-  "description": "Add a field to a record",
-  "title": "Add a field",
+  "description": "Add fields to a record",
+  "title": "Add fields",
   "type": "object",
   "properties": {
+    "fields": {
+      "type": "array",
+      "description": "Fields",
+      "properties": {
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "description": "Field",
+              "type": "string"
+            },
+            "expression": {
+              "description": "Expression",
+              "type": "string"
+            },
+            "language": {
+              "description": "Language",
+              "type": "string",
+              "enum": ["jmespath", "sql"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["field", "expression", "language"]
+        }
+      }
+    },
     "field": {
       "description": "Field",
       "type": "string"
@@ -14,9 +40,12 @@
     "language": {
       "description": "Language",
       "type": "string",
-      "enum": ["jmespath","sql"]
+      "enum": ["jmespath", "sql"]
     }
   },
   "additionalProperties": false,
-  "required": ["field", "expression", "language"]
+  "oneOf": [
+    { "required": ["fields"] },
+    { "required": ["field", "expression", "language"] }
+  ]
 }

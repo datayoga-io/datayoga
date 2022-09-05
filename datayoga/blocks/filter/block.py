@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 class Block(DyBlock):
     def init(self):
         logger.debug(f"Initializing {self.get_block_name()}")
-        self.language = self.properties["language"]
-        self.expression = expression.compile(self.language, self.properties["expression"])
+        self.expression = expression.compile(self.properties["language"], self.properties["expression"])
 
     def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")

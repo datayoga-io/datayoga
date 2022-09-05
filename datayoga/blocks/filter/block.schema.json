@@ -10,7 +10,7 @@
     "language": {
       "description": "Language",
       "type": "string",
-      "enum": ["jmespath","sql"]
+      "enum": ["jmespath", "sql"]
     }
   },
   "additionalProperties": false,

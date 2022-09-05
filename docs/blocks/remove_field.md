@@ -3,16 +3,33 @@ parent: Blocks Reference
 layout: page
 ---
 
-# Remove field
+# Remove fields
 
-Remove a field
+Remove fields
 
 
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**field**|`string`|Field<br/>|yes|
+|[**fields**](#fields)|`array`|Fields<br/>||
+|**field**|`string`|Field<br/>||
 
 **Additional Properties:** not allowed  
+   
+**Option 1 (alternative):** 
+**No properties.**
+
+
+   
+**Option 2 (alternative):** 
+**No properties.**
+
+
+<a name="fields"></a>
+## fields\[\]: array
+
+Fields
+
+
 
