@@ -22,34 +22,26 @@ Use this `example.yaml`:
 steps:
   - uses: add_field
     with:
-      field: full_name
-      language: jmespath
-      expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
+      - field: full_name
+        language: jmespath
+        expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
+      - field: country
+        language: sql
+        expression: country_code || ' - ' || UPPER(country_name)
   - uses: rename_field
     with:
-      from_field: fname
-      to_field: first_name
-  - uses: rename_field
-    with:
-      from_field: lname
-      to_field: last_name
+      - from_field: fname
+        to_field: first_name
+      - from_field: lname
+        to_field: last_name
   - uses: remove_field
     with:
-      field: credit_card
-  - uses: add_field
-    with:
-      field: country
-      language: sql
-      expression: country_code || ' - ' || UPPER(country_name)
-  - uses: remove_field
-    with:
-      field: country_name
-  - uses: remove_field
-    with:
-      field: country_code
+      - field: credit_card
+      - field: country_name
+      - field: country_code
   - uses: map
     with:
-      object:
+      expression:
         {
           first_name: first_name,
           last_name: last_name,
@@ -95,13 +87,15 @@ As can be seen, the record has been transformed based on the job:
     expression: country_code || ' - ' || UPPER(country_name)
   ```
 
-- Rename field `lname` to `last_name`:
+- Rename `fname` field to `first_name` and `lname` field to `last_name`:
 
   ```yaml
   uses: rename_field
   with:
-    from_field: lname
-    to_field: last_name
+    - from_field: fname
+      to_field: first_name
+    - from_field: lname
+      to_field: last_name
   ```
 
 - Remove `credit_card` field:

@@ -1,13 +1,18 @@
 {
   "title": "Remove field",
   "description": "Remove a field",
-  "type": "object",
+  "type": "array",
   "properties": {
-    "field": {
-      "description": "Field",
-      "type": "string"
+    "items": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "description": "Field",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["field"]
     }
-  },
-  "additionalProperties": false,
-  "required": ["field"]
+  }
 }

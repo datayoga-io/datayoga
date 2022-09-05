@@ -14,7 +14,7 @@
           },
           "with": {
             "description": "Properties",
-            "type": "object"
+            "type": ["object", "array"]
           }
         },
         "additionalProperties": false,

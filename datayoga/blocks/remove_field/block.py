@@ -15,5 +15,7 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
 
         for row in data:
-            del row[self.properties["field"]]
+            for property in self.properties:
+                del row[property["field"]]
+
         return data

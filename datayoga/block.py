@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from os import path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from jsonschema import validate
 
@@ -20,14 +20,14 @@ class Block():
         properties Dict[str, Any]: Block properties
     """
 
-    def __init__(self, properties: Dict[str, Any]):
+    def __init__(self, properties: Union[Dict[str, Any], List[Dict[str, Any]]]):
         """
         Constructs a block
 
         Args:
-            properties (Dict[str, Any]): Block [properties]
+            properties (Union[Dict[str, Any], List[Dict[str, Any]]]): Block [properties]
         """
-        self.properties = properties
+        self.properties = properties if isinstance(properties, list) else [properties]
         self.validate()
         self.init()
 

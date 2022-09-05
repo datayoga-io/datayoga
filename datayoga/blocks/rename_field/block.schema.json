@@ -1,17 +1,22 @@
 {
   "title": "Rename field",
   "description": "Renames a field. All other fields remain unchanged",
-  "type": "object",
+  "type": "array",
   "properties": {
-    "from_field": {
-      "description": "From field",
-      "type": "string"
-    },
-    "to_field": {
-      "description": "To field",
-      "type": "string"
+    "items": {
+      "type": "object",
+      "properties": {
+        "from_field": {
+          "description": "From field",
+          "type": "string"
+        },
+        "to_field": {
+          "description": "To field",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["from_field", "to_field"]
     }
-  },
-  "additionalProperties": false,
-  "required": ["from_field", "to_field"]
+  }
 }

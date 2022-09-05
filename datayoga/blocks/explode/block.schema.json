@@ -1,22 +1,27 @@
 {
   "description": "Split a field into multiple records",
   "title": "Explode",
-  "type": "object",
+  "type": "array",
   "properties": {
-    "field": {
-      "description": "Field",
-      "type": "string"
-    },
-    "target_field": {
-      "description": "Target field to add to the result. If omitted, the source field name will be used",
-      "type": "string"
-    },
-    "delimiter": {
-      "description": "Delimiter to use for splitting the source field",
-      "type": "string",
-      "default": ","
+    "items": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "description": "Field",
+          "type": "string"
+        },
+        "target_field": {
+          "description": "Target field to add to the result. If omitted, the source field name will be used",
+          "type": "string"
+        },
+        "delimiter": {
+          "description": "Delimiter to use for splitting the source field",
+          "type": "string",
+          "default": ","
+        }
+      },
+      "additionalProperties": false,
+      "required": ["field"]
     }
-  },
-  "additionalProperties": false,
-  "required": ["field"]
+  }
 }

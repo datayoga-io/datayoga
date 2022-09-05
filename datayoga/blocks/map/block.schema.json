@@ -1,18 +1,23 @@
 {
   "title": "Map record",
   "description": "Maps a record into a new output based on expressions",
-  "type": "object",
+  "type": "array",
   "properties": {
-    "expression": {
-      "description": "Expression",
-      "type": "object"
-    },
-    "language": {
-      "description": "Language",
-      "type": "string",
-      "enum": ["jmespath","sql"]
+    "items": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Expression",
+          "type": "object"
+        },
+        "language": {
+          "description": "Language",
+          "type": "string",
+          "enum": ["jmespath", "sql"]
+        }
+      },
+      "additionalProperties": false,
+      "required": ["expression", "language"]
     }
-  },
-  "additionalProperties": false,
-  "required": ["expression", "language"]
+  }
 }
