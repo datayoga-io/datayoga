@@ -18,6 +18,7 @@ class Block(DyBlock):
 
         for row in data:
             for property in self.properties["fields"]:
-                row[property["to_field"]] = row.pop(property["from_field"])
+                if property["from_field"] in row:
+                    row[property["to_field"]] = row.pop(property["from_field"])
 
         return data
