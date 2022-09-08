@@ -1,26 +1,19 @@
 {
   "description": "Job descriptor",
-  "type": "object",
-  "properties": {
-    "steps": {
-      "description": "Steps",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "uses": {
-            "description": "Block type",
-            "type": "string"
-          },
-          "with": {
-            "description": "Properties",
-            "type": ["object", "array"]
-          }
-        },
-        "additionalProperties": false,
-        "required": ["uses", "with"]
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "uses": {
+        "description": "Block type",
+        "type": "string"
+      },
+      "with": {
+        "description": "Properties",
+        "type": ["object", "array"]
       }
-    }
-  },
-  "required": ["steps"]
+    },
+    "additionalProperties": false,
+    "required": ["uses", "with"]
+  }
 }

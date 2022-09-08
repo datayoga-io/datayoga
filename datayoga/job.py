@@ -22,18 +22,18 @@ class Job():
         steps List[Block]: List of steps
     """
 
-    def __init__(self, job_settings: Dict[str, Any]):
+    def __init__(self, job_steps: List[Dict[str, Any]]):
         """
         Constructs a job and its blocks
 
         Args:
-            job_settings (Dict[str, Any]): Job settings
+            job_steps (List[Dict[str, Any]]): Job steps
         """
-        validate(instance=job_settings, schema=utils.read_json(
+        validate(instance=job_steps, schema=utils.read_json(
             path.join(os.path.dirname(__file__), "schemas", "job.schema.json")))
 
         steps: List[Block] = []
-        for step in job_settings["steps"]:
+        for step in job_steps:
             block_name = step["uses"]
             module_name = f"datayoga.blocks.{block_name}.block"
             try:
