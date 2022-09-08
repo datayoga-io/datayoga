@@ -53,7 +53,7 @@ def test_validate_valid_job():
 
 def test_validate_invalid_job():
     # `with` key is missing in this block
-    job_settings = {"steps": [{"uses": "add_field"}]}
+    job_settings = [{"uses": "add_field"}]
 
     with pytest.raises(ValueError):
         dy.validate(job_settings)
