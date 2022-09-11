@@ -18,6 +18,14 @@ class Block(DyBlock):
 
         for row in data:
             for property in self.properties["fields"]:
-                del row[property["field"]]
+                obj = row
+                from_field_path = property["field"].split(".")
+
+                for index, key in enumerate(from_field_path):
+                    if key in obj:
+                        if len(from_field_path) == index + 1:
+                            del obj[key]
+                        else:
+                            obj = obj[key]
 
         return data

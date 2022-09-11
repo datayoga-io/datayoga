@@ -18,7 +18,35 @@ class Block(DyBlock):
 
         for row in data:
             for property in self.properties["fields"]:
-                if property["from_field"] in row:
-                    row[property["to_field"]] = row.pop(property["from_field"])
+                key_found = True
+                obj = row
+                value = None
+                from_field_path = property["from_field"].split(".")
+
+                for index, key in enumerate(from_field_path):
+                    if key in obj:
+                        if len(from_field_path) == index + 1:
+                            value = obj[key]
+                            del obj[key]
+                        else:
+                            obj = obj[key]
+                    else:
+                        key_found = False
+                        break
+
+                if key_found:
+                    obj = row
+                    to_field_path = property["to_field"].split(".")
+
+                    for key in to_field_path[:-1]:
+                        if key in obj:
+                            obj = obj[key]
+                        else:
+                            obj[key] = {}
+
+                    if key in obj:
+                        obj = obj[key]
+
+                    obj[to_field_path[-1:][0]] = value
 
         return data
