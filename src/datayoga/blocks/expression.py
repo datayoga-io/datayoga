@@ -35,7 +35,8 @@ class Expression():
 
 class SQLExpression(Expression):
     def compile(self, expression: str):
-        self.conn = sqlite3.connect(":memory")
+        # we turn off check_same_thread to gain performance benefit by reusing the same connection object. safe to use since we are only creating in memory structures
+        self.conn = sqlite3.connect(":memory:", check_same_thread=False)
         self.expression = expression
 
     def search(self, data: Any) -> Any:
