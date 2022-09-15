@@ -1,4 +1,7 @@
 import json
+import os
+import sys
+from os import path
 from typing import Any, Dict
 
 import yaml
@@ -48,3 +51,12 @@ def format_block_properties(properties: Dict[str, Any]) -> Dict[str, Any]:
         Dict[str, Any]: formatted properties with `fields` array
     """
     return {"fields": [properties]} if not "fields" in properties else properties
+
+
+def get_resource_path(relative_path: str) -> str:
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        # we are running in a bundle
+        return path.join(sys._MEIPASS, "resources", relative_path)
+    else:
+        # we are running in a normal Python environment
+        return path.join(os.path.dirname(__file__), "resources", relative_path)
