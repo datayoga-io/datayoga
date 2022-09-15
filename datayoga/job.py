@@ -2,7 +2,6 @@ import copy
 import importlib
 import logging
 import os
-from os import path
 from typing import Any, Dict, List
 
 from jsonschema import validate
@@ -30,7 +29,7 @@ class Job():
             job_steps (List[Dict[str, Any]]): Job steps
         """
         validate(instance=job_steps, schema=utils.read_json(
-            path.join(os.path.dirname(__file__), "schemas", "job.schema.json")))
+            utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
 
         steps: List[Block] = []
         for step in job_steps:
