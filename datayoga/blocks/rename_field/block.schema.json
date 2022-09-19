@@ -22,7 +22,21 @@
               }
             },
             "additionalProperties": false,
-            "required": ["from_field", "to_field"]
+            "required": ["from_field", "to_field"],
+            "examples": [
+              {
+                "fields": [
+                  {
+                    "from_field": "name.lname",
+                    "to_field": "name.last_name"
+                  },
+                  {
+                    "from_field": "name.fname",
+                    "to_field": "name.first_name"
+                  }
+                ]
+              }
+            ]
           }
         }
       },
@@ -42,7 +56,13 @@
         }
       },
       "additionalProperties": false,
-      "required": ["from_field", "to_field"]
+      "required": ["from_field", "to_field"],
+      "examples": [
+        {
+          "from_field": "name.lname",
+          "to_field": "name.last_name"
+        }
+      ]
     }
   ]
 }

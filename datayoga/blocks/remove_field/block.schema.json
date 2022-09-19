@@ -23,7 +23,19 @@
         }
       },
       "required": ["fields"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "examples": [
+        {
+          "fields": [
+            {
+              "field": "credit_card"
+            },
+            {
+              "field": "name.mname"
+            }
+          ]
+        }
+      ]
     },
     {
       "description": "Remove one field",
@@ -34,7 +46,12 @@
         }
       },
       "additionalProperties": false,
-      "required": ["field"]
+      "required": ["field"],
+      "examples": [
+        {
+          "field": "credit_card"
+        }
+      ]
     }
   ]
 }
