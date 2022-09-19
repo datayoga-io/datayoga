@@ -8,28 +8,60 @@ layout: page
 Remove fields
 
 
+   
+**Option 1 (alternative):** 
+Remove multiple fields
+
+
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|[**fields**](#fields)|`array`|Fields<br/>||
-|**field**|`string`|Field<br/>||
+|[**fields**](#option1fields)|`object[]`|Fields<br/>|yes|
 
 **Additional Properties:** not allowed  
-   
-**Option 1 (alternative):** 
-**No properties.**
+**Example**
+
+```yaml
+fields:
+  - {}
+
+```
 
 
    
 **Option 2 (alternative):** 
-**No properties.**
+Remove one field
 
 
-<a name="fields"></a>
-## fields\[\]: array
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**field**|`string`|Field<br/>|yes|
+
+**Additional Properties:** not allowed  
+
+<a name="option1fields"></a>
+## Option 1: fields\[\]: array
 
 Fields
 
+
+**Items**
+
+**Item Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**field**|`string`|Field<br/>|yes|
+
+**Item Additional Properties:** not allowed  
+**Example**
+
+```yaml
+- {}
+
+```
 
 
