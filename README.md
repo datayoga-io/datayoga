@@ -24,7 +24,7 @@ Use this `example.yaml`:
     fields:
       - field: full_name
         language: jmespath
-        expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
+        expression: concat([fname, ' ' , lname])
       - field: country
         language: sql
         expression: country_code || ' - ' || UPPER(country_name)
