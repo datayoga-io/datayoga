@@ -24,7 +24,8 @@ Remove multiple fields
 
 ```yaml
 fields:
-  - {}
+  - field: credit_card
+  - field: name.mname
 
 ```
 
@@ -41,6 +42,13 @@ Remove one field
 |**field**|`string`|Field<br/>|yes|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+field: credit_card
+
+```
+
 
 <a name="option1fields"></a>
 ## Option 1: fields\[\]: array

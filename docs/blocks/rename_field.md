@@ -24,7 +24,11 @@ Rename multiple fields
 
 ```yaml
 fields:
-  - {}
+  - fields:
+      - from_field: name.lname
+        to_field: name.last_name
+      - from_field: name.fname
+        to_field: name.first_name
 
 ```
 
@@ -42,6 +46,14 @@ Rename one field
 |**to\_field**|`string`|To field<br/>|yes|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+from_field: name.lname
+to_field: name.last_name
+
+```
+
 
 <a name="option1fields"></a>
 ## Option 1: fields\[\]: array
@@ -62,7 +74,11 @@ Fields
 **Example**
 
 ```yaml
-- {}
+- fields:
+    - from_field: name.lname
+      to_field: name.last_name
+    - from_field: name.fname
+      to_field: name.first_name
 
 ```
 

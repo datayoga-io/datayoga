@@ -20,7 +20,9 @@ Split a field into multiple records
 **Example**
 
 ```yaml
-delimiter: ','
+field: features
+target_field: feature
+delimiter: ;
 
 ```
 

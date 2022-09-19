@@ -24,7 +24,12 @@ Add multiple fields
 
 ```yaml
 fields:
-  - {}
+  - field: name.full_name
+    language: jmespath
+    expression: concat([name.fname, ' ', name.lname])
+  - field: name.fname_upper
+    language: jmespath
+    expression: upper(name.fname)
 
 ```
 
@@ -43,6 +48,15 @@ Add one field
 |**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+field: country
+language: sql
+expression: country_code || ' - ' || UPPER(country_name)
+
+```
+
 
 <a name="option1fields"></a>
 ## Option 1: fields\[\]: array
