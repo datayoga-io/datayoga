@@ -2,40 +2,47 @@
   "title": "Rename fields",
   "description": "Renames fields. All other fields remain unchanged",
   "type": "object",
-  "properties": {
-    "fields": {
-      "type": "array",
-      "description": "Fields",
-      "properties": {
-        "items": {
-          "type": "object",
-          "properties": {
-            "from_field": {
-              "description": "From field",
-              "type": "string"
-            },
-            "to_field": {
-              "description": "To field",
-              "type": "string"
-            }
-          },
-          "additionalProperties": false,
-          "required": ["from_field", "to_field"]
-        }
-      }
-    },
-    "from_field": {
-      "description": "From field",
-      "type": "string"
-    },
-    "to_field": {
-      "description": "To field",
-      "type": "string"
-    }
-  },
-  "additionalProperties": false,
   "oneOf": [
-    { "required": ["fields"] },
-    { "required": ["from_field", "to_field"] }
+    {
+      "description": "Rename multiple fields",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "description": "Fields",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_field": {
+                "description": "From field",
+                "type": "string"
+              },
+              "to_field": {
+                "description": "To field",
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": ["from_field", "to_field"]
+          }
+        }
+      },
+      "required": ["fields"],
+      "additionalProperties": false
+    },
+    {
+      "description": "Rename one field",
+      "properties": {
+        "from_field": {
+          "description": "From field",
+          "type": "string"
+        },
+        "to_field": {
+          "description": "To field",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["from_field", "to_field"]
+    }
   ]
 }
