@@ -15,3 +15,10 @@ def test_add_nested_field():
                    "expression": "[name.fname,name.lname] | join(' ', @)"})
     assert block.run([{"name": {"fname": "john", "lname": "doe"}}]) == [
         {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}]
+
+
+def test_add_multiple_fields():
+    block = Block({"fields": [{"field": "name.full_name", "language": "jmespath", "expression": "concat([name.fname, ' ', name.lname])"}, {
+                  "field": "name.fname_upper", "language": "jmespath", "expression": "upper(name.fname)"}]})
+    assert block.run([{"name": {"fname": "john", "lname": "doe"}}]) == [
+        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}]

@@ -19,7 +19,15 @@ Maps a record into a new output based on expressions
 **Example**
 
 ```yaml
-expression: {}
+expression:
+  first_name: first_name
+  last_name: last_name
+  greeting: >-
+    'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.'
+    ELSE 'N/A' END || ' ' || full_name
+  country: country
+  full_name: full_name
+language: sql
 
 ```
 

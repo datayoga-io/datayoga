@@ -18,5 +18,12 @@
     }
   },
   "additionalProperties": false,
-  "required": ["field"]
+  "required": ["field"],
+  "examples": [
+    {
+      "field": "features",
+      "target_field": "feature",
+      "delimiter": ";"
+    }
+  ]
 }
