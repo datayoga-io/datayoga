@@ -21,3 +21,9 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string", "null"]})
     def _func_upper(self, element):
         return str(element).upper() if element is not None else None
+
+    @functions.signature({"types": ["string", "null"]},
+                         {"types": ["string"]},
+                         {"types": ["string"]})
+    def _func_replace(self, element, old_value, new_value):
+        return str(element).replace(old_value, new_value) if element is not None else None
