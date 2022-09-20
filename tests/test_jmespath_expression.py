@@ -46,3 +46,34 @@ def test_jmespath_replace_expression():
 def test_jmespath_replace_expression_null():
     expression.compile(f"replace(sentence, 'four', 'two')")
     assert expression.search({"sentence": None}) == None
+
+
+def test_jmespath_right_expression():
+    expression.compile(f"right(sentence, `5`)")
+    assert expression.search({"sentence": "one four three four!"}) == "four!"
+
+
+def test_jmespath_right_expression_null():
+    expression.compile(f"right(sentence, `5`)")
+    assert expression.search({}) == None
+
+
+def test_jmespath_left_expression():
+    expression.compile(f"left(sentence, `3`)")
+    assert expression.search({"sentence": "one four three four!"}) == "one"
+
+
+def test_jmespath_left_expression_null():
+    expression.compile(f"left(sentence, `5`)")
+    assert expression.search({}) == None
+
+
+def test_jmespath_mid_expression():
+    expression.compile(f"mid(sentence, `3`, `7`)")
+    assert expression.search({"sentence": "one four three four!"}) == " four t"
+
+
+def test_jmespath_mid_expression_null():
+    expression.compile(f"mid(sentence, `1`, `4`)")
+    assert expression.search({}) == None
+
