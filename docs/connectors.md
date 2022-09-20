@@ -14,7 +14,7 @@ the connections are defined in the `connections.yaml`. This file includes a refe
 
 Some connectors require installation of optional drivers.
 
-## Supported databases
+## Supported connectors
 
 | Connector                                                 | PyPi driver               | Used by                                                                   | Connector URL format                                                                                        |
 | --------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
