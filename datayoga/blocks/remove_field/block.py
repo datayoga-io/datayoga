@@ -19,9 +19,10 @@ class Block(DyBlock):
         for row in data:
             for property in self.properties["fields"]:
                 obj = row
-                from_field_path = property["field"].split(".")
+                from_field_path = utils.split_field(property["field"])
 
                 for index, key in enumerate(from_field_path):
+                    key = utils.unescape_field(key)
                     if key in obj:
                         if len(from_field_path) == index + 1:
                             del obj[key]
