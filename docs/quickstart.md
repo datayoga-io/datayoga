@@ -69,10 +69,12 @@ datayoga run sample.hello
 
 If all goes well, you should see some startup logs, and eventually:
 
+```
 +-----+-----+
 | id| name|
 +-----+-----+
 |hello|world|
 +-----+-----+
+```
 
 That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the reference to see the different block types currently available.
