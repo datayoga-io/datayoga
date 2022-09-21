@@ -1,5 +1,5 @@
 ---
-title: Quickstart
+title: Embedding
 layout: page
 nav_order: 3
 ---
@@ -60,7 +60,7 @@ Use this `example.yaml`:
         last_name: last_name,
         greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
         country: country,
-        full_name: full_name
+        full_name: full_name,
       }
     language: sql
 ```
