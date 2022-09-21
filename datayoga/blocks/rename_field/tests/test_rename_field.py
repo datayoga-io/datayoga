@@ -52,3 +52,13 @@ def test_rename_nested_field_missing_to_field_parent():
     )
     assert block.run([{"name": {"fname": "john", "lname": "doe"}}]) == [
         {"name": {"lname": "doe"}, "new_name": {"first_name": "john"}}]
+
+
+def test_rename_field_with_dot():
+    block = Block(
+        {
+            "from_field": "name\.fname",
+            "to_field": "name\.first_name"
+        }
+    )
+    assert block.run([{"name.fname": "john", "lname": "doe"}]) == [{"name.first_name": "john", "lname": "doe"}]

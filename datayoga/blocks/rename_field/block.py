@@ -21,9 +21,11 @@ class Block(DyBlock):
                 key_found = True
                 obj = row
                 value = None
-                from_field_path = property["from_field"].split(".")
+                from_field_path = utils.split_field(property["from_field"])
 
                 for index, key in enumerate(from_field_path):
+                    key = utils.unescape_field(key)
+
                     if key in obj:
                         if len(from_field_path) == index + 1:
                             value = obj[key]
@@ -36,9 +38,11 @@ class Block(DyBlock):
 
                 if key_found:
                     obj = row
-                    to_field_path = property["to_field"].split(".")
+                    to_field_path = utils.split_field(property["to_field"])
 
                     for key in to_field_path[:-1]:
+                        key = utils.unescape_field(key)
+
                         if key in obj:
                             obj = obj[key]
                         else:
@@ -47,6 +51,6 @@ class Block(DyBlock):
                     if key in obj:
                         obj = obj[key]
 
-                    obj[to_field_path[-1:][0]] = value
+                    obj[utils.unescape_field(to_field_path[-1:][0])] = value
 
         return data

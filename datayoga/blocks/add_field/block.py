@@ -26,14 +26,15 @@ class Block(DyBlock):
         for row in data:
             for field in self.fields:
                 obj = row
-                field_path = field.split(".")
+                field_path = utils.split_field(field)
 
                 for key in field_path[:-1]:
+                    key = utils.unescape_field(key)
                     if key in obj:
                         obj = obj[key]
                     else:
                         obj[key] = {}
 
-                obj[field_path[-1:][0]] = self.fields[field].search(row)
+                obj[utils.unescape_field(field_path[-1:][0])] = self.fields[field].search(row)
 
         return data

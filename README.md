@@ -115,6 +115,11 @@ For a full list of supported block types [see reference](https://datayoga-io.git
 
 DataYoga supports both SQL and [JMESPath](https://jmespath.org/) expressions. JMESPath are especially useful to handle nested JSON data, while SQL is more suited to flat row-like structures.
 
+### Notes
+
+- Dot notation in expression represents nesting fields in the object, for example `name.first_name` refers to `{ "name": { "first_name": "John" } }`.
+- In order to refer to a field that contains a dot in its name, escape it, for example `name\.first_name` refers to `{ "name.first_name": "John" }`.
+
 ### JMESPath Custom Functions
 
 DataYoga adds the following custom functions to the standard JMESPath library:
