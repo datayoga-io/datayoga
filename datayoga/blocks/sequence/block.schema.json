@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "title": "Add a sequence number",
+  "description": "Add a sequence number field to data",
+  "additionalProperties": false,
+  "examples": [
+  ],
+  "required": [],
+  "properties": {
+    "field": {
+      "type": "string",
+      "title": "name of new sequence field",
+    },
+    "start": {
+      "type": "number",
+      "title": "Start entry",
+      "default": 1,
+      "examples": [
+      ]
+    },
+    "increment": {
+      "type": "number",
+      "title": "Increment between sequences",
+      "examples": []
+    }
+  }
+}

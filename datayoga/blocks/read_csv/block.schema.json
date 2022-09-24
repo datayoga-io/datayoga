@@ -1,0 +1,39 @@
+{
+  "description": "Read data from CSV",
+  "title": "Read CSV",
+  "type": "object",
+  "properties": {
+    "filename": {
+      "description": "Filename. Can contain a regexp or glob expression",
+      "type": "string"
+    },
+    "columns": {
+      "$id": "#/items/anyOf/0/properties/properties/properties/columns",
+      "type": "array",
+      "title": "List of columns to use",
+      "description": "List of columns to use for extract",
+      "default": [],
+      "examples": [["fname","lname"]],
+      "additionalItems": true,
+      "items": {
+        "type": "string",
+        "description": "column name",
+        "examples": ["fname"]
+      }
+    },
+    "delimiter": {
+      "description": "Delimiter to use for splitting the csv records",
+      "type": "string",
+      "default": ","
+    }
+  },
+  "additionalProperties": false,
+  "required": ["field"],
+  "examples": [
+    {
+      "field": "features",
+      "target_field": "feature",
+      "delimiter": ";"
+    }
+  ]
+}
