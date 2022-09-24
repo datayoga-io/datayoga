@@ -1,7 +1,7 @@
 ---
 title: Getting started
 layout: page
-nav_order: 2
+nav_order: 1
 ---
 
 # Getting started
@@ -69,9 +69,9 @@ datayoga run sample.hello
 
 If all goes well, you should see some startup logs, and eventually:
 
-```
+```bash
 +-----+-----+
-| id| name|
+| id  | name|
 +-----+-----+
 |hello|world|
 +-----+-----+

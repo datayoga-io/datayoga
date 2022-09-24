@@ -1,5 +1,5 @@
 ---
-title: Quickstart
+title: Connectors
 layout: page
 nav_order: 3
 ---
