@@ -14,21 +14,35 @@ the connections are defined in the `connections.yaml`. This file includes a refe
 
 Some connectors require installation of optional drivers.
 
+## Connections.yaml example
+
+Example
+
+```yaml
+dwh:
+  type: postgresql
+  username: pg
+  password: ${oc.env:PG_PWD}
+  host: localhost
+  port: 5432
+  database: rww
+```
+
 ## Supported connectors
 
-| Connector                                                 | Used by                                       | PyPi driver                                                               | Connector URL format                                                                                        |
+| Connector                                                 | Used by                                       | PyPi driver                                                               | Connector properties                                                                                        |
 | --------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| [Amazon Athena](/docs/databases/athena)                   | `read_sql` `write_sql`                        | `pip install "PyAthenaJDBC>1.0.9` , `pip install "PyAthena>1.2.0`         | `awsathena+rest://{aws_access_key_id}:{aws_secret_access_key}@athena.{region_name}.amazonaws.com/{ `        |
-| [Amazon Redshift](/docs/databases/redshift)               | `read_sql` `write_sql`                        | `pip install sqlalchemy-redshift`                                         | ` redshift+psycopg2://<userName>:<DBPassword>@<AWS End Point>:5439/<Database Name>`                         |
-| [Apache Drill](/docs/databases/drill)                     | `read_sql` `write_sql`                        | `pip install sqlalchemy-drill`                                            | `drill+sadrill:// For JDBC drill+jdbc://`                                                                   |
-| [Apache Druid](/docs/databases/druid)                     | `read_sql` `write_sql`                        | `pip install pydruid`                                                     | `druid://<User>:<password>@<Host>:<Port-default-9088>/druid/v2/sql`                                         |
-| [Apache Hive](/docs/databases/hive)                       | `read_sql` `write_sql`                        | `pip install pyhive`                                                      | `hive://hive@{hostname}:{port}/{database}`                                                                  |
-| [Apache Impala](/docs/databases/impala)                   | `read_sql` `write_sql`                        | `pip install impyla`                                                      | `impala://{hostname}:{port}/{database}`                                                                     |
-| [Apache Kylin](/docs/databases/kylin)                     | `read_sql` `write_sql`                        | `pip install kylinpy`                                                     | `kylin://<username>:<password>@<hostname>:<port>/<project>?<param1>=<value1>&<param2>=<value2>`             |
-| [Apache Pinot](/docs/databases/pinot)                     | `read_sql` `write_sql`                        | `pip install pinotdb`                                                     | `pinot://BROKER:5436/query?server=http://CONTROLLER:5983/`                                                  |
-| [Apache Solr](/docs/databases/solr)                       | `read_sql` `write_sql`                        | `pip install sqlalchemy-solr`                                             | `solr://{username}:{password}@{hostname}:{port}/{server_path}/{collection}`                                 |
-| [Apache Spark SQL](/docs/databases/spark-sql)             | `read_sql` `write_sql`                        | `pip install pyhive`                                                      | `hive://hive@{hostname}:{port}/{database}`                                                                  |
-| [Ascend.io](/docs/databases/ascend)                       | `read_sql` `write_sql`                        | `pip install impyla`                                                      | `ascend://{username}:{password}@{hostname}:{port}/{database}?auth_mechanism=PLAIN;use_ssl=true`             |
+| [Amazon Athena](/docs/databases/athena)                   | `read_sql` `write_sql`                        | `pip install "PyAthenaJDBC>1.0.9` , `pip install "PyAthena>1.2.0`         | `aws_access_key_id` `aws_secret_access_key` `region_name`                                                   |
+| [Amazon Redshift](/docs/databases/redshift)               | `read_sql` `write_sql`                        | `pip install sqlalchemy-redshift`                                         | `username` `password` `aws_end_point` `database`                                                            |
+| [Apache Drill](/docs/databases/drill)                     | `read_sql` `write_sql`                        | `pip install sqlalchemy-drill`                                            |                                                                                                             |
+| [Apache Druid](/docs/databases/druid)                     | `read_sql` `write_sql`                        | `pip install pydruid`                                                     | `username` `password` `host` `port`                                                                         |
+| [Apache Hive](/docs/databases/hive)                       | `read_sql` `write_sql`                        | `pip install pyhive`                                                      | `host` `port` `database`                                                                                    |
+| [Apache Impala](/docs/databases/impala)                   | `read_sql` `write_sql`                        | `pip install impyla`                                                      | `host` `port` `database`                                                                                    |
+| [Apache Kylin](/docs/databases/kylin)                     | `read_sql` `write_sql`                        | `pip install kylinpy`                                                     | `host` `port` `database` `password` `project`                                                               |
+| [Apache Pinot](/docs/databases/pinot)                     | `read_sql` `write_sql`                        | `pip install pinotdb`                                                     | `broker` `server`                                                                                           |
+| [Apache Solr](/docs/databases/solr)                       | `read_sql` `write_sql`                        | `pip install sqlalchemy-solr`                                             | `username` `password` `host` `port` `server_path` `collection`                                              |
+| [Apache Spark SQL](/docs/databases/spark-sql)             | `read_sql` `write_sql`                        | `pip install pyhive`                                                      | `host` `port` `database`                                                                                    |
+| [Ascend.io](/docs/databases/ascend)                       | `read_sql` `write_sql`                        | `pip install impyla`                                                      | `host` `port` `database`                                                                                    |
 | [Azure MS SQL](/docs/databases/sql-server)                | `read_sql` `write_sql`                        | `pip install pymssql`                                                     | `mssql+pymssql://UserName@presetSQL:TestPassword@presetSQL.database.windows.net:1433/TestSchema`            |
 | [Big Query](/docs/databases/bigquery)                     | `read_sql` `write_sql`                        | `pip install pybigquery`                                                  | `bigquery://{project_id}`                                                                                   |
 | [ClickHouse](/docs/databases/clickhouse)                  | `read_sql` `write_sql`                        | `pip install clickhouse-sqlalchemy`                                       | `clickhouse+native://{username}:{password}@{hostname}:{port}/{database}`                                    |
@@ -51,7 +65,7 @@ Some connectors require installation of optional drivers.
 | SQLite                                                    | `read_sql` `write_sql`                        | No additional library needed                                              | `sqlite://`                                                                                                 |
 | [SQL Server](/docs/databases/sql-server)                  | `read_sql` `write_sql`                        | `pip install pymssql`                                                     | `mssql://`                                                                                                  |
 | [Teradata](/docs/databases/teradata)                      | `read_sql` `write_sql`                        | `pip install teradatasqlalchemy `                                         | `teradata://{user}:{password}@{host}`                                                                       |
-| [TimescaleDB](/docs/databases/timescaledb)                | `read_sql` `write_sql`                        | `pip install psycopg2`                                                    | `postgresql://<UserName>:<DBPassword>@<Database Host>:<Port>/<Database Name>`                               |
+| [TimescaleDB](/docs/databases/timescaledb)                | `read_sql` `write_sql`                        | `pip install psycopg2`                                                    | `username` `password` `host` `port` `database`                                                              |
 | [Vertica](/docs/databases/vertica)                        | `read_sql` `write_sql`                        | `pip install sqlalchemy-vertica-python`                                   | `vertica+vertica_python://<UserName>:<DBPassword>@<Database Host>/<Database Name>`                          |
 | [YugabyteDB](/docs/databases/yugabytedb)                  | `read_sql` `write_sql`                        | `pip install psycopg2`                                                    | `postgresql://<UserName>:<DBPassword>@<Database Host>/<Database Name>`                                      |
 | Amazon S3                                                 | `write_cloud_storage` `extract_cloud_storage` | `pip install boto3`                                                       |                                                                                                             |
@@ -59,3 +73,64 @@ Some connectors require installation of optional drivers.
 | Azure                                                     | `write_cloud_storage` `extract_cloud_storage` | `pip install azure-storage-blob`                                          |                                                                                                             |
 | Redis                                                     | `read_redis` `write_redis`                    | `pip install redis`                                                       |                                                                                                             |
 | MongoDB                                                   | `read_mongodb` `write_mongodb`                | `pip install pymongo`                                                     |                                                                                                             |
+| ElasticSearch                                             | `read_elasticsearch` `write_elasticsearch`    | `pip install elasticsearch`                                               | `nodes` `basic_auth` `ca_certs` `api_key` `bearer_auth`                                                     |
+
+## Interpolation
+
+DataYoga supports variable interpolation. The interpolated variable can be the path to another node in the configuration, and in that case the value will be the value of that node. This path may use either dot-notation (foo.1), brackets ([foo][1]) or a mix of both (foo[1], [foo].1).
+
+```yaml
+pg1:
+  type: postgresql
+  username: pg
+  password: ${}
+  host: localhost
+  port: 5432
+  database: rww
+pg2:
+  type: ${pg1.type}
+  username: pg
+  password: ${}
+  port: ${pg1.port}
+  host: localhost
+```
+
+Interpolations are absolute by default. Relative interpolation are prefixed by one or more dots: The first dot denotes the level of the node itself and additional dots are going up the parent hierarchy. e.g. ${..foo} points to the foo sibling of the parent of the current node.
+
+## Environment variables
+
+Access to environment variables is supported using `env:`
+
+Example:
+
+```
+pg1:
+    pwd: ${env:PG}
+```
+
+It is possible to provide a default value in case the variable is not set:
+
+```
+pg1:
+    host: ${env:PG_HOST,localhost}
+```
+
+## Secrets
+
+Access to secrets stored in tmpfs is supported using `file:`
+
+The file should contain `KEY=VALUE` lines
+
+Example:
+
+```yaml
+pg1:
+  pwd: ${file:/tmpfs/credentials:PWD}
+```
+
+It is possible to provide a default value in case the value is not set:
+
+```yaml
+pg1:
+  pwd: ${file:/tmpfs/credentials:PWD,12345}
+```
