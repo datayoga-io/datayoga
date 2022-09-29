@@ -22,23 +22,22 @@ class JmespathCustomFunctions(functions.Functions):
     def _func_upper(self, element):
         return str(element).upper() if element is not None else None
 
-    @functions.signature({"types": ["string", "null"]},
-                         {"types": ["string"]},
-                         {"types": ["string"]})
+    @functions.signature({"types": ["string", "null"]}, {"types": ["string"]}, {"types": ["string"]})
     def _func_replace(self, element, old_value, new_value):
         return str(element).replace(old_value, new_value) if element is not None else None
 
-    @functions.signature({"types": ["string", "null"]},
-                         {"types": ["number"]})
+    @functions.signature({"types": ["string", "null"]}, {"types": ["number"]})
     def _func_right(self, element, amount):
         return str(element)[-amount:] if element is not None else None
 
-    @functions.signature({"types": ["string", "null"]},
-                         {"types": ["number"]})
+    @functions.signature({"types": ["string", "null"]}, {"types": ["number"]})
     def _func_left(self, element, amount):
         return str(element)[:amount] if element is not None else None
 
-    @functions.signature({"types": ["string", "null"]}, {"types": ["number"]},
-                         {"types": ["number"]})
+    @functions.signature({"types": ["string", "null"]}, {"types": ["number"]}, {"types": ["number"]})
     def _func_mid(self, element, offset, amount):
         return str(element)[offset:offset+amount] if element is not None else None
+
+    @functions.signature({"types": ["string", "null"], "variadic": True})
+    def _func_split(self, element, delimiter=","):
+        return str(element).split(delimiter) if element is not None else None
