@@ -1,0 +1,12 @@
+{
+  "title": "Write SQL",
+  "description": "Write SQL",
+  "type": "object",
+  "properties": {
+    "connection": { "description": "Connection name", "type": "string" },
+    "schema": { "description": "DB schema", "type": "string" },
+    "table": { "description": "Table", "type": "string" }
+  },
+  "additionalProperties": false,
+  "required": ["connection", "schema", "table"]
+}

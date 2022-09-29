@@ -5,14 +5,14 @@ from datayoga.block import Block as DyBlock
 from datayoga.blocks import expression
 from datayoga.context import Context
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("dy")
 
 
 class Block(DyBlock):
-    def init(self):
+    def init(self, context: Context = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.expression = expression.compile(self.properties["language"], self.properties["expression"])
 
-    def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
+    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
         return self.expression.filter(data)

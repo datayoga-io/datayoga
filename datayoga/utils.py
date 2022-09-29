@@ -7,6 +7,8 @@ from typing import Any, Dict, List
 
 import yaml
 
+from datayoga.context import Context
+
 
 def read_json(filename: str) -> Any:
     """
@@ -69,3 +71,12 @@ def split_field(field: str) -> List[str]:
 
 def unescape_field(field: str) -> str:
     return field.replace("\\.", ".")
+
+
+def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
+    if context:
+        connection = next(filter(lambda x: x["name"] == connection_name, context.properties.get("connections")), None)
+        if connection:
+            return connection
+
+    raise ValueError(f"{connection_name} connection not found")

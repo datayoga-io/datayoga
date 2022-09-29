@@ -17,10 +17,15 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
+click = "^8.0.3"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
+psycopg2 = "^2.9.3"
 python = "^3.7"
 PyYAML = "^6.0"
+redis = "^4.1.4"
+SQLAlchemy = "^1.4.41"
+
 
 mock = { version = "^4.0.3", optional = true }
 pytest = { version = "^7.1.2", optional = true }
