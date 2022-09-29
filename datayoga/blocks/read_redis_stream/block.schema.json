@@ -1,0 +1,15 @@
+{
+  "title": "Read Redis Stream",
+  "description": "Read from Redis stream",
+  "type": "object",
+  "properties": {
+    "connection": { "description": "Connection name", "type": "string" },
+    "stream_name": {
+      "type": "string",
+      "title": "Source stream name",
+      "description": "Source stream name"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["connection", "stream_name"]
+}

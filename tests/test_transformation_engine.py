@@ -9,7 +9,7 @@ import pytest
 from datayoga.job import Job
 from datayoga.utils import read_yaml
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("dy")
 
 TEST_DATA = [
     {

@@ -1,0 +1,10 @@
+{
+  "title": "Read CSV",
+  "description": "Read from CSV file",
+  "type": "object",
+  "properties": {
+    "file": { "description": "CSV file", "type": "string" }
+  },
+  "additionalProperties": false,
+  "required": ["file"]
+}
