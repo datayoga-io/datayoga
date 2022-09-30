@@ -21,6 +21,7 @@ jobs:
       # generate the markdown from json schema
       - name: generate block schema doc
         run: |
+          cd datayoga-py
           rm -rf ./docs/blocks
           mkdir ./docs/blocks
           for schema in ./datayoga/blocks/**/*.schema.json; \
