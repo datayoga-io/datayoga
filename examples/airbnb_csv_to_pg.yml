@@ -1,0 +1,6 @@
+- uses: read_csv
+  with:
+    file: airbnb_open_data.csv
+- uses: write_redis
+  with:
+    connection: cache

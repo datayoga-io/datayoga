@@ -27,6 +27,8 @@ class Block(DyBlock):
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
         self.engine = sa.create_engine(engine_url, echo=False)
+        logger.debug(f"Connecting to {connection.get('type')}")
+
         self.conn = self.engine.connect()
 
     def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

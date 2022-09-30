@@ -1,0 +1,15 @@
+{
+  "title": "Write Redis",
+  "description": "Write to a Redis data structure",
+  "type": "object",
+  "properties": {
+    "connection": { "description": "Connection name", "type": "string" },
+    "command": {
+      "type": "string",
+      "title": "Redis command",
+      "description": "Redis command"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["connection"]
+}

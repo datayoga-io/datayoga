@@ -9,13 +9,14 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyBlock):
+
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         self.file = self.properties["file"]
 
     def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        logger.debug(f"Running {self.get_block_name()}")
+        logger.debug(f"Reading CSV")
 
         with open(self.file, 'r') as read_obj:
             records = list(DictReader(read_obj))

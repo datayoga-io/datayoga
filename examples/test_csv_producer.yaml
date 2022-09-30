@@ -37,5 +37,5 @@
 - uses: write_sql
   with:
     connection: hr
-    schema: public
+    schema: hr
     table: emp

@@ -1,7 +1,8 @@
 import logging
 import sys
 from logging import Formatter, Logger
-from typing import Any, Dict, List, Union
+import traceback
+from typing import List, Union
 
 # set up logging
 
@@ -42,3 +43,11 @@ def add_options(options: List[str]):
         return func
 
     return _add_options
+
+
+def handle_critical(logger: Logger, msg: str, e: Union[ValueError, str]):
+    logger.critical(f"{msg}:\n{e}")
+    if logger and logger.isEnabledFor(logging.DEBUG):
+        traceback.print_exc()
+
+    sys.exit(1)
