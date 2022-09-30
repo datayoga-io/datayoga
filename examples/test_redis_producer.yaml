@@ -34,7 +34,8 @@
         first_name: first_name,
         last_name: last_name,
         country: country,
-        full_name: full_name
+        full_name: full_name,
+        greeting: greeting
       }
     language: jmespath
 - uses: write_sql
