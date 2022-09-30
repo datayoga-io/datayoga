@@ -5,14 +5,46 @@ layout: page
 
 # Read CSV
 
-Read from CSV file
+Read data from CSV
 
 
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**file**|`string`|CSV file<br/>|yes|
+|**file**|`string`|Filename. Can contain a regexp or glob expression<br/>|yes|
+|[**fields**](#fields)<br/>(List of columns to use)|`string[]`|List of columns to use for extract<br/>Default: <br/>|no|
+|**delimiter**|`string`|Delimiter to use for splitting the csv records<br/>Default: `","`<br/>|no|
+|**use\_header**|`boolean`|Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified<br/>Default: `true`<br/>|no|
+|**quotechar**|`string`|A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '<br/>Default: `","`<br/>|no|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+file: archive.csv
+delimiter: ;
+
+```
+
+<a name="fields"></a>
+## fields\[\]: List of columns to use
+
+List of columns to use for extract
+
+
+**Items**
+
+
+field name
+
+**Item Type:** `string`  
+**Example**
+
+```yaml
+- fname
+- lname
+
+```
+
 
