@@ -25,6 +25,11 @@
       "type": "string",
       "default": ","
     },
+    "batch_size": {
+      "description": "Number of records to read per batch",
+      "type": "number",
+      "default": "1000"
+    },
     "use_header": {
       "description": "Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified",
       "type":"boolean",

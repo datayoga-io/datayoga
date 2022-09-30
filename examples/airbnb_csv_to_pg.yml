@@ -1,6 +1,9 @@
 - uses: read_csv
   with:
-    file: airbnb_open_data.csv
+    file: /home/oren/Downloads/airbnb_open_data.csv
+    batch_size: 2500
 - uses: write_redis
   with:
     connection: cache
+    command: HSET
+    key_field: id

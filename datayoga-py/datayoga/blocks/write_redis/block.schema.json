@@ -5,11 +5,17 @@
   "properties": {
     "connection": { "description": "Connection name", "type": "string" },
     "command": {
+      "enum": ["HSET", "SADD","XADD","RPUSH","LPUSH","SET","ZADD"],
       "type": "string",
       "title": "Redis command",
       "description": "Redis command"
+    },
+    "key_field": {
+      "type": "string",
+      "title": "Key field",
+      "description": "field to use as the Redis key"
     }
   },
   "additionalProperties": false,
-  "required": ["connection"]
+  "required": ["connection","key_field","command"]
 }

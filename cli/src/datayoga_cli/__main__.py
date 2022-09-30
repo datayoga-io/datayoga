@@ -81,14 +81,33 @@ def run(
 
         # assume the producer is the first block and remove it from job's steps
         producer = job.steps.pop(0)
-        logger.info(f"Producer: {producer.__module__}")
+        logger.info(f"Producing from {producer.__module__}")
+        batch_size = producer.batch_size
+        batch = []
+        keys = []
+        counter = 0
         for record in tqdm(producer.run([])):
+            counter += 1
             key = record["key"]
             value = record["value"]
             logger.debug(f"Retrieved record:\n\tKey: {key}\n\tValue: {value}")
-            job.transform([value])
+            keys.append(key)
+            batch.append(value)
 
+            if counter == batch_size:
+                job.transform(batch)
+
+                for key in keys:
+                    producer.ack(key)
+                batch = []
+                keys = []
+                counter = 0
+
+        # handle last batch
+        job.transform(batch)
+        for key in keys:
             producer.ack(key)
+
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)
 
