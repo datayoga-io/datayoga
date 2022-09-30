@@ -1,17 +1,24 @@
 import logging
-from typing import Any, Dict, List
+from csv import DictReader
+from typing import Any, Dict, List, Optional
 
-from datayoga import utils
 from datayoga.block import Block as DyBlock
-from datayoga.blocks import expression
 from datayoga.context import Context
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("dy")
 
 
 class Block(DyBlock):
-    def init(self):
-        pass
+    def init(self, context: Optional[Context] = None):
+        logger.debug(f"Initializing {self.get_block_name()}")
 
-    def run(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
-        pass
+        self.file = self.properties["file"]
+
+    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        logger.debug(f"Running {self.get_block_name()}")
+
+        with open(self.file, 'r') as read_obj:
+            records = list(DictReader(read_obj))
+
+        for i, record in enumerate(records):
+            yield {"key": f"{i}", "value": record}

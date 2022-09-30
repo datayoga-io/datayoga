@@ -3,12 +3,11 @@
   "title": "Read CSV",
   "type": "object",
   "properties": {
-    "filename": {
+    "file": {
       "description": "Filename. Can contain a regexp or glob expression",
       "type": "string"
     },
-    "columns": {
-      "$id": "#/items/anyOf/0/properties/properties/properties/columns",
+    "fields": {
       "type": "array",
       "title": "List of columns to use",
       "description": "List of columns to use for extract",
@@ -17,7 +16,7 @@
       "additionalItems": true,
       "items": {
         "type": "string",
-        "description": "column name",
+        "description": "field name",
         "examples": ["fname"]
       }
     },
@@ -25,14 +24,23 @@
       "description": "Delimiter to use for splitting the csv records",
       "type": "string",
       "default": ","
+    },
+    "use_header": {
+      "description": "Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified",
+      "type":"boolean",
+      "default": true
+    },
+    "quotechar": {
+      "description": "A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '",
+      "type": "string",
+      "default": ","
     }
   },
   "additionalProperties": false,
-  "required": ["field"],
+  "required": ["file"],
   "examples": [
     {
-      "field": "features",
-      "target_field": "feature",
+      "file": "archive.csv",
       "delimiter": ";"
     }
   ]

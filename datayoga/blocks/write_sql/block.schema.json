@@ -17,7 +17,7 @@
       }
     }
   ],
-  "required": [],
+  "required": ["connection","table","schema"],
   "properties": {
     "business_keys": {
       "type": "array",
@@ -28,68 +28,19 @@
         "title": "name of column"
       }
     },
-    "mapping": {
-      "type": "array",
-      "title": "The columns mapping of source to target",
-      "description": "A list of columns to use for loading into the target table. If ommitted, will use the table's column names and the dataframe's column names.",
-      "default": [],
-      "examples": [
-        [
-          {
-            "source": "employee_number",
-            "target": "empno",
-            "key": true
-          },
-          {
-            "source": "UPDATE_DT"
-          },
-          {
-            "source": "fNAME"
-          }
-        ]
-      ],
-      "items": {
-        "type": "object",
-        "description": "column mapping",
-        "examples": [
-          {
-            "source": "employee_number",
-            "target": "empno"
-          },
-          {
-            "source": "UPDATE_DT"
-          },
-          {
-            "source": "fNAME"
-          }
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "source": {
-            "type": ["string", "number"],
-            "title": "source column name or expression. Any valid SQL expression can be used"
-          },
-          "target": {
-            "type": "string",
-            "title": "target column name",
-            "description": "optional. if ommitted, source column and target column will be identical"
-          }
-        }
-      }
-    },
     "connection": {
       "type": "string",
       "title": "The connection to use for loading",
       "description": "Logical connection name as defined in the connections.yaml",
       "examples": ["europe_db", "target", "eu_dwh"]
     },
-    "table_name": {
+    "table": {
       "type": "string",
       "title": "The target table name",
       "description": "Target table name",
       "examples": ["employees"]
     },
-    "table_schema": {
+    "schema": {
       "type": "string",
       "title": "The table schema of the target table",
       "description": "If left blank, the default schema of this connection will be used as defined in the connections.yaml",
@@ -122,22 +73,6 @@
             "target": "is_active"
           }
         ]
-      ],
-      "items": {
-        "type": "object",
-        "description": "column mapping",
-        "properties": {
-          "source": {
-            "type": ["string", "number"],
-            "title": "source column name or expression. Any valid SQL expression can be used"
-          },
-          "target": {
-            "type": "string",
-            "title": "target column name",
-            "description": "optional. if ommitted, source column and target column will be identical"
-          }
-        }
-      }
+      ]
     }
   }
-}

@@ -1,10 +1,13 @@
 import json
 import os
+import re
 import sys
 from os import path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import yaml
+
+from datayoga.context import Context
 
 
 def read_json(filename: str) -> Any:
@@ -60,3 +63,20 @@ def get_resource_path(relative_path: str) -> str:
     else:
         # we are running in a normal Python environment
         return path.join(os.path.dirname(__file__), "resources", relative_path)
+
+
+def split_field(field: str) -> List[str]:
+    return re.split(r"(?<!\\)\.", field)
+
+
+def unescape_field(field: str) -> str:
+    return field.replace("\\.", ".")
+
+
+def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
+    if context:
+        connection = next(filter(lambda x: x["name"] == connection_name, context.properties.get("connections")), None)
+        if connection:
+            return connection
+
+    raise ValueError(f"{connection_name} connection not found")

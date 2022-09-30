@@ -115,14 +115,22 @@ For a full list of supported block types [see reference](https://datayoga-io.git
 
 DataYoga supports both SQL and [JMESPath](https://jmespath.org/) expressions. JMESPath are especially useful to handle nested JSON data, while SQL is more suited to flat row-like structures.
 
+### Notes
+
+- Dot notation in expression represents nesting fields in the object, for example `name.first_name` refers to `{ "name": { "first_name": "John" } }`.
+- In order to refer to a field that contains a dot in its name, escape it, for example `name\.first_name` refers to `{ "name.first_name": "John" }`.
+
 ### JMESPath Custom Functions
 
 DataYoga adds the following custom functions to the standard JMESPath library:
 
-| Function     | Description                                                             | Example                                                                                                                                 | Comments                                                                               |
-| ------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `capitalize` | Capitalizes all the words in the string                                 | Input: `{name: "john doe"}` <br /> Expression: `capitalize(name)` <br /> Output: `John Doe`                                             |
-| `concat`     | Concatenates an array of variables or literals                          | Input: `{fname: "john", lname: "doe"}` <br /> Expression: `concat([fname, ' ' ,lname])` <br /> Output: `john doe`                       | This is equivalent to the more verbose built-in expression: `' '.join([fname,lname])`. |
-| `lower`      | Converts all uppercase characters in a string into lowercase characters | Input: `{fname: "John"}` <br /> Expression: `lower(fname)` <br /> Output: `john`                                                        |
-| `replace`    | Replaces all the occurrences of a substring with a new one              | Input: `{"sentence": "one four three four!"}` <br /> Expression: `replace(sentence, 'four', 'two')` <br /> Output: `one two three two!` |
-| `upper`      | Converts all lowercase characters in a string into uppercase characters | Input: `{fname: "john"}` <br /> Expression: `upper(fname)` <br /> Output: `JOHN`                                                        |
+| Function     | Description                                                                     | Example                                                                                                                                 | Comments                                                                               |
+| ------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `capitalize` | Capitalizes all the words in the string                                         | Input: `{"name": "john doe"}` <br /> Expression: `capitalize(name)` <br /> Output: `John Doe`                                           |
+| `concat`     | Concatenates an array of variables or literals                                  | Input: `{"fname": "john", "lname": "doe"}` <br /> Expression: `concat([fname, ' ' ,lname])` <br /> Output: `john doe`                   | This is equivalent to the more verbose built-in expression: `' '.join([fname,lname])`. |
+| `left`       | Returns a specified number of characters from the start of a given text string  | Input: `{"greeting": "hello world!"}` <br /> Expression: `` left(greeting, `5`) `` <br /> Output: `hello`                               |
+| `lower`      | Converts all uppercase characters in a string into lowercase characters         | Input: `{"fname": "John"}` <br /> Expression: `lower(fname)` <br /> Output: `john`                                                      |
+| `mid `       | Returns a specified number of characters from the middle of a given text string | Input: `{"greeting": "hello world!"}` <br /> Expression: `` mid(greeting, `4`, `3`) `` <br /> Output: `o w`                             |
+| `replace`    | Replaces all the occurrences of a substring with a new one                      | Input: `{"sentence": "one four three four!"}` <br /> Expression: `replace(sentence, 'four', 'two')` <br /> Output: `one two three two!` |
+| `right`      | Returns a specified number of characters from the end of a given text string    | Input: `{"greeting": "hello world!"}` <br /> Expression: `` right(greeting, `6`) `` <br /> Output: `world!`                             |
+| `upper`      | Converts all lowercase characters in a string into uppercase characters         | Input: `{"fname": "john"}` <br /> Expression: `upper(fname)` <br /> Output: `JOHN`                                                      |

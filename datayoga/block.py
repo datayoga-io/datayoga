@@ -2,14 +2,14 @@ import logging
 import os
 import sys
 from os import path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from jsonschema import validate
 
 from datayoga import utils
 from datayoga.context import Context
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("dy")
 
 
 class Block():
@@ -20,16 +20,17 @@ class Block():
         properties Dict[str, Any]: Block properties
     """
 
-    def __init__(self, properties: Dict[str, Any]):
+    def __init__(self, properties: Dict[str, Any], context: Optional[Context] = None):
         """
         Constructs a block
 
         Args:
             properties (Dict[str, Any]): Block [properties]
+            context (Optional[Context], optional): Context. Defaults to None.
         """
         self.properties = properties
         self.validate()
-        self.init()
+        self.init(context)
 
     def validate(self):
         """
@@ -40,26 +41,28 @@ class Block():
         logger.debug(f"validating {self.properties} against {json_schema_file}")
         validate(instance=self.properties, schema=utils.read_json(json_schema_file))
 
-    def init(self):
+    def init(self, context: Optional[Context] = None):
         """
         Initializes block (abstract, should be implemented by the sub class)
+
+        Args:
+            context (Context, optional): Context. Defaults to None.
         """
         pass
 
-    def transform(self, data: List[Dict[str, Any]], context: Context = None) -> List[Dict[str, Any]]:
+    def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Transforms data
 
         Args:
             data (List[Dict[str, Any]]): Data
-            context (Context, optional): Context. Defaults to None.
 
         Returns:
             List[Dict[str, Any]]: Transformed data
         """
         logger.debug(f"Transforming data, data before: {data}")
 
-        transformed_data = self.run(data, context)
+        transformed_data = self.run(data)
         logger.debug(f"Data after: {transformed_data}")
 
         return transformed_data
@@ -72,6 +75,14 @@ class Block():
 
         Returns:
             List[Dict[str, Any]]: Transformed data
+        """
+        pass
+
+    def ack(self, key: str):
+        """ Sends acknowledge for a key of a record that has been processed
+
+        Args:
+            key (str): Record key 
         """
         pass
 
