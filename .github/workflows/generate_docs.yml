@@ -24,7 +24,7 @@ jobs:
           rm -rf ./docs/blocks
           mkdir ./docs/blocks
           for schema in ./datayoga/blocks/**/*.schema.json; \
-            do npx jsonschema2mk --schema $schema --extension yaml-examples \
+            do echo $schema; npx jsonschema2mk --schema $schema --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks Reference" --fm.layout page > \
             ./docs/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
       - name: push to repo

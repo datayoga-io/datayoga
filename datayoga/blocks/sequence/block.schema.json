@@ -10,7 +10,7 @@
   "properties": {
     "field": {
       "type": "string",
-      "title": "name of new sequence field",
+      "title": "name of new sequence field"
     },
     "start": {
       "type": "number",
