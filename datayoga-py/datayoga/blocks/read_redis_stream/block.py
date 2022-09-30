@@ -32,7 +32,8 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
 
         while True:
-            streams = self.redis_client.xreadgroup(self.consumer_group, self.requesting_consumer, {self.stream: ">"})
+            streams = self.redis_client.xreadgroup(
+                self.consumer_group, self.requesting_consumer, {self.stream: ">"}, None, 0)
             for stream in streams:
                 for stream_element in stream[1]:
                     key, value = stream_element

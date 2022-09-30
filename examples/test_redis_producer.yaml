@@ -1,7 +1,7 @@
 - uses: read_redis_stream
   with:
     connection: cache
-    stream_name: yossi
+    stream_name: emp
 - uses: add_field
   with:
     fields:
@@ -11,6 +11,9 @@
       - field: country
         language: sql
         expression: country_code || ' - ' || UPPER(country_name)
+      - field: greeting
+        language: sql
+        expression: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
 - uses: rename_field
   with:
     fields:
@@ -30,13 +33,12 @@
       {
         first_name: first_name,
         last_name: last_name,
-        greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
         country: country,
         full_name: full_name
       }
-    language: sql
+    language: jmespath
 - uses: write_sql
   with:
     connection: hr
-    schema: public
+    schema: hr
     table: emp

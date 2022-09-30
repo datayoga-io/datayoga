@@ -82,7 +82,7 @@ def run(
         # assume the producer is the first block and remove it from job's steps
         producer = job.steps.pop(0)
         logger.info(f"Producing from {producer.__module__}")
-        batch_size = producer.batch_size
+        batch_size = producer.properties.get("batch_size", 1)
         batch = []
         keys = []
         counter = 0
