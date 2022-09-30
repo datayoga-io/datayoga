@@ -21,10 +21,9 @@ jobs:
       # generate the markdown from json schema
       - name: generate block schema doc
         run: |
-          cd datayoga-py
           rm -rf ./docs/blocks
           mkdir ./docs/blocks
-          for schema in ./datayoga/blocks/**/*.schema.json; \
+          for schema in ./datayoga-py/datayoga/blocks/**/*.schema.json; \
             do echo $schema; npx jsonschema2mk --schema $schema --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks Reference" --fm.layout page > \
             ./docs/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
