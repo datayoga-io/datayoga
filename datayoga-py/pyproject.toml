@@ -39,10 +39,6 @@ redis = ["redis"]
 pg = ["psycopg2","SQLAlchemy"]
 test = ["mock", "pytest", "pytest-describe", "pytest-mock", "pytest-timeout", "requests-mock"]
 
-
-
-
-
 [tool.poetry.urls]
 url = "https://datayoga.io"
 [tool.poetry.scripts]

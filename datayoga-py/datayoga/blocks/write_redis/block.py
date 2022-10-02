@@ -1,8 +1,8 @@
-from functools import reduce
 import logging
-import datayoga.blocks.read_redis_stream.utils as utils
+from functools import reduce
 from typing import Any, Dict, List, Optional
 
+import datayoga.blocks.read_redis_stream.utils as utils
 from datayoga.block import Block as DyBlock
 from datayoga.context import Context
 from datayoga.utils import get_connection_details
@@ -23,7 +23,6 @@ class Block(DyBlock):
         logger.info(f"Writing to Redis connection '{self.properties.get('connection')}'")
 
     def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-
         pipeline = self.redis_client.pipeline()
         for record in data:
             dict_as_list = list(reduce(lambda x, y: x + y, record.items()))

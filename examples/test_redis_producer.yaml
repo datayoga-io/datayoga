@@ -8,36 +8,17 @@
       - field: full_name
         language: jmespath
         expression: concat([fname, ' ' , lname])
-      - field: country
-        language: sql
-        expression: country_code || ' - ' || UPPER(country_name)
-      - field: greeting
-        language: sql
-        expression: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
-- uses: rename_field
-  with:
-    fields:
-      - from_field: fname
-        to_field: first_name
-      - from_field: lname
-        to_field: last_name
-- uses: remove_field
-  with:
-    fields:
-      - field: credit_card
-      - field: country_name
-      - field: country_code
 - uses: map
   with:
     expression:
       {
-        first_name: first_name,
-        last_name: last_name,
-        country: country,
+        first_name: fname,
+        last_name: lname,
+        country: country_code || ' - ' || UPPER(country_name),
         full_name: full_name,
-        greeting: greeting
+        greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
       }
-    language: jmespath
+    language: sql
 - uses: write_sql
   with:
     connection: hr

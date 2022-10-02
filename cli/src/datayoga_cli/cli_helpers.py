@@ -1,10 +1,8 @@
 import logging
 import sys
-from logging import Formatter, Logger
 import traceback
+from logging import Formatter, Logger
 from typing import List, Union
-
-# set up logging
 
 
 class CustomFormatter(Formatter):

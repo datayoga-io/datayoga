@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
   "title": "Write SQL",
   "description": "Write into a SQL-compatible data store",
@@ -17,11 +16,11 @@
       }
     }
   ],
-  "required": ["connection","table","schema"],
+  "required": ["connection", "table", "schema"],
   "properties": {
     "business_keys": {
       "type": "array",
-      "title": "business keys to use for upsert in case of an UPSERT",
+      "title": "Business keys to use for upsert in case of an UPSERT",
       "items": {
         "type": "string",
         "description": "The business key is used for performing an upsert in case the load strategy is UPSERT",
@@ -54,13 +53,13 @@
     },
     "active_record_indicator": {
       "type": "string",
-      "description": "used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active",
+      "description": "Used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active",
       "examples": ["is_active='Y'", "deletedAt is null"]
     },
     "inactive_record_mapping": {
       "type": "array",
-      "title": "used for `TYPE2` load_strategy. The columns mapping to use to close out an active record",
-      "description": "A list of columns to use. Use any valid SQL expression for the source. If 'target' is ommitted, will default to the name of the source column",
+      "title": "Used for `TYPE2` load_strategy. The columns mapping to use to close out an active record",
+      "description": "A list of columns to use. Use any valid SQL expression for the source. If 'target' is omitted, will default to the name of the source column",
       "default": [],
       "examples": [
         [

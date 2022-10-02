@@ -17,7 +17,7 @@ class Block(DyBlock):
         self.batch_size = self.properties.get("batch_size", 1000)
 
     def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        logger.debug(f"Reading CSV")
+        logger.debug("Reading CSV")
 
         with open(self.file, 'r') as read_obj:
             records = list(DictReader(read_obj))
