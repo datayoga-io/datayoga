@@ -12,7 +12,7 @@ Add a sequence number field to data
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**field**<br/>(name of new sequence field)|`string`||no|
+|**field**<br/>(Name of new sequence field)|`string`||no|
 |**start**<br/>(Start entry)|`number`|Default: `1`<br/>|no|
 |**increment**<br/>(Increment between sequences)|`number`||no|
 
