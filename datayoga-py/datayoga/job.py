@@ -36,12 +36,9 @@ class Job():
         for step in job_steps:
             block_name = step["uses"]
             module_name = f"datayoga.blocks.{block_name}.block"
-            try:
-                module = importlib.import_module(module_name)
-            except ModuleNotFoundError:
-                raise ValueError(f"Block {block_name} does not exist")
-
+            module = importlib.import_module(module_name)
             block: Block = getattr(module, "Block")(step["with"], context)
+
             steps.append(block)
 
         self.steps = steps
