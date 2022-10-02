@@ -12,13 +12,13 @@ Write into a SQL-compatible data store
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|[**business\_keys**](#business_keys)<br/>(business keys to use for upsert in case of an UPSERT)|`string[]`||no|
+|[**business\_keys**](#business_keys)<br/>(Business keys to use for upsert in case of an UPSERT)|`string[]`||no|
 |**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.yaml<br/>|yes|
 |**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |**schema**<br/>(The table schema of the target table)|`string`|If left blank, the default schema of this connection will be used as defined in the connections.yaml<br/>|yes|
 |**load\_strategy**|`string`|type of target<br/>Default: `"APPEND"`<br/>Enum: `"APPEND"`, `"REPLACE"`, `"UPSERT"`, `"TYPE2"`<br/>|no|
-|**active\_record\_indicator**|`string`|used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active<br/>|no|
-|[**inactive\_record\_mapping**](#inactive_record_mapping)<br/>(used for \`TYPE2\` load\_strategy\. The columns mapping to use to close out an active record)|`array`|A list of columns to use. Use any valid SQL expression for the source. If 'target' is ommitted, will default to the name of the source column<br/>Default: <br/>|no|
+|**active\_record\_indicator**|`string`|Used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active<br/>|no|
+|[**inactive\_record\_mapping**](#inactive_record_mapping)<br/>(Used for \`TYPE2\` load\_strategy\. The columns mapping to use to close out an active record)|`array`|A list of columns to use. Use any valid SQL expression for the source. If 'target' is omitted, will default to the name of the source column<br/>Default: <br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
@@ -36,7 +36,7 @@ properties:
 ```
 
 <a name="business_keys"></a>
-## business\_keys\[\]: business keys to use for upsert in case of an UPSERT
+## business\_keys\[\]: Business keys to use for upsert in case of an UPSERT
 
 **Items: name of column**
 
@@ -45,9 +45,9 @@ The business key is used for performing an upsert in case the load strategy is U
 
 **Item Type:** `string`  
 <a name="inactive_record_mapping"></a>
-## inactive\_record\_mapping\[\]: used for \`TYPE2\` load\_strategy\. The columns mapping to use to close out an active record
+## inactive\_record\_mapping\[\]: Used for \`TYPE2\` load\_strategy\. The columns mapping to use to close out an active record
 
-A list of columns to use. Use any valid SQL expression for the source. If 'target' is ommitted, will default to the name of the source column
+A list of columns to use. Use any valid SQL expression for the source. If 'target' is omitted, will default to the name of the source column
 
 
 **No properties.**
