@@ -1,6 +1,6 @@
 {
   "description": "Add fields to a record",
-  "title": "Add fields",
+  "title": "Add Fields",
   "type": "object",
   "oneOf": [
     {
