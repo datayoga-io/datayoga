@@ -2,7 +2,7 @@
 parent: Blocks Reference
 ---
 
-# Filter records
+# Filter Records
 
 Filter records
 

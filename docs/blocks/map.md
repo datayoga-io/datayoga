@@ -2,7 +2,7 @@
 parent: Blocks Reference
 ---
 
-# Map record
+# Map Record
 
 Maps a record into a new output based on expressions
 

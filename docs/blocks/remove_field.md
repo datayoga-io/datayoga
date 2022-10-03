@@ -2,7 +2,7 @@
 parent: Blocks Reference
 ---
 
-# Remove fields
+# Remove Fields
 
 Remove fields
 
