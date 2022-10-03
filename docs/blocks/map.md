@@ -1,6 +1,5 @@
 ---
 parent: Blocks Reference
-layout: page
 ---
 
 # Map record

@@ -25,7 +25,7 @@ jobs:
           mkdir ./docs/blocks
           for schema in ./datayoga-py/datayoga/blocks/**/*.schema.json; \
             do echo $schema; npx jsonschema2mk --schema $schema --extension yaml-examples \
-              --extension front-matter --fm.parent "Blocks Reference" --fm.layout page > \
+              --extension front-matter --fm.parent "Blocks Reference" > \
             ./docs/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
       - name: push to repo
         run: |

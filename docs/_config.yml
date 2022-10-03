@@ -1,3 +1,19 @@
 highlighter: pygments
 theme: "just-the-docs"
 markdown: kramdown
+search_enabled: false
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+footer_content: "Copyright DataYoga"
+
+# Aux links for the upper right navigation
+aux_links:
+  "DataYoga on GitHub":
+    - "//github.com/datayoga-io"
+
+titles_from_headings:
+  enabled: true
+  strip_title: false
+  collections: false
