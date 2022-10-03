@@ -12,7 +12,7 @@ nav_order: 5
 
 ## Run the Job in the DataYoga Runner
 
-## Tutorial - a Job that reads from Redis and Writes to Postgres
+## Tutorial - a Job that Reads from Redis and Writes to Postgres
 
 ### Set up Environment
 
