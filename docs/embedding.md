@@ -1,10 +1,8 @@
 ---
-title: Embedding
-layout: page
 nav_order: 3
 ---
 
-# datayoga-py
+# Embedding
 
 ## Introduction
 
@@ -16,7 +14,7 @@ nav_order: 3
 pip install datayoga-py
 ```
 
-## Quick start
+## Quick Start
 
 This demonstrates how to transform data using a DataYoga job.
 
@@ -60,12 +58,12 @@ Use this `example.yaml`:
         last_name: last_name,
         greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
         country: country,
-        full_name: full_name,
+        full_name: full_name
       }
     language: sql
 ```
 
-### Transform data using `datayoga-py`
+### Transform Data using `datayoga-py`
 
 Use this code snippet to transform a data record using the job defined [above](#create-a-job):
 
@@ -88,7 +86,7 @@ As can be seen, the record has been transformed based on the job:
 - `full_name` field added based on a [JMESPath](https://jmespath.org/) expression.
 - `greeting` field added based on an SQL expression.
 
-## Block reference
+## Block Reference
 
 For a full list of supported block types [see reference](blocks.md).
 

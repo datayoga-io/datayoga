@@ -1,7 +1,5 @@
 ---
-title: Getting started
-layout: page
-nav_order: 1
+nav_order: 2
 ---
 
 # Getting started
@@ -50,16 +48,16 @@ datayoga --version
 
 \*Note: Non-root users should unpack to a directory with write permission and run `datayoga` directly from it.
 
-## Create a new datayoga project
+## Create a new DataYoga Project
 
-To create a new datayoga project, use the init command.
+To create a new DataYoga project, use the init command.
 
 ```bash
 datayoga init hello_world
 cd hello_world
 ```
 
-## Validating the install
+## Validating the Install
 
 Let's run our first job. It is pre-defined in the samples folder as part of the init command.
 

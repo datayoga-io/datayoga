@@ -1,10 +1,8 @@
 ---
-title: Connectors
-layout: page
-nav_order: 3
+nav_order: 4
 ---
 
-# Connections
+# Connectors
 
 ## Introduction
 
@@ -14,7 +12,7 @@ the connections are defined in the `connections.yaml`. This file includes a refe
 
 Some connectors require installation of optional drivers.
 
-## Connections.yaml example
+## Connections.yaml Example
 
 Example
 
@@ -28,9 +26,9 @@ dwh:
   database: rww
 ```
 
-## Supported connectors
+## Supported Connectors
 
-| Connector                                                 | Used by                                       | PyPi driver                                                               | Connector properties                                                                                        |
+| Connector                                                 | Used by                                       | PyPi Driver                                                               | Connector Properties                                                                                        |
 | --------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | [Amazon Athena](/docs/databases/athena)                   | `read_sql` `write_sql`                        | `pip install "PyAthenaJDBC>1.0.9` , `pip install "PyAthena>1.2.0`         | `aws_access_key_id` `aws_secret_access_key` `region_name`                                                   |
 | [Amazon Redshift](/docs/databases/redshift)               | `read_sql` `write_sql`                        | `pip install sqlalchemy-redshift`                                         | `username` `password` `aws_end_point` `database`                                                            |
@@ -97,7 +95,7 @@ pg2:
 
 Interpolations are absolute by default. Relative interpolation are prefixed by one or more dots: The first dot denotes the level of the node itself and additional dots are going up the parent hierarchy. e.g. ${..foo} points to the foo sibling of the parent of the current node.
 
-## Environment variables
+## Environment Variables
 
 Access to environment variables is supported using `env:`
 

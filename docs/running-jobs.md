@@ -1,14 +1,12 @@
 ---
-title: Running jobs
-layout: page
-nav_order: 3
+nav_order: 7
 ---
 
-# Running jobs
+# Running Jobs
 
 The DataYoga runner reads and processes job definitions.
 
-## DataYoga docker runner
+## DataYoga Docker Runner
 
 ## Performance
 
