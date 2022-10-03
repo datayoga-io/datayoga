@@ -1,4 +1,4 @@
-from datayoga.blocks.expression import JMESPathExpression
+from datayoga.expression import JMESPathExpression
 
 expression = JMESPathExpression()
 
