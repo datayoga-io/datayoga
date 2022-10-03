@@ -18,9 +18,16 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Build and Install CLI
+        run: |
+          cd datayoga-py/cli
+          pip install poetry
+          poetry build
+          pip install dist/*.whl
+
       - name: Install dependencies
         run: |
-          cd datayoga-py
+          cd ..
           pip install . 
           pip install .[test]
 
