@@ -69,13 +69,16 @@ def run(
         job_settings = read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
 
-        connections = read_yaml(path.join(path.dirname(job_file), "connections.yaml"))
+        job_path = path.dirname(job_file)
+
+        connections = read_yaml(path.join(job_path, "connections.yaml"))
         jsonschema.validate(instance=connections, schema=utils.read_json(
             utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
         context = Context({
             "connections": connections,
-            "job_name": Path(job_file).stem
+            "job_name": Path(job_file).stem,
+            "job_path": job_path
         })
 
         job = Job(job_settings, context)
@@ -122,7 +125,7 @@ def test(
     set_logging_level(loglevel)
 
 
-@cli.command(name="status", help="Display status and statistics of running and completed jobs")
+@cli.command(name="status", help="Displays status and statistics of running and completed jobs")
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def status(
     loglevel: str

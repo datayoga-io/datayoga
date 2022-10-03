@@ -1,0 +1,4 @@
+- name: cache
+  type: redis
+  host: localhost
+  port: 12554
