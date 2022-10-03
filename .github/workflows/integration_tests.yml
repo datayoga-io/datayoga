@@ -20,14 +20,14 @@ jobs:
 
       - name: Build and Install CLI
         run: |
-          cd datayoga-py/cli
+          cd cli
           pip install poetry
           poetry build
           pip install dist/*.whl
 
       - name: Install dependencies
         run: |
-          cd ..
+          cd ../datayoga-py
           pip install . 
           pip install .[test]
 
