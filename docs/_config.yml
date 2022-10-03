@@ -1,5 +1,10 @@
-highlighter: pygments
-theme: "just-the-docs"
+# Jekyll configuration file (used by GitHub Pages)
+remote_theme: just-the-docs/just-the-docs
+source: docs
+title: DataYoga
+name: DataYoga
+description: DataYoga is a framework for building and running streaming or batch data pipelines.
+
 markdown: kramdown
 search_enabled: false
 
@@ -12,8 +17,3 @@ footer_content: "Copyright DataYoga"
 aux_links:
   "DataYoga on GitHub":
     - "//github.com/datayoga-io"
-
-titles_from_headings:
-  enabled: true
-  strip_title: false
-  collections: false
