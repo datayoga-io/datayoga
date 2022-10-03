@@ -2,7 +2,7 @@
 parent: Blocks Reference
 ---
 
-# Add fields
+# Add Fields
 
 Add fields to a record
 

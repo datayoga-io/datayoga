@@ -2,7 +2,7 @@
 parent: Blocks Reference
 ---
 
-# Rename fields
+# Rename Fields
 
 Renames fields. All other fields remain unchanged
 

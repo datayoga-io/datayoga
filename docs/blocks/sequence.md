@@ -2,7 +2,7 @@
 parent: Blocks Reference
 ---
 
-# Add a sequence number
+# Add a Sequence Number
 
 Add a sequence number field to data
 
