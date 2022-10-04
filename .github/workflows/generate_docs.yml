@@ -19,15 +19,15 @@ jobs:
         with:
           node-version: 14
       # generate the markdown from json schema
-      - name: generate block schema doc
+      - name: Generate block schema doc
         run: |
           rm -rf ./docs/blocks
           mkdir ./docs/blocks
           for schema in ./datayoga-py/datayoga/blocks/**/*.schema.json; \
             do echo $schema; npx jsonschema2mk --schema $schema --extension yaml-examples \
-              --extension front-matter --fm.parent "Blocks Reference" > \
-            ./docs/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
-      - name: push to repo
+              --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
+            ./docs/reference/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
+      - name: Push to repo
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
