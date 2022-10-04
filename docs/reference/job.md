@@ -21,10 +21,27 @@ Job descriptor
 **Example**
 
 ```yaml
-- uses: read_csv
-  with:
-    file: employees.csv
-    batch_size: 2500
+- - uses: read_csv
+    with:
+      file: employees.csv
+      batch_size: 2500
+  - uses: add_field
+    with:
+      field: full_name
+      language: jmespath
+      expression: concat([capitalize(fname), ' ' , capitalize(lname)])
+  - uses: map
+    with:
+      expression:
+        id: id
+        full_name: full_name
+        country: country_code || ' - ' || UPPER(country_name)
+        gender: gender
+  - uses: write_redis
+    with:
+      connection: cache
+      command: HSET
+      key_field: id
 
 ```
 
