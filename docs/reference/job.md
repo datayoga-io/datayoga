@@ -1,6 +1,6 @@
 ---
 parent: Reference
-nav_order: ((nav_order=nav_order+1))
+nav_order: nav_order+1
 ---
 
 # Job
