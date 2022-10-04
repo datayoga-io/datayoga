@@ -28,6 +28,19 @@ SQL database
 |**password**|`string`|DB password<br/>|no|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+name: ht
+type: postgresql
+host: localhost
+port: 5432
+database: postgres
+user: postgres
+password: postgres
+
+```
+
 
    
 **Option 2 (optional):** 
@@ -45,6 +58,16 @@ Redis
 |**password**|`string`|Redis DB password<br/>|no|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+name: cache
+type: redis
+host: localhost
+port: 6379
+
+```
+
 
 **Example**
 
