@@ -31,7 +31,7 @@ SQL database
 **Example**
 
 ```yaml
-name: ht
+name: hr
 type: postgresql
 host: localhost
 port: 5432
