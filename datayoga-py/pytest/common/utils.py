@@ -10,6 +10,7 @@ import redis
 from datayoga.utils import read_yaml
 from redis import Redis
 from testcontainers.core.container import DockerContainer
+from testcontainers.postgres import PostgresContainer
 from testcontainers.redis import RedisContainer
 
 logger = logging.getLogger("dy")
@@ -69,3 +70,7 @@ def get_redis_oss_container(redis_port: int, redis_password: Optional[str] = Non
             with_command(f"redis-server --requirepass {redis_password}")
     else:
         return RedisContainer().with_bind_ports(6379, redis_port)
+
+
+def get_postgres_container():
+    return PostgresContainer(dbname="postgres", user="postgres", password="postgres").with_bind_ports(5432, 5433)

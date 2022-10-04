@@ -8,6 +8,12 @@
       "type": "string",
       "title": "Source stream name",
       "description": "Source stream name"
+    },
+    "read_once": {
+      "type": "boolean",
+      "title": "Read the steam only once",
+      "description": "Read stream elements only once and quit or read infinitely",
+      "default": false
     }
   },
   "additionalProperties": false,

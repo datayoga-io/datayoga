@@ -1,14 +1,34 @@
+import json
 import logging
 
 import sqlalchemy
-from common.utils import get_postgres_container, run_job
+from common.utils import (get_postgres_container, get_redis_client,
+                          get_redis_oss_container, run_job)
 from sqlalchemy import Column, Integer, String, Table
 from sqlalchemy.orm import declarative_base
 
 logger = logging.getLogger("dy")
 
+REDIS_PORT = 12554
 
-def test_csv_to_pg():
+
+def test_redis_to_pg():
+    redis_container = get_redis_oss_container(REDIS_PORT)
+    redis_container.start()
+
+    redis_client = get_redis_client("localhost", REDIS_PORT)
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"id": 1, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M"})})
+
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"id": 2, "fname": "jane", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1000-2000-3000-4000", "gender": "F"})})
+
     postgres_container = get_postgres_container()
     postgres_container.start()
 
@@ -29,10 +49,10 @@ def test_csv_to_pg():
 
     base.metadata.create_all(engine)
 
-    run_job("test_csv_to_pg.yaml")
+    run_job("test_redis_to_pg.yaml")
 
     total_employees = engine.execute("select count(*) as total from hr.emp").fetchone()
-    assert total_employees["total"] == 3
+    assert total_employees["total"] == 2
 
     first_employee = engine.execute("select * from hr.emp where id = 1").fetchone()
 
@@ -47,10 +67,5 @@ def test_csv_to_pg():
     assert second_employee["country"] == "972 - ISRAEL"
     assert second_employee["gender"] == "F"
 
-    third_employee = engine.execute("select * from hr.emp where id = 3").fetchone()
-    assert third_employee["id"] == 3
-    assert third_employee["full_name"] == "Bill Adams"
-    assert third_employee["country"] == "1 - USA"
-    assert third_employee["gender"] == "M"
-
+    redis_container.stop()
     postgres_container.stop()
