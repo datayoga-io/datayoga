@@ -25,11 +25,11 @@ jobs:
           rm -rf ./docs/reference
           mkdir ./docs/reference
 
-          nav_order=0
+          nav_order=1
           for schema in ./datayoga-py/datayoga/resources/schemas/*.schema.json; \
             do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
-              --extension front-matter --fm.parent "Reference" --fm.nav_order "((nav_order=nav_order+1))" > \
-            ./docs/reference/$(basename "${schema}" .schema.json).md; done;
+              --extension front-matter --fm.parent "Reference" --fm.nav_order "${nav_order}" > \
+            ./docs/reference/$(basename "${schema}" .schema.json).md; nav_order=nav_order+1; done;
 
           cp /tmp/blocks.md ./docs/reference/blocks.md
 
