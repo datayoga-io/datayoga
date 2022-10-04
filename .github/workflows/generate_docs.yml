@@ -21,12 +21,16 @@ jobs:
 
       - name: Generate resource schema doc
         run: |
+          cp ./docs/reference/blocks.md /tmp/blocks.md
           rm -rf ./docs/reference
           mkdir ./docs/reference
+
           for schema in ./datayoga-py/datayoga/resources/schemas/*.schema.json; \
             do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Reference" > \
             ./docs/reference/$(basename "${schema}" .schema.json).md; done;
+
+          cp /tmp/blocks.md ./docs/reference/blocks.md
 
       # generate the markdown from json schema
       - name: Generate block schema doc
