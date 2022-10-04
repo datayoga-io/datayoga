@@ -4,10 +4,9 @@
     batch_size: 2500
 - uses: add_field
   with:
-    fields:
-      - field: full_name
-        language: jmespath
-        expression: concat([capitalize(fname), ' ' , capitalize(lname)])
+    field: full_name
+    language: jmespath
+    expression: concat([capitalize(fname), ' ' , capitalize(lname)])
 - uses: map
   with:
     expression:
