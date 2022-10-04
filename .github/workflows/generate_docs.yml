@@ -26,7 +26,7 @@ jobs:
           for schema in ./datayoga-py/datayoga/resources/schemas/*.schema.json; \
             do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Reference" > \
-            ./docs/reference <<< ${schema}.md; done;
+            ./docs/reference/ <<< ${schema}.md; done;
 
       # generate the markdown from json schema
       - name: Generate block schema doc
