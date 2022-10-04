@@ -7,12 +7,13 @@ grand_parent: Reference
 
 Filter records
 
+
 **Properties**
 
-| Name           | Type     | Description                                   | Required |
-| -------------- | -------- | --------------------------------------------- | -------- |
-| **expression** | `string` | Expression<br/>                               | yes      |
-| **language**   | `string` | Language<br/>Enum: `"jmespath"`, `"sql"`<br/> | yes      |
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**expression**|`string`|Expression<br/>|yes|
+|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 
 **Additional Properties:** not allowed  
 **Example**
@@ -20,4 +21,7 @@ Filter records
 ```yaml
 language: sql
 expression: age>20
+
 ```
+
+
