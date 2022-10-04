@@ -1,4 +1,5 @@
 {
+  "title": "Connections",
   "description": "Connection catalog",
   "type": "array",
   "items": {
