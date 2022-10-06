@@ -1,5 +1,11 @@
-import string
 
+import string
+from datetime import datetime, timezone
+from typing import Union
+from uuid import uuid4
+import hashlib
+
+import orjson
 from jmespath import functions
 
 
@@ -41,3 +47,76 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string", "null"], "variadic": True})
     def _func_split(self, element, delimiter=","):
         return str(element).split(delimiter) if element is not None else None
+
+    @functions.signature()
+    def _func_uuid(self):
+        """Generates random uuid4 and returns it as string in standard format."""
+
+        return str(uuid4())
+
+    @functions.signature({"types": ["any"], "variadic": True})
+    def _func_hash(self, obj, hash_name="sha1"):
+        """\
+        Calculates hash using given `hash_name` hash function and returns hexadecimal representation.
+
+        The following algorithms were tested:
+
+        - sha256
+        - md5
+        - sha384
+        - sha3_384
+        - blake2b
+        - sha1
+        - sha512
+        - sha3_224
+        - sha224
+        - shake_256
+        - sha3_256
+        - sha3_512
+        - blake2s
+
+        See https://docs.python.org/3/library/hashlib.html for more information.
+        """
+
+        def prepare() -> Union[bytes, bytearray]:
+            if isinstance(obj, (bytes, bytearray)):
+                return obj
+
+            if obj is None:
+                return b""
+
+            if isinstance(obj, str):
+                return obj.encode()
+
+            return orjson.dumps(obj)
+
+        h = hashlib.new(hash_name)
+        h.update(prepare())
+        return h.hexdigest()
+
+    @functions.signature({"types": ["string", "number"], "variadic": True})
+    def _func_time_delta_days(self, dt):
+        """\
+        Returns the number of days left until now(negative) or the number of days that have passed from now(positive).
+        """
+
+        dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
+        now = dt.now(dt.tzinfo)
+
+        delta = dt - now
+
+        return delta.days
+
+
+    @functions.signature({"types": ["string", "number"], "variadic": True})
+    def _func_time_delta_seconds(self, dt):
+        """\
+        Returns the number of days left until now(negative) or the number of days that have passed from now(positive).
+        """
+
+        dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
+        now = dt.now(dt.tzinfo)
+
+        delta = dt - now
+
+        return delta.days * 86400 + delta.seconds
