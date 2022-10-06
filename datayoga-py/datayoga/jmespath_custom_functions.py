@@ -111,7 +111,8 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string", "number"], "variadic": True})
     def _func_time_delta_seconds(self, dt):
         """\
-        Returns the number of days left until now(negative) or the number of days that have passed from now(positive).
+        Returns the number of days left until now(negative) or the number
+        of seconds that have passed from now(positive).
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
