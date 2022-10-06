@@ -94,10 +94,13 @@ class JmespathCustomFunctions(functions.Functions):
         h.update(prepare())
         return h.hexdigest()
 
-    @functions.signature({"types": ["string", "number"], "variadic": True})
+    @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_days(self, dt):
         """\
         Returns the number of days left until now(negative) or the number of days that have passed from now(positive).
+
+        If `dt` is string ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
+        If `dt` is number unix timestamp is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
@@ -108,11 +111,14 @@ class JmespathCustomFunctions(functions.Functions):
         return delta.days
 
 
-    @functions.signature({"types": ["string", "number"], "variadic": True})
+    @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_seconds(self, dt):
         """\
         Returns the number of days left until now(negative) or the number
         of seconds that have passed from now(positive).
+
+        If `dt` is string ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
+        If `dt` is number unix timestamp is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
