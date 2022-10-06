@@ -1,53 +1,37 @@
 import logging
 
-import sqlalchemy
-from common.utils import get_postgres_container, run_job
-from sqlalchemy import Column, Integer, String, Table
-from sqlalchemy.orm import declarative_base
+import common.pg as pg
+from common.utils import run_job
 
 logger = logging.getLogger("dy")
 
 
 def test_csv_to_pg():
-    postgres_container = get_postgres_container()
+    postgres_container = pg.get_postgres_container()
     postgres_container.start()
 
-    schema_name = "hr"
-    engine = sqlalchemy.create_engine(postgres_container.get_connection_url())
-    base = declarative_base()
-
-    if not engine.dialect.has_schema(engine, schema_name):
-        engine.execute(sqlalchemy.schema.CreateSchema(schema_name))
-
-    columns = [
-        Column("id", Integer, primary_key=True, nullable=False),
-        Column("full_name", String(50)),
-        Column("country", String(50)),
-        Column("gender", String(1))
-    ]
-    Table("emp", base.metadata, *columns, schema=schema_name)
-
-    base.metadata.create_all(engine)
+    engine = pg.get_engine(postgres_container)
+    pg.create_emp_table(engine, "hr")
 
     run_job("test_csv_to_pg.yaml")
 
-    total_employees = engine.execute("select count(*) as total from hr.emp").fetchone()
+    total_employees = pg.select_one_row(engine, "select count(*) as total from hr.emp")
     assert total_employees["total"] == 3
 
-    first_employee = engine.execute("select * from hr.emp where id = 1").fetchone()
+    first_employee = pg.select_one_row(engine, "select * from hr.emp where id = 1")
 
     assert first_employee["id"] == 1
     assert first_employee["full_name"] == "John Doe"
     assert first_employee["country"] == "972 - ISRAEL"
     assert first_employee["gender"] == "M"
 
-    second_employee = engine.execute("select * from hr.emp where id = 2").fetchone()
+    second_employee = pg.select_one_row(engine, "select * from hr.emp where id = 2")
     assert second_employee["id"] == 2
     assert second_employee["full_name"] == "Jane Doe"
     assert second_employee["country"] == "972 - ISRAEL"
     assert second_employee["gender"] == "F"
 
-    third_employee = engine.execute("select * from hr.emp where id = 3").fetchone()
+    third_employee = pg.select_one_row(engine, "select * from hr.emp where id = 3")
     assert third_employee["id"] == 3
     assert third_employee["full_name"] == "Bill Adams"
     assert third_employee["country"] == "1 - USA"

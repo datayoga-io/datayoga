@@ -4,14 +4,9 @@ import os
 import time
 from os import path
 from subprocess import PIPE, Popen
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict
 
-import redis
 from datayoga.utils import read_yaml
-from redis import Redis
-from testcontainers.core.container import DockerContainer
-from testcontainers.postgres import PostgresContainer
-from testcontainers.redis import RedisContainer
 
 logger = logging.getLogger("dy")
 
@@ -45,32 +40,3 @@ def execute_program(command: str):
 def run_job(job_file: str):
     execute_program(
         f'datayoga run {path.join(os.path.dirname(os.path.realpath(__file__)), "..", "resources", job_file)} --loglevel DEBUG')
-
-
-def get_redis_client(host: str, port: int, password: Optional[str] = None) -> Redis:
-    try:
-        client = redis.Redis(
-            host=host,
-            port=port,
-            password=password,
-            decode_responses=True,
-            client_name="datayoga"
-        )
-
-        client.ping()
-        return client
-    except Exception as e:
-        raise ValueError(f"can not connect to Redis on {host}:{port}:\n {e}")
-
-
-def get_redis_oss_container(redis_port: int, redis_password: Optional[str] = None) -> Union[DockerContainer, RedisContainer]:
-    if redis_password:
-        return DockerContainer(image="redis:latest").\
-            with_bind_ports(6379, redis_port).\
-            with_command(f"redis-server --requirepass {redis_password}")
-    else:
-        return RedisContainer().with_bind_ports(6379, redis_port)
-
-
-def get_postgres_container():
-    return PostgresContainer(dbname="postgres", user="postgres", password="postgres").with_bind_ports(5432, 5433)
