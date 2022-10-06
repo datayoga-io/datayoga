@@ -54,7 +54,7 @@ class JmespathCustomFunctions(functions.Functions):
 
         return str(uuid4())
 
-    @functions.signature({"types": ["any"], "variadic": True})
+    @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"], "variadic": True})
     def _func_hash(self, obj, hash_name="sha1"):
         """\
         Calculates hash using given `hash_name` hash function and returns hexadecimal representation.
@@ -70,7 +70,6 @@ class JmespathCustomFunctions(functions.Functions):
         - sha512
         - sha3_224
         - sha224
-        - shake_256
         - sha3_256
         - sha3_512
         - blake2s
@@ -97,25 +96,26 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_days(self, dt):
         """\
-        Returns the number of days left until now(negative) or the number of days that have passed from now(positive).
+        Returns the number of days between given `dt` and now(positive)
+        or the number of days that have passed from now(negative).
 
         If `dt` is string ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
         If `dt` is number unix timestamp is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
+
         now = dt.now(dt.tzinfo)
 
-        delta = dt - now
+        delta = now - dt
 
         return delta.days
-
 
     @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_seconds(self, dt):
         """\
-        Returns the number of days left until now(negative) or the number
-        of seconds that have passed from now(positive).
+        Returns the number of seconds between given `dt` and now(positive)
+        or the number of seconds that have passed from now(negative).
 
         If `dt` is string ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
         If `dt` is number unix timestamp is assumed.
@@ -124,6 +124,6 @@ class JmespathCustomFunctions(functions.Functions):
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
         now = dt.now(dt.tzinfo)
 
-        delta = dt - now
+        delta = now - dt
 
         return delta.days * 86400 + delta.seconds
