@@ -3,7 +3,7 @@ remote_theme: just-the-docs/just-the-docs
 source: docs
 title: DataYoga
 name: DataYoga
-description: DataYoga transformation engine
+description: DataYoga is a framework for building and running streaming or batch data pipelines.
 
 markdown: kramdown
 search_enabled: false
@@ -17,12 +17,3 @@ footer_content: "Copyright DataYoga"
 aux_links:
   "DataYoga on GitHub":
     - "//github.com/datayoga-io"
-
-# Makes Aux links open in a new tab. Default is false
-aux_links_new_tab: false
-
-# variables exposed in the markdown files as {{ site.<VARIABLE_NAME> }}
-titles_from_headings:
-  enabled:     true
-  strip_title: false
-  collections: false

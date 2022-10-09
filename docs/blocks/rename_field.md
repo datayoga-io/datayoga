@@ -1,9 +1,8 @@
 ---
 parent: Blocks Reference
-layout: page
 ---
 
-# Rename fields
+# Rename Fields
 
 Renames fields. All other fields remain unchanged
 

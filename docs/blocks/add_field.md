@@ -1,9 +1,8 @@
 ---
 parent: Blocks Reference
-layout: page
 ---
 
-# Add fields
+# Add Fields
 
 Add fields to a record
 

@@ -77,3 +77,17 @@ def test_jmespath_mid_expression_null():
     expression.compile(f"mid(sentence, `1`, `4`)")
     assert expression.search({}) == None
 
+
+def test_jmespath_split_expression():
+    expression.compile(f"split(departments)")
+    assert expression.search({"departments": "finance,hr,r&d"}) == ["finance", "hr", "r&d"]
+
+
+def test_jmespath_split_expression_null():
+    expression.compile(f"split(animals, ',')")
+    assert expression.search({"animals": None}) == None
+
+
+def test_jmespath_split_delimiter_expression():
+    expression.compile(f"split(animals, '|')")
+    assert expression.search({"animals": "cat|dog|frog|mouse"}) == ["cat", "dog", "frog", "mouse"]

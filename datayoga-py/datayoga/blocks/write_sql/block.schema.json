@@ -1,0 +1,78 @@
+{
+  "type": "object",
+  "title": "Write SQL",
+  "description": "Write into a SQL-compatible data store",
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "load_snowflake",
+      "type": "write_sql",
+      "properties": {
+        "connection": "eu_datalake",
+        "table_name": "employees",
+        "table_schema": "dbo",
+        "target_type": "database",
+        "load_strategy": "APPEND"
+      }
+    }
+  ],
+  "required": ["connection", "table", "schema"],
+  "properties": {
+    "business_keys": {
+      "type": "array",
+      "title": "Business keys to use for upsert in case of an UPSERT",
+      "items": {
+        "type": "string",
+        "description": "The business key is used for performing an upsert in case the load strategy is UPSERT",
+        "title": "name of column"
+      }
+    },
+    "connection": {
+      "type": "string",
+      "title": "The connection to use for loading",
+      "description": "Logical connection name as defined in the connections.yaml",
+      "examples": ["europe_db", "target", "eu_dwh"]
+    },
+    "table": {
+      "type": "string",
+      "title": "The target table name",
+      "description": "Target table name",
+      "examples": ["employees"]
+    },
+    "schema": {
+      "type": "string",
+      "title": "The table schema of the target table",
+      "description": "If left blank, the default schema of this connection will be used as defined in the connections.yaml",
+      "examples": ["dbo"]
+    },
+    "load_strategy": {
+      "type": "string",
+      "enum": ["APPEND", "REPLACE", "UPSERT", "TYPE2"],
+      "description": "type of target",
+      "default": "APPEND"
+    },
+    "active_record_indicator": {
+      "type": "string",
+      "description": "Used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active",
+      "examples": ["is_active='Y'", "deletedAt is null"]
+    },
+    "inactive_record_mapping": {
+      "type": "array",
+      "title": "Used for `TYPE2` load_strategy. The columns mapping to use to close out an active record",
+      "description": "A list of columns to use. Use any valid SQL expression for the source. If 'target' is omitted, will default to the name of the source column",
+      "default": [],
+      "examples": [
+        [
+          {
+            "source": "CURRENT_DATE",
+            "target": "deletedAt"
+          },
+          {
+            "source": "'Y'",
+            "target": "is_active"
+          }
+        ]
+      ]
+    }
+  }
+}

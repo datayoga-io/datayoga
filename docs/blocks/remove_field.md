@@ -1,9 +1,8 @@
 ---
 parent: Blocks Reference
-layout: page
 ---
 
-# Remove fields
+# Remove Fields
 
 Remove fields
 

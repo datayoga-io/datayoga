@@ -1,9 +1,8 @@
 ---
 parent: Blocks Reference
-layout: page
 ---
 
-# Filter records
+# Filter Records
 
 Filter records
 
