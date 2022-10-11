@@ -1,4 +1,3 @@
-
 import string
 from datetime import datetime, timezone
 from typing import Union
@@ -50,23 +49,23 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature()
     def _func_uuid(self):
-        """Generates random uuid4 and returns it as string in standard format."""
+        """Generates a random UUID4 and returns it as a string in standard format."""
 
         return str(uuid4())
 
     @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"], "variadic": True})
     def _func_hash(self, obj, hash_name="sha1"):
         """\
-        Calculates hash using given `hash_name` hash function and returns hexadecimal representation.
+        Calculates a hash using given the `hash_name` hash function and returns its hexadecimal representation.
 
-        The following algorithms were tested:
+        Supported algorithms:
 
+        - sha1(default)
         - sha256
         - md5
         - sha384
         - sha3_384
         - blake2b
-        - sha1
         - sha512
         - sha3_224
         - sha224
