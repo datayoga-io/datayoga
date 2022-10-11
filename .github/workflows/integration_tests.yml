@@ -1,7 +1,7 @@
 name: integration-tests
 on:
-  workflow_dispatch:
-  push:
+  pull_request:
+    types: [opened, edited, synchronize]
 
 jobs:
   integration-tests:
