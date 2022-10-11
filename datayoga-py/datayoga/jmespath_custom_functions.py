@@ -103,10 +103,7 @@ class JmespathCustomFunctions(functions.Functions):
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
-
-        now = dt.now(dt.tzinfo)
-
-        delta = now - dt
+        delta = dt.now(dt.tzinfo) - dt
 
         return delta.days
 
@@ -121,8 +118,6 @@ class JmespathCustomFunctions(functions.Functions):
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
-        now = dt.now(dt.tzinfo)
-
-        delta = now - dt
+        delta = dt.now(dt.tzinfo) - dt
 
         return delta.days * 86400 + delta.seconds
