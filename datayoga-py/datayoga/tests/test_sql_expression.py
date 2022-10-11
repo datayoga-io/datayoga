@@ -1,4 +1,4 @@
-from datayoga.blocks.expression import SQLExpression
+from datayoga.expression import SQLExpression
 
 
 def test_sql_expression():

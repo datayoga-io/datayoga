@@ -1,15 +1,16 @@
 ---
-parent: Blocks Reference
+parent: Blocks
+grand_parent: Reference
 ---
 
-# Rename Fields
+# Remove Fields
 
-Renames fields. All other fields remain unchanged
+Remove fields
 
 
    
 **Option 1 (alternative):** 
-Rename multiple fields
+Remove multiple fields
 
 
 **Properties**
@@ -23,33 +24,28 @@ Rename multiple fields
 
 ```yaml
 fields:
-  - fields:
-      - from_field: name.lname
-        to_field: name.last_name
-      - from_field: name.fname
-        to_field: name.first_name
+  - field: credit_card
+  - field: name.mname
 
 ```
 
 
    
 **Option 2 (alternative):** 
-Rename one field
+Remove one field
 
 
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**from\_field**|`string`|From field<br/>|yes|
-|**to\_field**|`string`|To field<br/>|yes|
+|**field**|`string`|Field<br/>|yes|
 
 **Additional Properties:** not allowed  
 **Example**
 
 ```yaml
-from_field: name.lname
-to_field: name.last_name
+field: credit_card
 
 ```
 
@@ -66,18 +62,13 @@ Fields
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**from\_field**|`string`|From field<br/>|yes|
-|**to\_field**|`string`|To field<br/>|yes|
+|**field**|`string`|Field<br/>|yes|
 
 **Item Additional Properties:** not allowed  
 **Example**
 
 ```yaml
-- fields:
-    - from_field: name.lname
-      to_field: name.last_name
-    - from_field: name.fname
-      to_field: name.first_name
+- {}
 
 ```
 

@@ -8,6 +8,12 @@
       "type": "string",
       "title": "Source stream name",
       "description": "Source stream name"
+    },
+    "snapshot": {
+      "type": "boolean",
+      "title": "Snapshot current entries and quit",
+      "description": "Snapshot current entries and quit",
+      "default": false
     }
   },
   "additionalProperties": false,

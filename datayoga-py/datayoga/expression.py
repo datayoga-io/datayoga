@@ -4,7 +4,8 @@ from enum import Enum, unique
 from typing import Any, Dict, List
 
 import jmespath
-from datayoga.blocks.jmespath_custom_functions import JmespathCustomFunctions
+
+from datayoga.jmespath_custom_functions import JmespathCustomFunctions
 
 
 @unique

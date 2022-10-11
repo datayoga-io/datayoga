@@ -1,5 +1,6 @@
 ---
-parent: Blocks Reference
+parent: Blocks
+grand_parent: Reference
 ---
 
 # Add a Sequence Number

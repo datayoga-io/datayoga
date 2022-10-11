@@ -1,4 +1,5 @@
 import logging
+import os
 from csv import DictReader
 from typing import Any, Dict, List, Optional
 
@@ -12,8 +13,14 @@ class Block(DyBlock):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
+        csv_file = self.properties["file"]
 
-        self.file = self.properties["file"]
+        if os.path.isabs(csv_file) or context is None:
+            self.file = csv_file
+        else:
+            self.file = os.path.join(context.properties.get("data_path"), csv_file)
+
+        logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)
 
     def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

@@ -1,15 +1,16 @@
 ---
-parent: Blocks Reference
+parent: Blocks
+grand_parent: Reference
 ---
 
-# Remove Fields
+# Add Fields
 
-Remove fields
+Add fields to a record
 
 
    
 **Option 1 (alternative):** 
-Remove multiple fields
+Add multiple fields
 
 
 **Properties**
@@ -23,15 +24,19 @@ Remove multiple fields
 
 ```yaml
 fields:
-  - field: credit_card
-  - field: name.mname
+  - field: name.full_name
+    language: jmespath
+    expression: concat([name.fname, ' ', name.lname])
+  - field: name.fname_upper
+    language: jmespath
+    expression: upper(name.fname)
 
 ```
 
 
    
 **Option 2 (alternative):** 
-Remove one field
+Add one field
 
 
 **Properties**
@@ -39,12 +44,16 @@ Remove one field
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**field**|`string`|Field<br/>|yes|
+|**expression**|`string`|Expression<br/>|yes|
+|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 
 **Additional Properties:** not allowed  
 **Example**
 
 ```yaml
-field: credit_card
+field: country
+language: sql
+expression: country_code || ' - ' || UPPER(country_name)
 
 ```
 
@@ -62,6 +71,8 @@ Fields
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**field**|`string`|Field<br/>|yes|
+|**expression**|`string`|Expression<br/>|yes|
+|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 
 **Item Additional Properties:** not allowed  
 **Example**

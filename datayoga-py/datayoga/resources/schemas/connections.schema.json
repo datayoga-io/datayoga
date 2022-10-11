@@ -1,4 +1,5 @@
 {
+  "title": "Connections",
   "description": "Connection catalog",
   "type": "array",
   "items": {
@@ -25,7 +26,18 @@
           "password": { "description": "DB password", "type": "string" }
         },
         "additionalProperties": false,
-        "required": ["type", "host", "database", "user"]
+        "required": ["type", "host", "database", "user"],
+        "examples": [
+          {
+            "name": "hr",
+            "type": "postgresql",
+            "host": "localhost",
+            "port": 5432,
+            "database": "postgres",
+            "user": "postgres",
+            "password": "postgres"
+          }
+        ]
       },
       {
         "description": "Redis",
@@ -49,7 +61,15 @@
           }
         },
         "additionalProperties": false,
-        "required": ["name", "type", "host", "port"]
+        "required": ["name", "type", "host", "port"],
+        "examples": [
+          {
+            "name": "cache",
+            "type": "redis",
+            "host": "localhost",
+            "port": 6379
+          }
+        ]
       }
     ]
   }
