@@ -1,15 +1,16 @@
 ---
-parent: Blocks Reference
+parent: Blocks
+grand_parent: Reference
 ---
 
-# Add Fields
+# Rename Fields
 
-Add fields to a record
+Renames fields. All other fields remain unchanged
 
 
    
 **Option 1 (alternative):** 
-Add multiple fields
+Rename multiple fields
 
 
 **Properties**
@@ -23,36 +24,33 @@ Add multiple fields
 
 ```yaml
 fields:
-  - field: name.full_name
-    language: jmespath
-    expression: concat([name.fname, ' ', name.lname])
-  - field: name.fname_upper
-    language: jmespath
-    expression: upper(name.fname)
+  - fields:
+      - from_field: name.lname
+        to_field: name.last_name
+      - from_field: name.fname
+        to_field: name.first_name
 
 ```
 
 
    
 **Option 2 (alternative):** 
-Add one field
+Rename one field
 
 
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**field**|`string`|Field<br/>|yes|
-|**expression**|`string`|Expression<br/>|yes|
-|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
+|**from\_field**|`string`|From field<br/>|yes|
+|**to\_field**|`string`|To field<br/>|yes|
 
 **Additional Properties:** not allowed  
 **Example**
 
 ```yaml
-field: country
-language: sql
-expression: country_code || ' - ' || UPPER(country_name)
+from_field: name.lname
+to_field: name.last_name
 
 ```
 
@@ -69,15 +67,18 @@ Fields
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**field**|`string`|Field<br/>|yes|
-|**expression**|`string`|Expression<br/>|yes|
-|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
+|**from\_field**|`string`|From field<br/>|yes|
+|**to\_field**|`string`|To field<br/>|yes|
 
 **Item Additional Properties:** not allowed  
 **Example**
 
 ```yaml
-- {}
+- fields:
+    - from_field: name.lname
+      to_field: name.last_name
+    - from_field: name.fname
+      to_field: name.first_name
 
 ```
 

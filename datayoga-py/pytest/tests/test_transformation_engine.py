@@ -1,13 +1,11 @@
 
 
 import logging
-import os
-from os import path
 
 import datayoga as dy
 import pytest
+from common.utils import get_job_settings_from_yaml
 from datayoga.job import Job
-from datayoga.utils import read_yaml
 
 logger = logging.getLogger("dy")
 
@@ -22,9 +20,11 @@ TEST_DATA = [
     }
 ]
 
+TEST_YAML = "test.yaml"
+
 
 def test_transform_oo():
-    job_settings = get_job_settings_from_test_yaml()
+    job_settings = get_job_settings_from_yaml(TEST_YAML)
     job = Job(job_settings)
 
     for data in TEST_DATA:
@@ -32,7 +32,7 @@ def test_transform_oo():
 
 
 def test_compile_and_transform_module():
-    job_settings = get_job_settings_from_test_yaml()
+    job_settings = get_job_settings_from_yaml(TEST_YAML)
     job = dy.compile(job_settings)
 
     for data in TEST_DATA:
@@ -40,14 +40,14 @@ def test_compile_and_transform_module():
 
 
 def test_transform_module():
-    job_settings = get_job_settings_from_test_yaml()
+    job_settings = get_job_settings_from_yaml(TEST_YAML)
 
     for data in TEST_DATA:
         assert dy.transform(job_settings, data["before"]) == data["after"]
 
 
 def test_validate_valid_job():
-    job_settings = get_job_settings_from_test_yaml()
+    job_settings = get_job_settings_from_yaml(TEST_YAML)
     dy.validate(job_settings)
 
 
@@ -57,9 +57,3 @@ def test_validate_invalid_job():
 
     with pytest.raises(ValueError):
         dy.validate(job_settings)
-
-
-def get_job_settings_from_test_yaml():
-    job_settings = read_yaml(path.join(os.path.dirname(os.path.realpath(__file__)), "test.yaml"))
-    logger.debug(f"job_settings: {job_settings}")
-    return job_settings

@@ -1,0 +1,30 @@
+name: unit-tests
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      # Setup Python (faster than using Python container)
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          cd datayoga-py
+          pip install . 
+          pip install .[test]
+
+      - name: Run tests
+        run: |
+          cd datayoga-py/datayoga
+          PYTHONPATH=. python -m pytest --log-cli-level=DEBUG
