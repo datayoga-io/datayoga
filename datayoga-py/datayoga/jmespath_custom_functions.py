@@ -99,7 +99,7 @@ class JmespathCustomFunctions(functions.Functions):
         or the number of days that have passed from now(negative).
 
         If `dt` is a string, ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
-        If `dt` is a number, Unix timestamp is assumed.
+        If `dt` is a number, Unix timestamp(1320365123) is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
@@ -114,7 +114,7 @@ class JmespathCustomFunctions(functions.Functions):
         or the number of seconds that have passed from now(negative).
 
         If `dt` is a string, ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
-        If `dt` is a number, Unix timestamp is assumed.
+        If `dt` is a number, Unix timestamp(1320365123) is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
