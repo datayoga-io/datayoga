@@ -99,8 +99,8 @@ class JmespathCustomFunctions(functions.Functions):
         Returns the number of days between given `dt` and now(positive)
         or the number of days that have passed from now(negative).
 
-        If `dt` is string ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
-        If `dt` is number unix timestamp is assumed.
+        If `dt` is a string, ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
+        If `dt` is a number, Unix timestamp is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
@@ -117,8 +117,8 @@ class JmespathCustomFunctions(functions.Functions):
         Returns the number of seconds between given `dt` and now(positive)
         or the number of seconds that have passed from now(negative).
 
-        If `dt` is string ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
-        If `dt` is number unix timestamp is assumed.
+        If `dt` is a string, ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
+        If `dt` is a number, Unix timestamp is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
