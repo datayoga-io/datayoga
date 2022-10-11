@@ -3,10 +3,10 @@
 name: upload python package
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

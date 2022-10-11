@@ -77,7 +77,7 @@ def run(
 
         context = Context({
             "connections": connections,
-            "data_path": path.join(job_path, "..", "data"),
+            "data_path": path.join(job_path, "data"),
             "job_name": Path(job_file).stem
         })
 
