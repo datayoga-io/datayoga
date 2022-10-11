@@ -18,7 +18,7 @@ class Block(DyBlock):
         if os.path.isabs(csv_file) or context is None:
             self.file = csv_file
         else:
-            self.file = os.path.join(context.properties.get("job_path"), csv_file)
+            self.file = os.path.join(context.properties.get("data_path"), csv_file)
 
         logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)

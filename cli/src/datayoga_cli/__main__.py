@@ -69,16 +69,16 @@ def run(
         job_settings = read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
 
-        job_path = path.dirname(job_file)
+        data_path = path.dirname(job_file)
 
-        connections = read_yaml(path.join(job_path, "connections.yaml"))
+        connections = read_yaml(path.join(data_path, "connections.yaml"))
         jsonschema.validate(instance=connections, schema=utils.read_json(
             utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
         context = Context({
             "connections": connections,
-            "job_name": Path(job_file).stem,
-            "job_path": job_path
+            "data_path": data_path,
+            "job_name": Path(job_file).stem
         })
 
         job = Job(job_settings, context)
