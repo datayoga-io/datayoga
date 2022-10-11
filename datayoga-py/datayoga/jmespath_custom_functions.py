@@ -1,8 +1,8 @@
+import hashlib
 import string
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Union
 from uuid import uuid4
-import hashlib
 
 import orjson
 from jmespath import functions
@@ -95,11 +95,11 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_days(self, dt):
         """\
-        Returns the number of days between given `dt` and now(positive)
-        or the number of days that have passed from now(negative).
+        Returns the number of days between given `dt` and now (positive)
+        or the number of days that have passed from now (negative).
 
-        If `dt` is a string, ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
-        If `dt` is a number, Unix timestamp(1320365123) is assumed.
+        If `dt` is a string, ISO datetime (2011-11-04T00:05:23+04:00, for example) is assumed.
+        If `dt` is a number, Unix timestamp (1320365123, for example) is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
@@ -110,11 +110,11 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_seconds(self, dt):
         """\
-        Returns the number of seconds between given `dt` and now(positive)
-        or the number of seconds that have passed from now(negative).
+        Returns the number of seconds between given `dt` and now (positive)
+        or the number of seconds that have passed from now (negative).
 
-        If `dt` is a string, ISO datetime(2011-11-04T00:05:23+04:00) is assumed.
-        If `dt` is a number, Unix timestamp(1320365123) is assumed.
+        If `dt` is a string, ISO datetime (2011-11-04T00:05:23+04:00, for example) is assumed.
+        If `dt` is a number, Unix timestamp (1320365123, for example) is assumed.
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
