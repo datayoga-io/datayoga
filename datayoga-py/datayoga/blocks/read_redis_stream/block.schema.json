@@ -9,10 +9,10 @@
       "title": "Source stream name",
       "description": "Source stream name"
     },
-    "read_once": {
+    "snapshot": {
       "type": "boolean",
-      "title": "Read the steam only once",
-      "description": "Read stream elements only once and quit or read infinitely",
+      "title": "Snapshot current entries and quit",
+      "description": "Snapshot current entries and quit",
       "default": false
     }
   },

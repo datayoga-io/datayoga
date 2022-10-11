@@ -21,7 +21,7 @@ class Block(DyBlock):
             connection.get("password"))
 
         self.stream = self.properties["stream_name"]
-        self.read_once = self.properties.get("read_once", False)
+        self.snapshot = self.properties.get("snapshot", False)
         self.consumer_group = f'datayoga_job_{context.properties.get("job_name", "") if context else ""}'
         self.requesting_consumer = "dy_consumer_a"
         stream_groups = self.redis_client.xinfo_groups(self.stream)
@@ -40,7 +40,7 @@ class Block(DyBlock):
                     key, value = stream_element
                     yield {"key": key, "value": json.loads(value[next(iter(value))])}
 
-            if self.read_once:
+            if self.snapshot:
                 break
 
     def ack(self, key: str):
