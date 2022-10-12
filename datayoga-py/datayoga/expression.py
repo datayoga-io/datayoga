@@ -83,7 +83,8 @@ class SQLExpression(Expression):
             for field in fields:
                 new_data[field] = self.exec_sql(data, fields[field])
             return new_data
-        except:
+        except json.JSONDecodeError:
+            # this is not a json, treat as a simple expression
             return self.exec_sql(data, self.expression)
 
     def exec_sql(self, data: List[Dict[str, Any]], expression: str) -> List[Dict[str, Any]]:
