@@ -36,8 +36,12 @@ class Block():
         """
         Validates block against its JSON Schema
         """
-        json_schema_file = path.join(os.path.dirname(os.path.realpath(
-            sys.modules[self.__module__].__file__)), "block.schema.json")
+        json_schema_file = path.join(
+            sys._MEIPASS, "blocks", self.get_block_name(),
+            "block.schema.json") if utils.is_bundled() else path.join(
+            os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
+            "block.schema.json")
+
         logger.debug(f"validating {self.properties} against {json_schema_file}")
         validate(instance=self.properties, schema=utils.read_json(json_schema_file))
 
@@ -87,4 +91,4 @@ class Block():
         pass
 
     def get_block_name(self):
-        return self.__class__.__name__
+        return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))

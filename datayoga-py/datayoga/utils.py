@@ -56,8 +56,12 @@ def format_block_properties(properties: Dict[str, Any]) -> Dict[str, Any]:
     return {"fields": [properties]} if not "fields" in properties else properties
 
 
+def is_bundled() -> bool:
+    return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+
+
 def get_resource_path(relative_path: str) -> str:
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    if is_bundled():
         # we are running in a bundle
         return path.join(sys._MEIPASS, "resources", relative_path)
     else:
