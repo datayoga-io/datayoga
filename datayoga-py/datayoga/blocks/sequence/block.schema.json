@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "title": "Add a Sequence Number",
+  "description": "Add a sequence number field to data",
+  "additionalProperties": false,
+  "examples": [],
+  "required": [],
+  "properties": {
+    "field": {
+      "type": "string",
+      "title": "Name of new sequence field"
+    },
+    "start": {
+      "type": "number",
+      "title": "Start entry",
+      "default": 1,
+      "examples": []
+    },
+    "increment": {
+      "type": "number",
+      "title": "Increment between sequences",
+      "examples": []
+    }
+  }
+}

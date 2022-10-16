@@ -1,121 +1,78 @@
 ---
-title: Quickstart
-nav_order: 1
+nav_order: 2
 ---
 
-# datayoga-py
+# Getting started
 
-## Introduction
+## Download the CLI
 
-`datayoga-py` is the transformation engine used in `DataYoga`, a framework for building and generating data pipelines.
-
-## Installation
+UBUNTU20.04
 
 ```bash
-pip install datayoga-py
+wget https://datayoga.io/releases/dy_cli/latest/dy_cli-ubuntu20.04-latest.tar.gz -O /tmp/dy_cli.tar.gz
 ```
 
-## Quick start
+UBUNTU18.04
 
-This demonstrates how to transform data using a DataYoga job.
-
-### Create a Job
-
-Use this `example.yaml`:
-
-```yaml
-- uses: add_field
-  with:
-    field: full_name
-    language: jmespath
-    expression: '{ "fname": fname, "lname": lname} | join('' '', values(@))'
-- uses: rename_field
-  with:
-    from_field: fname
-    to_field: first_name
-- uses: rename_field
-  with:
-    from_field: lname
-    to_field: last_name
-- uses: remove_field
-  with:
-    field: credit_card
-- uses: add_field
-  with:
-    field: country
-    language: sql
-    expression: country_code || ' - ' || UPPER(country_name)
-- uses: remove_field
-  with:
-    field: country_name
-- uses: remove_field
-  with:
-    field: country_code
-- uses: map
-  with:
-    object:
-      {
-        first_name: first_name,
-        last_name: last_name,
-        greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
-        country: country,
-        full_name: full_name
-      }
-    language: sql
+```bash
+wget https://datayoga.io/releases/dy_cli/latest/dy_cli-ubuntu18.04-latest.tar.gz -O /tmp/dy_cli.tar.gz
 ```
 
-### Transform data using `datayoga-py`
+RHEL8
 
-Use this code snippet to transform a data record using the job defined [above](#create-a-job):
-
-```python
-import datayoga as dy
-from datayoga.job import Job
-from datayoga.utils import read_yaml
-
-job_settings = read_yaml("example.yaml")
-job = dy.compile(job_settings)
-
-assert job.transform({"fname": "jane", "lname": "smith", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999", "gender": "F"}) == {"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"}
+```bash
+wget https://datayoga.io/releases/dy_cli/latest/dy_cli-rhel8-latest.tar.gz -O /tmp/dy_cli.tar.gz
 ```
 
-As can be seen, the record has been transformed based on the job:
+RHEL7
 
-- `fname` field renamed to `first_name`.
-- `lname` field renamed to `last_name`.
-- `country` field added based on an SQL expression.
-- `full_name` field added based on a [JMESPath](https://jmespath.org/) expression.
-- `greeting` field added based on an SQL expression.
+```bash
+wget https://datayoga.io/releases/dy_cli/latest/dy_cli-rhel7-latest.tar.gz -O /tmp/dy_cli.tar.gz
+```
 
-## Block reference
+For other platforms, see installing from pip
 
-For a full list of supported block types [see reference](blocks.md).
+## Install the CLI
 
-### Examples
+Unpack the downloaded file into /usr/local/bin/ directory:
 
-- Add a new field `country` out of an SQL expression that concatenates `country_code` and `country_name` fields after upper case the later:
+```bash
+sudo tar xvf /tmp/dy_cli.tar.gz -C /usr/local/bin/
+```
 
-  ```yaml
-  uses: add_field
-  with:
-    field: country
-    language: sql
-    expression: country_code || ' - ' || UPPER(country_name)
-  ```
+Verify that the installation completed successfully by running the following command:
 
-- Rename field `lname` to `last_name`:
+```bash
+datayoga --version
+```
 
-  ```yaml
-  uses: rename_field
-  with:
-    from_field: lname
-    to_field: last_name
-  ```
+\*Note: Non-root users should unpack to a directory with write permission and run `datayoga` directly from it.
 
-- Remove `credit_card` field:
+## Create a new DataYoga Project
 
-  ```yaml
-  uses: remove_field
-  with:
-    field: credit_card
-  ```
+To create a new DataYoga project, use the init command.
+
+```bash
+datayoga init hello_world
+cd hello_world
+```
+
+## Validating the Install
+
+Let's run our first job. It is pre-defined in the samples folder as part of the init command.
+
+```bash
+datayoga run sample.hello
+```
+
+If all goes well, you should see some startup logs, and eventually:
+
+```bash
++-----+-----+
+| id  | name|
++-----+-----+
+|hello|world|
++-----+-----+
+```
+
+That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the reference to see the different block types currently available.

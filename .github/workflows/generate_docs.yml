@@ -1,7 +1,7 @@
 name: generate docs for jsonschema
 on:
-  workflow_dispatch:
   pull_request:
+    types: [opened, edited, synchronize]
 
 jobs:
   docs:
@@ -18,16 +18,33 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      # generate the markdown from json schema
-      - name: generate block schema doc
+
+      - name: Generate resource schema doc
         run: |
-          rm -rf ./docs/blocks
-          mkdir ./docs/blocks
-          for schema in ./datayoga/blocks/**/*.schema.json; \
-            do npx jsonschema2mk --schema $schema --extension yaml-examples \
-              --extension front-matter --fm.parent "Blocks Reference" > \
-            ./docs/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"$schema").md; done;
-      - name: push to repo
+          cp ./docs/reference/blocks.md /tmp/blocks.md
+          rm -rf ./docs/reference
+          mkdir ./docs/reference
+
+          nav_order=1
+          for schema in ./datayoga-py/datayoga/resources/schemas/*.schema.json; \
+            do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+              --extension front-matter --fm.parent "Reference" --fm.nav_order "${nav_order}" > \
+            ./docs/reference/$(basename "${schema}" .schema.json).md; \
+            nav_order=$((nav_order+1)); done;
+
+          cp /tmp/blocks.md ./docs/reference/blocks.md
+
+      # generate the markdown from json schema
+      - name: Generate block schema doc
+        run: |
+          rm -rf ./docs/reference/blocks
+          mkdir ./docs/reference/blocks
+          for schema in ./datayoga-py/datayoga/blocks/**/*.schema.json; \
+            do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+              --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
+            ./docs/reference/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"${schema}").md; done;
+
+      - name: Push to repo
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
