@@ -21,13 +21,15 @@ class Job():
         steps List[Block]: List of steps
     """
 
-    def __init__(self, job_steps: List[Dict[str, Any]], context: Optional[Context] = None):
+    def __init__(self, job_steps: List[Dict[str, Any]],
+                 context: Optional[Context] = None, whitelisted_blocks: Optional[List[str]] = None):
         """
         Constructs a job and its blocks
 
         Args:
             job_steps (List[Dict[str, Any]]): Job steps
             context (Optional[Context], optional): Context. Defaults to None.
+            whitelisted_blocks: (Optional[List[str]], optional): Whitelisted blocks. Defaults to None.
         """
         validate(instance=job_steps, schema=utils.read_json(
             utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
@@ -35,6 +37,9 @@ class Job():
         steps: List[Block] = []
         for step in job_steps:
             block_name = step["uses"]
+            if whitelisted_blocks and block_name not in whitelisted_blocks:
+                raise ValueError(f"Using {block_name} block is prohibited")
+
             module_name = f"datayoga.blocks.{block_name}.block"
             module = importlib.import_module(module_name)
             block: Block = getattr(module, "Block")(step["with"], context)
