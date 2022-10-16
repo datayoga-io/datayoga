@@ -57,3 +57,10 @@ def test_validate_invalid_job():
 
     with pytest.raises(ValueError):
         dy.validate(job_settings)
+
+
+def test_block_not_in_whitelisted_blocks():
+    job_settings = get_job_settings_from_yaml(TEST_YAML)
+
+    with pytest.raises(ValueError, match="map block"):
+        dy.compile(job_settings, whitelisted_blocks=["add_field", "rename_field", "remove_field"])
