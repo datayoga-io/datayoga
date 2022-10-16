@@ -59,6 +59,13 @@ def test_validate_invalid_job():
         dy.validate(job_settings)
 
 
+def test_block_not_in_whitelisted_blocks():
+    job_settings = get_job_settings_from_test_yaml()
+
+    with pytest.raises(ValueError, match="map block"):
+        dy.compile(job_settings, ["add_field", "rename_field", "remove_field"])
+
+
 def get_job_settings_from_test_yaml():
     job_settings = read_yaml(path.join(os.path.dirname(os.path.realpath(__file__)), "test.yaml"))
     logger.debug(f"job_settings: {job_settings}")

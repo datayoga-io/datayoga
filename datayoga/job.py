@@ -2,7 +2,7 @@ import copy
 import importlib
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from jsonschema import validate
 
@@ -21,12 +21,13 @@ class Job():
         steps List[Block]: List of steps
     """
 
-    def __init__(self, job_steps: List[Dict[str, Any]]):
+    def __init__(self, job_steps: List[Dict[str, Any]], whitelisted_blocks: Optional[List[str]] = None):
         """
         Constructs a job and its blocks
 
         Args:
             job_steps (List[Dict[str, Any]]): Job steps
+            whitelisted_blocks: (Optional[List[str]], optional): Whitelisted blocks. Defaults to None.
         """
         validate(instance=job_steps, schema=utils.read_json(
             utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
@@ -34,6 +35,9 @@ class Job():
         steps: List[Block] = []
         for step in job_steps:
             block_name = step["uses"]
+            if whitelisted_blocks and block_name not in whitelisted_blocks:
+                raise ValueError(f"Using {block_name} block is prohibited")
+
             module_name = f"datayoga.blocks.{block_name}.block"
             try:
                 module = importlib.import_module(module_name)
