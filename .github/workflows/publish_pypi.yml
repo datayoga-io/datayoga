@@ -38,11 +38,9 @@ jobs:
       - name: Set output with new version tag with v prefix
         id: vars
         run: echo ::set-output name=new_version::$(echo ${{steps.bump_version.outputs.new_tag}} | cut -c 2-)
-      - name: chdir
-        run: |
-          cd datayoga-py/datayoga-py
       - name: update pyproject.toml
         run: |
+          cd datayoga-py
           pip install bump2version
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
       #
