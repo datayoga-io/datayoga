@@ -60,10 +60,15 @@ def is_bundled() -> bool:
     return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 
 
+def get_bundled_dir() -> str:
+    datayoga_dir = path.join(sys._MEIPASS, "datayoga")
+    return datayoga_dir if os.path.isdir(datayoga_dir) else sys._MEIPASS
+
+
 def get_resource_path(relative_path: str) -> str:
     if is_bundled():
         # we are running in a bundle
-        return path.join(sys._MEIPASS, "resources", relative_path)
+        return path.join(get_bundled_dir(), "resources", relative_path)
     else:
         # we are running in a normal Python environment
         return path.join(os.path.dirname(__file__), "resources", relative_path)

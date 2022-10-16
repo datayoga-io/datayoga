@@ -37,7 +37,7 @@ class Block():
         Validates block against its JSON Schema
         """
         json_schema_file = path.join(
-            sys._MEIPASS, "blocks", self.get_block_name(),
+            utils.get_bundled_dir(), "blocks", self.get_block_name(),
             "block.schema.json") if utils.is_bundled() else path.join(
             os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
             "block.schema.json")
