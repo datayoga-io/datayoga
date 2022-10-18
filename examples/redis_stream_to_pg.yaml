@@ -5,6 +5,7 @@
   with:
     connection: cache
     stream_name: emp
+    snapshot: false
 - uses: add_field
   with:
     fields:

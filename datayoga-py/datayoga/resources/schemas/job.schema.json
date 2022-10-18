@@ -23,6 +23,11 @@
             "title": "maximum time to expiry of the cache entry"
           }
         }
+      },
+      "processing": {
+        "description": "Processing strategy",
+        "type": ["string"],
+        "enum": ["sequential","continuous","parallel_async","multiprocess"]
       }
     },
     "additionalProperties": false,

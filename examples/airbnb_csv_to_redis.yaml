@@ -4,7 +4,7 @@
 - uses: read_csv
   with:
     file: airbnb_open_data.csv
-    batch_size: 2500
+    batch_size: 250
 #
 # add a calculated field using SQL expression
 #
@@ -16,6 +16,10 @@
 #
 # customize the key we will use in Redis
 #
+- uses: sentiment
+  with:
+    field: NAME
+    target_field: sentiment
 - uses: add_field
   with:
     field: id

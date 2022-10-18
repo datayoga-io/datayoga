@@ -1,0 +1,23 @@
+{
+  "description": "Analyze sentiment of text",
+  "title": "Sentiment",
+  "type": "object",
+  "properties": {
+    "field": {
+      "description": "Field",
+      "type": "string"
+    },
+    "target_field": {
+      "description": "Target field to add to the result. ",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["field","target_field"],
+  "examples": [
+    {
+      "field": "features",
+      "target_field": "sentiment"
+    }
+  ]
+}
