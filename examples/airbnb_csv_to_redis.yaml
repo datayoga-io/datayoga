@@ -1,7 +1,26 @@
+#
+# read CSV from airbnb
+#
 - uses: read_csv
   with:
-    file: /home/oren/Downloads/airbnb_open_data.csv
+    file: airbnb_open_data.csv
     batch_size: 2500
+#
+# add a calculated field using SQL expression
+#
+- uses: add_field
+  with:
+    field: total_price
+    expression: price + `service fee`
+    language: sql
+#
+# customize the key we will use in Redis
+#
+- uses: add_field
+  with:
+    field: id
+    expression: join(':',['airbnb',"country code",'id',id])
+    language: jmespath
 - uses: write_redis
   with:
     connection: cache

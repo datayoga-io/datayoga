@@ -17,21 +17,39 @@ This example reads change events from a Kafka stream and continuously pushes the
 ### Code
 
 ```yaml
-steps:
-  - uses: read_stream
-    with:
-      - connection: kafka
-        topic: emp_cdc
-  - uses: map
-    with:
-      - expression: $.after
-  - uses: write_sql
-    with:
-      - connection: pg
-        table_name: emp
-        schema: hr
-        load_strategy: APPEND
-        key: $.emp_id
+#
+# read entries from a redis stream named 'emp'
+#
+- uses: read_kafka
+  with:
+    connection: cache
+    topic: emp
+- uses: add_field
+  with:
+    fields:
+      - field: full_name
+        language: jmespath
+        expression: concat([fname, ' ' , lname])
+- uses: map
+  with:
+    expression:
+      {
+        first_name: fname,
+        last_name: lname,
+        country: country_code || ' - ' || UPPER(country_name),
+        full_name: full_name,
+        greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
+      }
+    language: sql
+#
+# write records to postgres using APPEND load strategy
+#
+- uses: write_sql
+  with:
+    connection: hr
+    schema: hr
+    table: emp
+    load_strategy: APPEND
 ```
 
 ## Read from CSV and load into Redis
@@ -46,17 +64,32 @@ This example reads a CSV file from the AirBNB open data, filters by minimum numb
 ### Code
 
 ```yml
-steps:
-  - uses: read_csv
-    with:
-      - filename: listings.csv
-        delimiter: ,
-  - uses: filter
-    with:
-      - condition: number_of_reviews > 5
-  - uses: write_redis
-    with:
-      - connection: redis-data
-        command: HSET
-        key: concat('employee:',$.emp_id)
+#
+# read CSV from airbnb
+#
+- uses: read_csv
+  with:
+    file: listings.csv
+    batch_size: 2500
+#
+# add a calculated field using SQL expression
+#
+- uses: add_field
+  with:
+    field: total_price
+    expression: price + `service fee`
+    language: sql
+#
+# customize the key we will use in Redis
+#
+- uses: add_field
+  with:
+    field: id
+    expression: join(':',['airbnb',"country code",'id',id])
+    language: jmespath
+- uses: write_redis
+  with:
+    connection: cache
+    command: HSET
+    key_field: id
 ```

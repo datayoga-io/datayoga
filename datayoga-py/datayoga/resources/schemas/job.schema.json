@@ -12,6 +12,17 @@
       "with": {
         "description": "Properties",
         "type": ["object", "array"]
+      },
+      "cached": {
+        "description": "Caching indication",
+        "type": ["object", "boolean"],
+        "properties": {
+          "expiry": {
+            "type": ["number"],
+            "description": "expiry in seconds",
+            "title": "maximum time to expiry of the cache entry"
+          }
+        }
       }
     },
     "additionalProperties": false,

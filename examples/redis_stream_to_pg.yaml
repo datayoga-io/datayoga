@@ -1,3 +1,6 @@
+#
+# read entries from a redis stream named 'emp'
+#
 - uses: read_redis_stream
   with:
     connection: cache
@@ -19,8 +22,12 @@
         greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
       }
     language: sql
+#
+# write records to postgres using APPEND load strategy
+#
 - uses: write_sql
   with:
     connection: hr
     schema: hr
     table: emp
+    load_strategy: APPEND
