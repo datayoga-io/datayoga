@@ -25,6 +25,6 @@ class Block(DyBlock):
     def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         pipeline = self.redis_client.pipeline()
         for record in data:
-            dict_as_list = list(reduce(lambda x, y: x + y, record.items()))
+            dict_as_list = list(reduce(lambda x, y: x + y, [(k, v) for k, v in record.items() if v is not None]))
             pipeline.execute_command(self.command, record[self.key_field], *dict_as_list)
         pipeline.execute()

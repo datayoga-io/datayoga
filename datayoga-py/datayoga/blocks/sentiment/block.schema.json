@@ -10,6 +10,10 @@
     "target_field": {
       "description": "Target field to add to the result. ",
       "type": "string"
+    },
+    "processors": {
+      "description": "Parallel processors",
+      "type": "number"
     }
   },
   "additionalProperties": false,

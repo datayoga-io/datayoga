@@ -18,7 +18,7 @@
       {
         first_name: fname,
         last_name: lname,
-        country: country_code || ' - ' || UPPER(country_name),
+        country: UPPER(country_name),
         full_name: full_name,
         greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
       }

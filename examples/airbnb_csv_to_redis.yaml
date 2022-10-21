@@ -3,27 +3,41 @@
 #
 - uses: read_csv
   with:
-    file: airbnb_open_data.csv
-    batch_size: 250
+    file: airbnb_reviews.csv.gz
+    batch_size: 2
 #
 # add a calculated field using SQL expression
 #
 - uses: add_field
   with:
-    field: total_price
-    expression: price + `service fee`
+    field: review_month
+    expression: cast(strftime('%m',date) as number)
+    language: sql
+- uses: add_field
+  with:
+    field: season
+    expression: |
+      (case when review_month in (12, 1, 2) then 'winter'
+      when review_month in (3, 4, 5) then 'spring'
+      when review_month in (6, 7, 8) then 'summer'
+      when review_month in (9, 10, 11) then 'autumn'
+      end)
     language: sql
 #
 # customize the key we will use in Redis
 #
 - uses: sentiment
   with:
-    field: NAME
+    field: comments
     target_field: sentiment
+- uses: filter
+  with:
+    expression: sentiment = 'Negative'
+    language: sql
 - uses: add_field
   with:
     field: id
-    expression: join(':',['airbnb',"country code",'id',id])
+    expression: join(':',['airbnb','reviewer',reviewer_id])
     language: jmespath
 - uses: write_redis
   with:

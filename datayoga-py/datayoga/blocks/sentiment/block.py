@@ -1,3 +1,4 @@
+import statistics
 from concurrent import futures
 import json
 import requests
@@ -8,6 +9,14 @@ from datayoga.block import Block as DyBlock
 from datayoga.context import Context
 
 logger = logging.getLogger("dy")
+SENTIMENTS = {
+    "Verynegative": 0,
+    "Negative": 1,
+    "Neutral": 2,
+    "Positive": 3,
+    "Verypositive": 4
+}
+REVERSE_SENTIMENT = {v: k for k, v in SENTIMENTS.items()}
 
 
 class Block(DyBlock):
@@ -18,16 +27,24 @@ class Block(DyBlock):
 
         def get_sentiment(row):
             return requests.post(
-                'http://localhost:9000/?properties={"annotators":"sentiment","outputFormat":"json"}',
-                data={'data': row[self.properties["field"]]}).text
+                'http://localhost:9000/?properties={"annotators":"sentiment","outputFormat":"json","timeout":30000}',
+                data=row[self.properties["field"]].encode('utf-8')).text
 
         # you can increase the amount of workers, it would increase the amount of thread created
-        with futures.ThreadPoolExecutor(max_workers=20) as executor:
+        with futures.ThreadPoolExecutor(max_workers=self.properties.get("processors", 4)) as executor:
             res = executor.map(get_sentiment, data)
             for index, response in enumerate(res):
-                # add a list of the items with the new field
-                sentiment = json.loads(response)["sentences"][0]["sentiment"]
-                data[index][self.properties["target_field"]] = sentiment
+                try:
+                    # add a list of the items with the new field
+                    logger.debug(response)
+                    response_json = json.loads(response)["sentences"]
+                    # calculate average sentiment (coreNLP is only by sentence)
+                    sentiment = statistics.mean([SENTIMENTS[sentence["sentiment"]] for sentence in response_json])
+                    sentiment = REVERSE_SENTIMENT[round(sentiment)]
+
+                    data[index][self.properties["target_field"]] = sentiment
+                except Exception:
+                    pass
                 return_data.append(data[index])
 
         return return_data
