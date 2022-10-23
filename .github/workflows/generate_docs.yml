@@ -54,7 +54,7 @@ jobs:
 
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
-              "${block_path}" <<< "${doc_name}"
+              "${block_path}${doc_name}"
           done
 
       - name: Push to repo
