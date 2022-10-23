@@ -2,7 +2,7 @@ import logging
 from functools import reduce
 from typing import Any, Dict, List, Optional
 
-import datayoga.blocks.read_redis_stream.utils as utils
+import datayoga.blocks.redis.utils as utils
 from datayoga.block import Block as DyBlock
 from datayoga.context import Context
 from datayoga.utils import get_connection_details

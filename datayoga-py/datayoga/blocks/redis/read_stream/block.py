@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Any, Dict, List, Optional
 
-import datayoga.blocks.read_redis_stream.utils as utils
+import datayoga.blocks.redis.utils as utils
 from datayoga.block import Block as DyBlock
 from datayoga.context import Context
 from datayoga.utils import get_connection_details
@@ -36,8 +36,7 @@ class Block(DyBlock):
             streams = self.redis_client.xreadgroup(
                 self.consumer_group, self.requesting_consumer, {self.stream: ">"}, None, 0)
             for stream in streams:
-                for stream_element in stream[1]:
-                    key, value = stream_element
+                for key, value in stream[1]:
                     yield {"key": key, "value": json.loads(value[next(iter(value))])}
 
             if self.snapshot:

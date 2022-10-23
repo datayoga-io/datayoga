@@ -25,7 +25,7 @@ steps:
   - uses: map
     with:
       - expression: $.after
-  - uses: write_sql
+  - uses: relational.write
     with:
       - connection: pg
         table_name: emp
@@ -47,14 +47,14 @@ This example reads a CSV file from the AirBNB open data, filters by minimum numb
 
 ```yml
 steps:
-  - uses: read_csv
+  - uses: files.read_csv
     with:
       - filename: listings.csv
         delimiter: ,
   - uses: filter
     with:
       - condition: number_of_reviews > 5
-  - uses: write_redis
+  - uses: redis.write
     with:
       - connection: redis-data
         command: HSET

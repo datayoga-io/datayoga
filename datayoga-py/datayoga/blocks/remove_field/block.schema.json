@@ -1,5 +1,5 @@
 {
-  "title": "Remove Fields",
+  "title": "remove_field",
   "description": "Remove fields",
   "type": "object",
   "oneOf": [

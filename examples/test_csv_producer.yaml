@@ -1,4 +1,4 @@
-- uses: read_csv
+- uses: files.read_csv
   with:
     file: examples/test.csv
 - uses: add_field
@@ -18,7 +18,7 @@
         greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
       }
     language: sql
-- uses: write_sql
+- uses: relational.write
   with:
     connection: hr
     schema: hr

@@ -1,5 +1,5 @@
 {
-  "title": "Rename Fields",
+  "title": "rename_field",
   "description": "Renames fields. All other fields remain unchanged",
   "type": "object",
   "oneOf": [

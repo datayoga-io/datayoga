@@ -3,7 +3,7 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# Map Record
+# map
 
 Maps a record into a new output based on expressions
 
