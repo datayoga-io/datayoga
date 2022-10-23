@@ -48,8 +48,7 @@ jobs:
             doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
             dir="$(echo ${schema} | sed -e s@${blocks_dir}@@)"
             block_package="$(dirname $(dirname ${dir}))"
-            block_package="$(echo ${block_package} | cut -c2-)"
-            block_package=${block_package/\//-}
+            block_package="$(echo ${block_package} | cut -c2- | sed 's/\//\-/g')"
             [ ! -z "${block_package}" ] && block_package="${block_package}-"
            
             echo "FILE :${blocks_dir}/${block_package}/${doc_name}"
