@@ -3,7 +3,7 @@ import datetime
 from wsgiref import validate
 import pytest
 import time
-from step import Step
+from step import Step, StepResult
 import mock
 
 
@@ -11,6 +11,14 @@ class SleepBlock():
     async def run(self, i):
         await asyncio.sleep(i[0]["sleep"])
         return i
+
+
+class ExceptionBlock():
+    async def run(self, i):
+        if (i[0]):
+            raise ValueError()
+        else:
+            return i
 
 
 @pytest.mark.asyncio
@@ -73,4 +81,32 @@ async def test_step_parallel():
     # if we are parallel with 2 workers, total time should be the two slower activities
     assert round(loop.time()-start, 1) == 0.6+0.4
 
-# test failure of a block propagates upward
+
+@pytest.mark.asyncio
+async def test_acks_successful():
+    # test success of a block propagates upward
+    root = Step("A", SleepBlock(), concurrency=1)
+    input = [{"msg_id": k, "value": {"key": k, "sleep": v}} for k, v in enumerate([0.3, 0.4, 0.5, 1])]
+    producer = mock.MagicMock()
+    root.add_done_callback(producer.ack)
+    for i in input:
+        await root.process([i])
+    await root.stop()
+    producer.assert_has_calls([mock.call.ack([i["msg_id"]]) for i in input])
+
+
+@pytest.mark.asyncio
+async def test_acks_exception():
+    # test failure of a block propagates upward
+    root = Step("A", ExceptionBlock(), concurrency=1)
+    input = [
+        {"msg_id": "message1", "value": True},
+        {"msg_id": "message2", "value": True}
+    ]
+    producer = mock.MagicMock()
+    root.add_done_callback(producer.ack)
+    for i in input:
+        await root.process([i])
+    await root.stop()
+    producer.assert_has_calls([mock.call.ack([i["msg_id"]], StepResult.REJECTED,
+                              "Error in step A: ValueError()") for i in input])

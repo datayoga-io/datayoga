@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import aiofastforward
 from unittest import mock
 import datetime
@@ -14,7 +15,15 @@ class SleepBlock():
         return i
 
 
+async def e():
+    raise ValueError()
+
+
 async def main():
+    try:
+        res, _ = await asyncio.gather(e(), return_exceptions=True)
+    finally:
+        print("x")
     # tests that step A does not wait for B to complete before processing the next item, up to a limit
     start = datetime.datetime.now()
     results_block = mock.AsyncMock()

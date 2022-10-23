@@ -1,8 +1,11 @@
 import asyncio
 import logging
-from typing import Callable
+from typing import Callable, List, Optional
+from enum import Enum     # for enum34, or the stdlib version
 
 logger = logging.getLogger("dy")
+
+StepResult = Enum('StepResult', 'SUCCESS REJECTED FILTERED')
 
 
 class Step():
@@ -23,7 +26,7 @@ class Step():
             if worker is None or not worker.done():
                 self.workers[id] = asyncio.create_task(self.run(id))
             else:
-                print(f"worker {id} is running: {not worker.done()}")
+                logger.debug(f"worker {id} is running: {not worker.done()}")
 
     def add_done_callback(self, callback: Callable[[str], None]):
         self.done_callback = callback
@@ -39,36 +42,35 @@ class Step():
     async def process(self, i):
         self.active_entries.update([x['msg_id'] for x in i])
         await self.queue.put(i)
-        print(f"{self.id} enqueued {i}")
 
     async def run(self, worker_id):
         while True:
             entry = await self.queue.get()
             try:
-                print(f"{self.id}-{worker_id} processing {entry[0]['msg_id']}")
+                logger.debug(f"{self.id}-{worker_id} processing {entry[0]['msg_id']}")
                 await self.block.run([i["value"] for i in entry])
-            finally:
-                # TODO: add error handling
+                # check if we have a next step
                 if self.child:
                     await self.child.process(entry)
-                    print(f"{self.id} child done enqueue {entry[0]['msg_id']}")
                 else:
                     # we are a last channel, propagate the ack upstream
-                    self.done([x["msg_id"] for x in entry])
+                    self.done([x["msg_id"] for x in entry], StepResult.SUCCESS)
+            except Exception as e:
+                self.done([x["msg_id"] for x in entry], StepResult.REJECTED, f"Error in step {self.id}: {repr(e)}")
+            finally:
                 self.queue.task_done()
-            print(f"{self.id}-{worker_id} done processing {entry[0]['msg_id']}")
+            logger.debug(f"{self.id}-{worker_id} done processing {entry[0]['msg_id']}")
 
-    def done(self, msg_id):
-        print(f"{self.id} acking {msg_id}")
-        self.active_entries.difference_update(msg_id)
-        if self.done_callback:
-            self.done_callback(msg_id)
+    def done(self, msg_ids: List[str], result: Optional[StepResult] = None, reason: Optional[str] = None):
+        logger.debug(f"{self.id} acking {msg_ids}")
+        self.active_entries.difference_update(msg_ids)
+        if self.done_callback is not None:
+            self.done_callback(msg_ids, result, reason)
 
     async def join(self):
         # wait for all active entries to be processed
         while len(self.active_entries) > 0:
-            # print(self.active_entries)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.2)
 
     async def stop(self):
         # wait for all tasks to finish
