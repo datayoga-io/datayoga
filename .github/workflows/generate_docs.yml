@@ -50,7 +50,7 @@ jobs:
             block_package="$(dirname $(dirname ${dir}))"
             block_package="$(echo ${block_package} | cut -c2-)"
             block_package=${block_package/\//-}
-            [ ! -z "${block_package ] && block_package="${block_package}-"
+            [ ! -z "${block_package}" ] && block_package="${block_package}-"
            
             echo "FILE :${blocks_dir}/${block_package}/${doc_name}"
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
