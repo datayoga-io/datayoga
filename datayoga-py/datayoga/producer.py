@@ -1,7 +1,7 @@
 import logging
 from os import path
 from typing import Any, Dict, List, TypedDict
-from block import Block
+from .block import Block
 
 logger = logging.getLogger("dy")
 

@@ -20,7 +20,7 @@ class Block(DyBlock):
                 property["language"],
                 property["expression"])
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
 
         for row in data:

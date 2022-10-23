@@ -14,7 +14,7 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.expression = expression.compile(self.properties["language"], json.dumps(self.properties["expression"]))
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
         return_data = []
         for row in data:

@@ -22,7 +22,7 @@ class Block(DyBlock):
             connection.get("password"))
         logger.info(f"Writing to Redis connection '{self.properties.get('connection')}'")
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         pipeline = self.redis_client.pipeline()
         for record in data:
             dict_as_list = list(reduce(lambda x, y: x + y, record.items()))

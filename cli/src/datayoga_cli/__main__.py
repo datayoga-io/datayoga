@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import asyncio
 import logging
 import os
 from os import path
@@ -15,6 +16,7 @@ from pkg_resources import get_distribution
 from tqdm import tqdm
 
 from . import cli_helpers
+from . import actions
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
@@ -81,37 +83,13 @@ def run(
             "job_name": Path(job_file).stem
         })
 
-        job = Job(job_settings, context)
+        job = Job(context=context)
+        job.load_json(job_settings)
 
-        # assume the producer is the first block and remove it from job's steps
-        producer = job.steps.pop(0)
+        producer = job.input
         logger.info(f"Producing from {producer.__module__}")
-        batch_size = producer.properties.get("batch_size", 1)
-        batch = []
-        keys = []
 
-        def handle_batch(batch: List, keys: List):
-            job.transform(batch)
-
-            for key in keys:
-                producer.ack(key)
-
-        for record in tqdm(producer.run([])):
-            key = record["key"]
-            value = record["value"]
-            logger.debug(f"Retrieved record:\n\tKey: {key}\n\tValue: {value}")
-            keys.append(key)
-            batch.append(value)
-
-            if len(batch) == batch_size:
-                handle_batch(batch, keys)
-
-                batch = []
-                keys = []
-
-        # handle last batch
-        if len(batch) > 0:
-            handle_batch(batch, keys)
+        asyncio.run(actions.run(job))
 
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)

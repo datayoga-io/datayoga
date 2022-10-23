@@ -49,7 +49,7 @@ async def test_step_continuous_parallel():
     await root.stop()
     results_block.assert_has_calls([mock.call.run([i["value"]]) for i in input])
     # if we are parallel with 1 worker, we should 4*interval vs 4*2*interval if we were sequential
-    assert round(loop.time()-start, 1) == 0.5*5
+    assert abs(loop.time()-start-0.5*5) < 0.3
 
 
 @pytest.mark.asyncio
@@ -92,7 +92,7 @@ async def test_acks_successful():
     for i in input:
         await root.process([i])
     await root.stop()
-    producer.assert_has_calls([mock.call.ack([i["msg_id"]]) for i in input])
+    producer.assert_has_calls([mock.call.ack([i["msg_id"]], StepResult.SUCCESS, None) for i in input])
 
 
 @pytest.mark.asyncio

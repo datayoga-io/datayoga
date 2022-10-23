@@ -71,7 +71,7 @@ class Block():
 
         return transformed_data
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """ Transforms data (abstract, should be implemented by the sub class)
 
         Args:

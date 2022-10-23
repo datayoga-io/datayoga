@@ -14,7 +14,7 @@ class Block(DyBlock):
         self.delimiter = self.properties.get("delimiter", ",")
         self.field = self.properties["field"]
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
         return_data = []
         for row in data:

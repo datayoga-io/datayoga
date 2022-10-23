@@ -47,22 +47,25 @@ class Step():
         while True:
             entry = await self.queue.get()
             try:
-                logger.debug(f"{self.id}-{worker_id} processing {entry[0]['msg_id']}")
-                await self.block.run([i["value"] for i in entry])
+                msg_ids = [i["msg_id"] for i in entry]
+                logger.debug(f"{self.id}-{worker_id} processing {msg_ids}")
+                processed_entry = await self.block.run([i["value"] for i in entry])
                 # check if we have a next step
                 if self.child:
-                    await self.child.process(entry)
+                    # re-combine the values with the msg_ids
+                    await self.child.process([{'msg_id': k, 'value': v} for k, v in list(zip(msg_ids, processed_entry))])
                 else:
                     # we are a last channel, propagate the ack upstream
-                    self.done([x["msg_id"] for x in entry], StepResult.SUCCESS)
+                    self.done(msg_ids, StepResult.SUCCESS)
             except Exception as e:
+                logger.debug(e)
                 self.done([x["msg_id"] for x in entry], StepResult.REJECTED, f"Error in step {self.id}: {repr(e)}")
             finally:
                 self.queue.task_done()
             logger.debug(f"{self.id}-{worker_id} done processing {entry[0]['msg_id']}")
 
     def done(self, msg_ids: List[str], result: Optional[StepResult] = None, reason: Optional[str] = None):
-        logger.debug(f"{self.id} acking {msg_ids}")
+        logger.debug(f"{self.id} acking {msg_ids} with result {result}")
         self.active_entries.difference_update(msg_ids)
         if self.done_callback is not None:
             self.done_callback(msg_ids, result, reason)

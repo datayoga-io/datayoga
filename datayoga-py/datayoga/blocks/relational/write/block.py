@@ -31,7 +31,7 @@ class Block(DyBlock):
 
         self.conn = self.engine.connect()
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
 
         logger.info(f"Inserting {len(data)} record(s) to {self.table} table")
