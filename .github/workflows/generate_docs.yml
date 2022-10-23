@@ -46,10 +46,9 @@ jobs:
           for schema in $(find ${blocks_dir} -name '*.schema.json')
           do
             doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
-            echo "doc_name: ${doc_name}"
             dir="$(echo ${schema} | sed -e s@${blocks_dir}@@)"
             block_package="$(dirname $(dirname ${dir}))"
-            block_package="$(echo ${block_package} | cut -c2- | sed 's/\//\-/g')"
+            block_package="$(echo ${block_package} | cut -c2- | sed 's/\//-/g')"
             [ ! -z "${block_package}" ] && block_package="${block_package}-"
            
             echo "FILE :${blocks_dir}/${block_package}/${doc_name}"
