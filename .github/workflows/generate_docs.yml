@@ -30,7 +30,7 @@ jobs:
           do
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Reference" --fm.nav_order "${nav_order}" > \
-            ./docs/reference/$(basename "${schema}" .schema.json).md; \
+            ./docs/reference/$(basename "${schema}" .schema.json).md \
             nav_order=$((nav_order+1))
           done
 
@@ -50,9 +50,9 @@ jobs:
             block_path="$(dirname $(dirname ${dir}))"
             block_path=${block_path:1}
             block_path=${block_path/\//-}
-            [ ! -z "${block_path}" ] &&  block_path="${block_path}-"
+            [ ! -z "${block_path}" ] && block_path="${block_path}-"
            
-            echo "${block_path}/${doc_name}"
+            echo "FILE :${block_path}/${doc_name}"
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
               "${block_path}/${doc_name}"
