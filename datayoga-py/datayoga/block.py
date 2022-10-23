@@ -82,13 +82,5 @@ class Block():
         """
         pass
 
-    def ack(self, key: str):
-        """ Sends acknowledge for a key of a record that has been processed
-
-        Args:
-            key (str): Record key 
-        """
-        pass
-
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))

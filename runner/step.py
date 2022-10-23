@@ -3,7 +3,7 @@ import time
 
 
 class Step():
-    def __init__(self, id, block, concurrency):
+    def __init__(self, id, block, concurrency=1):
         self.id = id
         self.block = block
         self.child = None
