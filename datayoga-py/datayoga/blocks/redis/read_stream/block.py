@@ -3,14 +3,14 @@ import logging
 from typing import Any, Dict, List, Optional
 
 import datayoga.blocks.redis.utils as utils
-from datayoga.block import Block as DyBlock
+from datayoga.producer import Producer as DyProducer
 from datayoga.context import Context
 from datayoga.utils import get_connection_details
 
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock):
+class Block(DyProducer):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
@@ -29,7 +29,7 @@ class Block(DyBlock):
             logger.info(f"Creating a new {self.consumer_group} consumer group associated with the {self.stream}")
             self.redis_client.xgroup_create(self.stream, self.consumer_group, 0)
 
-    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def produce(self) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
 
         while True:
@@ -37,11 +37,12 @@ class Block(DyBlock):
                 self.consumer_group, self.requesting_consumer, {self.stream: ">"}, None, 0)
             for stream in streams:
                 for key, value in stream[1]:
-                    yield {"key": key, "value": json.loads(value[next(iter(value))])}
+                    yield {"msg_id": key, "value": json.loads(value[next(iter(value))])}
 
             if self.snapshot:
                 break
 
-    def ack(self, key: str):
-        logger.info(f"Acking {key} message in {self.stream} stream of {self.consumer_group} consumer group")
-        self.redis_client.xack(self.stream, self.consumer_group, key)
+    def ack(self, msg_ids: List[str]):
+        for msg_id in msg_ids:
+            logger.info(f"Acking {msg_id} message in {self.stream} stream of {self.consumer_group} consumer group")
+            self.redis_client.xack(self.stream, self.consumer_group, msg_id)
