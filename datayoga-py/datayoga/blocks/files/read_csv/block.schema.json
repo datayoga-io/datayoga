@@ -1,6 +1,6 @@
 {
+  "title": "files.read_csv",
   "description": "Read data from CSV",
-  "title": "Read CSV",
   "type": "object",
   "properties": {
     "file": {
@@ -12,7 +12,7 @@
       "title": "List of columns to use",
       "description": "List of columns to use for extract",
       "default": [],
-      "examples": [["fname","lname"]],
+      "examples": [["fname", "lname"]],
       "additionalItems": true,
       "items": {
         "type": "string",
@@ -32,7 +32,7 @@
     },
     "use_header": {
       "description": "Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified",
-      "type":"boolean",
+      "type": "boolean",
       "default": true
     },
     "quotechar": {

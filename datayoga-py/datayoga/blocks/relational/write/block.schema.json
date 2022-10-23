@@ -1,7 +1,7 @@
 {
-  "type": "object",
-  "title": "Write SQL",
+  "title": "relational.write",
   "description": "Write into a SQL-compatible data store",
+  "type": "object",
   "additionalProperties": false,
   "examples": [
     {

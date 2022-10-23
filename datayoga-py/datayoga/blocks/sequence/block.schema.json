@@ -1,7 +1,7 @@
 {
-  "type": "object",
-  "title": "Add a Sequence Number",
+  "title": "sequence",
   "description": "Add a sequence number field to data",
+  "type": "object",
   "additionalProperties": false,
   "examples": [],
   "required": [],

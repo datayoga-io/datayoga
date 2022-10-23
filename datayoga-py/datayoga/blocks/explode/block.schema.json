@@ -1,6 +1,6 @@
 {
+  "title": "explode",
   "description": "Split a field into multiple records",
-  "title": "Explode",
   "type": "object",
   "properties": {
     "field": {

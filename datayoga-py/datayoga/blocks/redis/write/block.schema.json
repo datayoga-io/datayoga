@@ -1,5 +1,5 @@
 {
-  "title": "Write Redis",
+  "title": "redis.write",
   "description": "Write to a Redis data structure",
   "type": "object",
   "properties": {
