@@ -1,5 +1,6 @@
 import asyncio
 import time
+from typing import Callable
 
 
 class Step():
@@ -8,10 +9,10 @@ class Step():
         self.block = block
         self.child = None
         self.queue = asyncio.Queue(maxsize=1)
-        self.parent = None
         self.active_entries = set()
         self.concurrency = concurrency
         self.workers = [None]*self.concurrency
+        self.done_callback = None
         self.start_pool()
 
     def start_pool(self):
@@ -22,16 +23,19 @@ class Step():
             else:
                 print(f"worker {id} is running: {not worker.done()}")
 
+    def add_done_callback(self, callback: Callable[[str], None]):
+        self.done_callback = callback
+
     def __or__(self, other):
         return self.add_child(other)
 
     def add_child(self, child):
         self.child = child
-        self.child.parent = self
+        self.child.add_done_callback(self.done)
         return self.child
 
     async def process(self, i):
-        self.active_entries.update([x['key'] for x in i])
+        self.active_entries.update([x['msg_id'] for x in i])
         await self.queue.put(i)
         print(f"{self.id} enqueued {i}")
 
@@ -39,24 +43,24 @@ class Step():
         while True:
             entry = await self.queue.get()
             try:
-                print(f"{self.id}-{worker_id} processing {entry[0]['key']}")
+                print(f"{self.id}-{worker_id} processing {entry[0]['msg_id']}")
                 await self.block.run([i["value"] for i in entry])
             finally:
                 # TODO: add error handling
                 if self.child:
                     await self.child.process(entry)
-                    print(f"{self.id} child done enqueue {entry[0]['key']}")
+                    print(f"{self.id} child done enqueue {entry[0]['msg_id']}")
                 else:
                     # we are a last channel, propagate the ack upstream
-                    self.ack([x["key"] for x in entry])
+                    self.done([x["msg_id"] for x in entry])
                 self.queue.task_done()
-            print(f"{self.id}-{worker_id} done processing {entry[0]['key']}")
+            print(f"{self.id}-{worker_id} done processing {entry[0]['msg_id']}")
 
-    def ack(self, i):
-        print(f"{self.id} acking {i}")
-        self.active_entries.difference_update(i)
-        if self.parent:
-            self.parent.ack(i)
+    def done(self, msg_id):
+        print(f"{self.id} acking {msg_id}")
+        self.active_entries.difference_update(msg_id)
+        if self.done_callback:
+            self.done_callback(msg_id)
 
     async def join(self):
         # wait for all active entries to be processed

@@ -22,10 +22,10 @@ async def main():
     root = Step("A", SleepBlock(), concurrency=2)
     root | Step("C", results_block, concurrency=100)
     input = [
-        {'key': 0, 'value': {'key': 0, 'sleep': 2}},
-        {'key': 1, 'value': {'key': 1, 'sleep': 1}},
-        {'key': 2, 'value': {'key': 2, 'sleep': 2}},
-        {'key': 3, 'value': {'key': 3, 'sleep': 0.5}}
+        {'msg_id': 0, 'value': {'key': 0, 'sleep': 2}},
+        {'msg_id': 1, 'value': {'key': 1, 'sleep': 1}},
+        {'msg_id': 2, 'value': {'key': 2, 'sleep': 2}},
+        {'msg_id': 3, 'value': {'key': 3, 'sleep': 0.5}}
     ]
 
     # we expect these to return in pairs where the shorter one in the pair returns first
