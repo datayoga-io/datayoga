@@ -29,6 +29,8 @@ async def main():
     ]
 
     # we expect these to return in pairs where the shorter one in the pair returns first
+    producer = mock.MagicMock()
+    root.add_done_callback(lambda x: print("got"))
     start = loop.time()
     for i in input:
         await root.process([i])
@@ -36,5 +38,6 @@ async def main():
     await root.join()
     await root.stop()
     print(loop.time()-start)
+    producer.assert_has_calls([mock.call.ack([6])])
 
 asyncio.run(main())
