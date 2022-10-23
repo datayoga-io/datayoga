@@ -51,7 +51,7 @@ jobs:
             if [ ! -d ${block_path} ]; then
               mkdir -p "${block_path}"
             fi
-            echo ${block_path}
+            echo "${block_path}${doc_name}"
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
               "${block_path}${doc_name}"
