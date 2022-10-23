@@ -48,8 +48,8 @@ jobs:
             doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
             dir="$(echo ${schema} | sed -e s@${blocks_dir}@@)"
             block_package="$(dirname $(dirname ${dir}))"
-            block_package="$(echo ${block_package} | cut -c2- | sed 's/\//-/g')"
-            [ ! -z "${block_package}" ] && block_package="${block_package}-"
+            block_package="$(echo ${block_package} | cut -c2- | sed 's/\//_/g')"
+            [ ! -z "${block_package}" ] && block_package="${block_package}_"
            
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
