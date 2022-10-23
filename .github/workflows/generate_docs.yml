@@ -47,15 +47,15 @@ jobs:
           do
             doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
             dir="$(echo ${schema} | sed -e s@${blocks_dir}@@)"
-            block_path="$(dirname $(dirname ${dir}))"
-            block_path=${block_path:1}
-            block_path=${block_path/\//-}
-            [ ! -z "${block_path}" ] && block_path="${block_path}-"
+            block_package="$(dirname $(dirname ${dir}))"
+            block_package=${block_package:1}
+            block_package=${block_package/\//-}
+            [ ! -z "${block_package}" ] && block_package="${block_package}-"
            
-            echo "FILE :${block_path}/${doc_name}"
+            echo "FILE :${block_package}/${doc_name}"
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
-              "${block_path}/${doc_name}"
+              "${blocks_dir}/${block_package}/${doc_name}"
           done
 
       - name: Push to repo
