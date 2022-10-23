@@ -6,7 +6,7 @@ logger = logging.getLogger("dy")
 
 
 class Step():
-    def __init__(self, id, block: datayoga.Block, concurrency=1):
+    def __init__(self, id, block, concurrency=1):
         self.id = id
         self.block = block
         self.child = None
