@@ -3,7 +3,7 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# Explode
+# explode
 
 Split a field into multiple records
 

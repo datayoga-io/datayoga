@@ -3,7 +3,7 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# Write SQL
+# relational\.write
 
 Write into a SQL-compatible data store
 
