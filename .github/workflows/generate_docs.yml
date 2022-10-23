@@ -51,10 +51,9 @@ jobs:
             block_package="$(echo ${block_package} | cut -c2- | sed 's/\//-/g')"
             [ ! -z "${block_package}" ] && block_package="${block_package}-"
            
-            echo "FILE :${blocks_dir}/${block_package}${doc_name}"
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
-              "${blocks_dir}/${block_package}${doc_name}"
+              "./docs/reference/blocks/${block_package}${doc_name}"
           done
 
       - name: Push to repo
