@@ -81,7 +81,7 @@ EOF
 ```bash
 cat << EOF > redis_to_pg.yaml
 steps:
-- uses: read_redis_stream
+- uses: redis.read_stream
   with:
     connection: stream
     stream_name: emp
@@ -102,7 +102,7 @@ steps:
         greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
       }
     language: sql
-- uses: write_sql
+- uses: relational.write
   with:
     connection: hr
     schema: public
