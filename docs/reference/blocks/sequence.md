@@ -3,7 +3,7 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# Add a Sequence Number
+# sequence
 
 Add a sequence number field to data
 

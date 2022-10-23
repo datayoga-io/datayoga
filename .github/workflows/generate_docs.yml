@@ -26,11 +26,13 @@ jobs:
           mkdir ./docs/reference
 
           nav_order=1
-          for schema in ./datayoga-py/datayoga/resources/schemas/*.schema.json; \
-            do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+          for schema in ./datayoga-py/datayoga/resources/schemas/*.schema.json
+          do
+            npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Reference" --fm.nav_order "${nav_order}" > \
-            ./docs/reference/$(basename "${schema}" .schema.json).md; \
-            nav_order=$((nav_order+1)); done;
+            ./docs/reference/$(basename "${schema}" .schema.json).md \
+            nav_order=$((nav_order+1))
+          done
 
           cp /tmp/blocks.md ./docs/reference/blocks.md
 
@@ -39,10 +41,20 @@ jobs:
         run: |
           rm -rf ./docs/reference/blocks
           mkdir ./docs/reference/blocks
-          for schema in ./datayoga-py/datayoga/blocks/**/*.schema.json; \
-            do echo ${schema}; npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+
+          blocks_dir="./datayoga-py/datayoga/blocks"
+          for schema in $(find ${blocks_dir} -name '*.schema.json')
+          do
+            doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
+            dir="$(echo ${schema} | sed -e s@${blocks_dir}@@)"
+            block_package="$(dirname $(dirname ${dir}))"
+            block_package="$(echo ${block_package} | cut -c2- | sed 's/\//_/g')"
+            [ ! -z "${block_package}" ] && block_package="${block_package}_"
+           
+            npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
-            ./docs/reference/blocks/$(awk -F/ '{ print $(NF-1) }' <<<"${schema}").md; done;
+              "./docs/reference/blocks/${block_package}${doc_name}"
+          done
 
       - name: Push to repo
         run: |

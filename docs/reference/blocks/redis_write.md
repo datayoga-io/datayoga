@@ -3,7 +3,7 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# Write Redis
+# redis\.write
 
 Write to a Redis data structure
 

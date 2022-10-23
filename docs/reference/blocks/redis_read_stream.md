@@ -3,7 +3,7 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# Read Redis Stream
+# redis\.read\_stream
 
 Read from Redis stream
 

@@ -1,5 +1,5 @@
 {
-  "title": "Read Redis Stream",
+  "title": "redis.read_stream",
   "description": "Read from Redis stream",
   "type": "object",
   "properties": {
