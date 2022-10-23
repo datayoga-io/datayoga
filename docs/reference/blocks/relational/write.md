@@ -25,7 +25,7 @@ Write into a SQL-compatible data store
 
 ```yaml
 id: load_snowflake
-type: write_sql
+type: relational.write
 properties:
   connection: eu_datalake
   table_name: employees

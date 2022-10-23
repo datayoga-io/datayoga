@@ -21,7 +21,7 @@ Job descriptor
 **Example**
 
 ```yaml
-- - uses: read_csv
+- - uses: files.read_csv
     with:
       file: employees.csv
       batch_size: 2500
@@ -37,7 +37,7 @@ Job descriptor
         full_name: full_name
         country: country_code || ' - ' || UPPER(country_name)
         gender: gender
-  - uses: write_redis
+  - uses: redis.write
     with:
       connection: cache
       command: HSET
