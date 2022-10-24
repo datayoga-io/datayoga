@@ -22,7 +22,9 @@ def compile(
         Job: Compiled job
     """
     logger.debug("Compiling job")
-    return Job(job_settings, context, whitelisted_blocks)
+    job = Job(context=context, whitelisted_blocks=whitelisted_blocks)
+    job.load_json(job_settings)
+    return job
 
 
 def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
@@ -38,7 +40,8 @@ def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str
     """
     logger.debug("Validating job")
     try:
-        Job(job_settings, whitelisted_blocks=whitelisted_blocks)
+        job = Job(whitelisted_blocks=whitelisted_blocks)
+        job.load_json(job_settings)
     except Exception as e:
         raise ValueError(e)
 

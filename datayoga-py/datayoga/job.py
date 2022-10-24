@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import importlib
 import logging
@@ -8,6 +9,7 @@ import jsonschema
 
 from datayoga import utils
 from datayoga.block import Block
+from datayoga.step import Step
 from datayoga.context import Context
 
 logger = logging.getLogger("dy")
@@ -60,7 +62,8 @@ class Job():
         jsonschema.validate(instance=json_source, schema=utils.read_json(
             utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
         self.set_blocks(json_source["steps"])
-        self.input = self.get_block(json_source.get("input"))
+        if json_source.get("input") is not None:
+            self.input = self.get_block(json_source.get("input"))
 
     def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
@@ -74,5 +77,7 @@ class Job():
         """
         transformed_data = copy.deepcopy(data)
         for step in self.blocks:
-            transformed_data = step.transform(transformed_data)
+            transformed_data, results = asyncio.run(step.run(transformed_data))
+            logger.debug(transformed_data)
+
         return transformed_data

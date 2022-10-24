@@ -2,10 +2,12 @@ import json
 import sqlite3
 from enum import Enum, unique
 from typing import Any, Dict, List
-
+import logging
 import jmespath
 
 from datayoga.jmespath_custom_functions import JmespathCustomFunctions
+
+logger = logging.getLogger("dy")
 
 
 @unique
@@ -105,6 +107,7 @@ class SQLExpression(Expression):
         # fetch the CTE and bind the variables
         data_values = [row.get(colname) for row in data_inner for colname in column_names]
         self.conn.row_factory = sqlite3.Row
+        logger.debug(f"{cte_clause} select {expression} from data)")
         cursor = self.conn.execute(
             f"{cte_clause} select {expression} from data", data_values
         )

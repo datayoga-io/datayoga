@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Callable, List, Optional
 from enum import Enum     # for enum34, or the stdlib version
-from block import Block, Result
+from datayoga.block import Block, Result
 
 logger = logging.getLogger("dy")
 
