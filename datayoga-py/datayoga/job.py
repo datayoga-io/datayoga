@@ -32,11 +32,11 @@ class Job():
             input (Dict[str, Any]): Block to be used as a producer
             whitelisted_blocks: (Optional[List[str]], optional): Whitelisted blocks. Defaults to None.
         """
+        self.whitelisted_blocks = whitelisted_blocks
+        self.input = input
+        self.context = context
         if steps is not None:
             self.set_blocks(steps)
-        self.input = input
-        self.whitelisted_blocks = whitelisted_blocks
-        self.context = context
 
     def set_blocks(self, block_definitions: List[Dict[str, Any]]):
         blocks: List[Block] = []

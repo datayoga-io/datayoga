@@ -1,8 +1,9 @@
+from enum import Enum
 import logging
 import os
 import sys
 from os import path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from jsonschema import validate
 
@@ -12,7 +13,11 @@ from datayoga.context import Context
 logger = logging.getLogger("dy")
 
 
+Result = Enum('Result', 'SUCCESS REJECTED FILTERED')
+
+
 class Block():
+    MSG_ID_FIELD = "__$$msg_id"
     """
     Block
 
@@ -71,7 +76,7 @@ class Block():
 
         return transformed_data
 
-    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         """ Transforms data (abstract, should be implemented by the sub class)
 
         Args:

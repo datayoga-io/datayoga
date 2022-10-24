@@ -2,17 +2,16 @@ import asyncio
 import logging
 from typing import Callable, List, Optional
 from enum import Enum     # for enum34, or the stdlib version
+from block import Block, Result
 
 logger = logging.getLogger("dy")
-
-StepResult = Enum('StepResult', 'SUCCESS REJECTED FILTERED')
 
 
 class Step():
     def __init__(self, id, block, concurrency=1):
         self.id = id
         self.block = block
-        self.child = None
+        self.next_step = None
         self.queue = asyncio.Queue(maxsize=1)
         self.active_entries = set()
         self.concurrency = concurrency
@@ -32,39 +31,50 @@ class Step():
         self.done_callback = callback
 
     def __or__(self, other):
-        return self.add_child(other)
+        return self.append(other)
 
-    def add_child(self, child):
-        self.child = child
-        self.child.add_done_callback(self.done)
-        return self.child
+    def append(self, next_step):
+        self.next_step = next_step
+        self.next_step.add_done_callback(self.done)
+        return self.next_step
 
     async def process(self, i):
-        self.active_entries.update([x['msg_id'] for x in i])
+        self.active_entries.update([x[Block.MSG_ID_FIELD] for x in i])
         await self.queue.put(i)
 
     async def run(self, worker_id):
         while True:
             entry = await self.queue.get()
+            logger.debug(f"{self.id}-{worker_id} processing {[i[Block.MSG_ID_FIELD] for i in entry]}")
             try:
-                msg_ids = [i["msg_id"] for i in entry]
-                logger.debug(f"{self.id}-{worker_id} processing {msg_ids}")
-                processed_entry = await self.block.run([i["value"] for i in entry])
+                processed_entries, results = await self.block.run(entry)
+
+                # TODO: handle filtered. anything not processed or rejected
                 # check if we have a next step
-                if self.child:
-                    # re-combine the values with the msg_ids
-                    await self.child.process([{'msg_id': k, 'value': v} for k, v in list(zip(msg_ids, processed_entry))])
+                if self.next_step:
+                    # process downstream
+                    await self.next_step.process(processed_entries)
                 else:
                     # we are a last channel, propagate the ack upstream
-                    self.done(msg_ids, StepResult.SUCCESS)
+                    # TODO: verify that all entries have a msg id otherwise raise consistency error
+                    self.done([x[Block.MSG_ID_FIELD] for x in processed_entries], Result.SUCCESS)
+
+                    # indicate rejected records if any
+                    if Result.REJECTED in results:
+                        self.done([entry[i][Block.MSG_ID_FIELD]
+                                   for i, v in enumerate(results) if v == Result.REJECTED], Result.REJECTED)
             except Exception as e:
-                logger.debug(e)
-                self.done([x["msg_id"] for x in entry], StepResult.REJECTED, f"Error in step {self.id}: {repr(e)}")
+                # we caught an exception. the entire batch is considered rejected
+                logger.exception(e)
+                # verify that all messages still have a msg_id property
+                # if next(filter(lambda x: not Block.MSG_ID_FIELD in x,entry),None) is not None
+                self.done([x[Block.MSG_ID_FIELD] for x in entry],
+                          Result.REJECTED, f"Error in step {self.id}: {repr(e)}")
             finally:
                 self.queue.task_done()
-            logger.debug(f"{self.id}-{worker_id} done processing {entry[0]['msg_id']}")
+            logger.debug(f"{self.id}-{worker_id} done processing {entry[0][Block.MSG_ID_FIELD]}")
 
-    def done(self, msg_ids: List[str], result: Optional[StepResult] = None, reason: Optional[str] = None):
+    def done(self, msg_ids: List[str], result: Optional[Result] = None, reason: Optional[str] = None):
         logger.debug(f"{self.id} acking {msg_ids} with result {result}")
         self.active_entries.difference_update(msg_ids)
         if self.done_callback is not None:
@@ -79,9 +89,9 @@ class Step():
         # wait for all tasks to finish
         await self.join()
 
-        # start by stopped children workers
-        if self.child:
-            await self.child.stop()
+        # stop any downstream workers
+        if self.next_step:
+            await self.next_step.stop()
 
         # stop all workers in the pool
         for worker in self.workers:

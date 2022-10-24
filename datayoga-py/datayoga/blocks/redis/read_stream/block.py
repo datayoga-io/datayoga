@@ -37,7 +37,9 @@ class Block(DyProducer):
                 self.consumer_group, self.requesting_consumer, {self.stream: ">"}, None, 0)
             for stream in streams:
                 for key, value in stream[1]:
-                    yield {"msg_id": key, "value": json.loads(value[next(iter(value))])}
+                    payload = json.loads(value[next(iter(value))])
+                    payload[self.MSG_ID_FIELD] = key
+                    yield payload
 
             if self.snapshot:
                 break

@@ -15,7 +15,7 @@ async def run(job: Job):
             root = Step("A", block)
             last_step = root
         else:
-            last_step = last_step.add_child(Step("B", block))
+            last_step = last_step.append(Step("B", block))
 
     root.add_done_callback(lambda msg_ids, result, reason: job.input.ack(msg_ids))
 
