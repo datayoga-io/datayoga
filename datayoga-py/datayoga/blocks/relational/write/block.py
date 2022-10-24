@@ -1,8 +1,8 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import sqlalchemy as sa
-from datayoga.block import Block as DyBlock
+from datayoga.block import Block as DyBlock, Result
 from datayoga.context import Context
 from datayoga.utils import get_connection_details
 
@@ -31,10 +31,12 @@ class Block(DyBlock):
 
         self.conn = self.engine.connect()
 
-    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
 
         logger.info(f"Inserting {len(data)} record(s) to {self.table} table")
         tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         self.conn.execute(tbl.insert(), data)
+        # if we made it here, it is a success. return the data and the success result
+        return data, [Result.SUCCESS]*len(data)

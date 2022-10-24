@@ -30,4 +30,4 @@ class Block(DyProducer):
             records = list(DictReader(read_obj))
 
         for i, record in enumerate(records):
-            yield {"msg_id": f"{i}", "value": record}
+            yield {self.MSG_ID_FIELD: str(i), **record}

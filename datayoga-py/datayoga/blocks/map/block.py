@@ -19,7 +19,11 @@ class Block(DyBlock):
         results = []
         return_data = []
         for row in data:
-            return_data.append(self.expression.search(row))
+            mapped_row = self.expression.search(row)
+            # we always add the msg_id back
+            if Block.MSG_ID_FIELD in row:
+                mapped_row[Block.MSG_ID_FIELD] = row[Block.MSG_ID_FIELD]
+            return_data.append(mapped_row)
 
         results.append(Result.SUCCESS)
         return return_data, results
