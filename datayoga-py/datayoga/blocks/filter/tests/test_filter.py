@@ -1,24 +1,27 @@
 from datayoga.blocks.filter.block import Block
+import pytest
 
 
-def test_filter_sql():
+@pytest.mark.asyncio
+async def test_filter_sql():
     block = Block(
         {
             "language": "sql",
             "expression": "age>20"
         }
     )
-    assert block.run([{"fname": "john", "lname": "doe", "age": 25}]) == [{"fname": "john", "lname": "doe", "age": 25}]
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == [{"fname": "john", "lname": "doe", "age": 25}]
 
 
-def test_filter_sql_multiple():
+@pytest.mark.asyncio
+async def test_filter_sql_multiple():
     block = Block(
         {
             "language": "sql",
             "expression": "age>20"
         }
     )
-    assert block.run(
+    assert await block.run(
         [
             {"fname": "john", "lname": "doe", "age": 25},
             {"fname": "john2", "lname": "doe2", "age": 15},
@@ -30,34 +33,37 @@ def test_filter_sql_multiple():
     ]
 
 
-def test_filter_sql_not():
+@pytest.mark.asyncio
+async def test_filter_sql_not():
     block = Block(
         {
             "language": "sql",
             "expression": "age>20"
         }
     )
-    assert block.run([{"fname": "john", "lname": "doe", "age": 15}]) == []
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 15}]) == []
 
 
-def test_filter_jmespath():
+@pytest.mark.asyncio
+async def test_filter_jmespath():
     block = Block(
         {
             "language": "jmespath",
             "expression": "age>`20`"
         }
     )
-    assert block.run([{"fname": "john", "lname": "doe", "age": 25}]) == [{"fname": "john", "lname": "doe", "age": 25}]
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == [{"fname": "john", "lname": "doe", "age": 25}]
 
 
-def test_filter_jmespath_multiple_nested():
+@pytest.mark.asyncio
+async def test_filter_jmespath_multiple_nested():
     block = Block(
         {
             "language": "jmespath",
             "expression": "age.years>`20`"
         }
     )
-    assert block.run(
+    assert await block.run(
         [
             {"fname": "john", "lname": "doe", "age": {"years": 25, "months": 5}},
             {"fname": "john2", "lname": "doe2", "age": {"years": 15, "months": 1}},
@@ -69,11 +75,12 @@ def test_filter_jmespath_multiple_nested():
     ]
 
 
-def test_filter_jmespath_not():
+@pytest.mark.asyncio
+async def test_filter_jmespath_not():
     block = Block(
         {
             "language": "jmespath",
             "expression": "age>`20`"
         }
     )
-    assert block.run([{"fname": "john", "lname": "doe", "age": 15}]) == []
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 15}]) == []
