@@ -3,6 +3,7 @@ import logging
 from typing import Callable, List, Optional
 from enum import Enum     # for enum34, or the stdlib version
 from datayoga.block import Block, Result
+from datayoga.context import Context
 
 logger = logging.getLogger("dy")
 
@@ -17,12 +18,14 @@ class Step():
         self.concurrency = concurrency
         self.workers = [None]*self.concurrency
         self.done_callback = None
+        self.initialized = False
 
-    def init(self):
+    def init(self, context: Optional[Context] = None):
         # initialize the block
-        self.block.init()
+        self.block.init(context)
         # start pool of workers for parallelization
         self.start_pool()
+        self.initialized = True
 
     def start_pool(self):
         for id in range(self.concurrency):
@@ -44,6 +47,8 @@ class Step():
         return self.next_step
 
     async def process(self, i):
+        if not self.initialized:
+            self.init()
         self.active_entries.update([x[Block.MSG_ID_FIELD] for x in i])
         await self.queue.put(i)
 

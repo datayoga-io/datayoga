@@ -5,13 +5,10 @@ import os
 from os import path
 from pathlib import Path
 from typing import List
-
+import datayoga_cli.utils as utils
 import click
 import jsonschema
-from datayoga import utils
-from datayoga.context import Context
-from datayoga.job import Job
-from datayoga.utils import read_yaml
+import datayoga as dy
 from pkg_resources import get_distribution
 from tqdm import tqdm
 
@@ -68,28 +65,28 @@ def run(
     try:
         logger.info("Runner started...")
 
-        job_settings = read_yaml(job_file)
+        job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
 
         job_path = path.dirname(job_file)
 
-        connections = read_yaml(path.join(job_path, "connections.yaml"))
+        connections = utils.read_yaml(path.join(job_path, "connections.yaml"))
         jsonschema.validate(instance=connections, schema=utils.read_json(
-            utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
+            dy.utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
-        context = Context({
+        context = dy.Context({
             "connections": connections,
             "data_path": path.join(job_path, "data"),
             "job_name": Path(job_file).stem
         })
 
-        job = Job(context=context)
-        job.load_json(job_settings)
+        job = dy.compile(job_settings)
 
         producer = job.input
         logger.info(f"Producing from {producer.__module__}")
-
-        asyncio.run(actions.run(job))
+        print(connections)
+        job.init(context)
+        asyncio.run(job.run())
 
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)

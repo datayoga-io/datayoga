@@ -41,6 +41,10 @@ class Job():
     def init(self, context: Optional[Context] = None):
         # open any connections or setup needed
         self.context = context
+        for step in self.steps:
+            step.init(context)
+        if self.input:
+            self.input.init(context)
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -60,6 +64,28 @@ class Job():
             logger.debug(transformed_data)
 
         return transformed_data
+
+    async def run(self):
+        # create the step sequence
+        root = None
+        for step in self.steps:
+            if root is None:
+                root = step
+                last_step = root
+            else:
+                last_step = last_step.append(step)
+
+        root.add_done_callback(lambda msg_ids, result, reason: self.input.ack(msg_ids))
+
+        for record in self.input.produce():
+            logger.debug(f"Retrieved record:\n\t{record}")
+            await root.process([record])
+
+        # wait for in-flight records to finish
+        await root.join()
+
+        # graceful shutdown
+        await root.stop()
 
 #
 # static utility methods

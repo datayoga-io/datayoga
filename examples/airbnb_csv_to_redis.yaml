@@ -1,9 +1,11 @@
-- uses: files.read_csv
+input:
+  uses: files.read_csv
   with:
     file: /home/oren/Downloads/airbnb_open_data.csv
     batch_size: 2500
-- uses: redis.write
-  with:
-    connection: cache
-    command: HSET
-    key_field: id
+steps:
+  - uses: redis.write
+    with:
+      connection: cache
+      command: HSET
+      key_field: id

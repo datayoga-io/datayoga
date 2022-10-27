@@ -36,7 +36,6 @@ class Block():
         """
         self.properties = properties
         self.validate()
-        self.init(context)
 
     def validate(self):
         """

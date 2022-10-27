@@ -11,12 +11,18 @@ logger = logging.getLogger("dy")
 
 
 class SleepBlock():
+    def init(self):
+        pass
+
     async def run(self, i):
         await asyncio.sleep(i[0]["sleep"])
         return i, [Result.SUCCESS]*len(i)
 
 
 class ExceptionBlock():
+    def init(self):
+        pass
+
     async def run(self, i):
         if (i[0]):
             raise ValueError()
@@ -25,6 +31,9 @@ class ExceptionBlock():
 
 
 class EchoBlock():
+    def init(self):
+        pass
+
     async def run(self, i):
         return i, [Result.SUCCESS]*len(i)
 
