@@ -3,8 +3,8 @@ import datetime
 import logging
 import pytest
 import time
-from step import Step
-from block import Block, Result
+from datayoga.step import Step
+from datayoga.block import Block, Result
 import mock
 
 logger = logging.getLogger("dy")
@@ -119,10 +119,10 @@ async def test_acks_exception():
         {Block.MSG_ID_FIELD: "message1", "value": True},
         {Block.MSG_ID_FIELD: "message2", "value": True}
     ]
-    producer = mock.MagicMock()
-    root.add_done_callback(producer.ack)
+    producer_mock = mock.MagicMock()
+    root.add_done_callback(producer_mock.ack)
     for i in input:
         await root.process([i])
     await root.stop()
-    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], Result.REJECTED,
-                              "Error in step A: ValueError()") for i in input])
+    assert producer_mock.ack.call_args_list == [mock.call.ck([i[Block.MSG_ID_FIELD]], Result.REJECTED,
+                                                             "Error in step A: ValueError()") for i in input]

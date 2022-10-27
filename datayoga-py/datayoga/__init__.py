@@ -2,29 +2,26 @@ import logging
 from typing import Any, Dict, List, Optional, TypedDict
 
 from datayoga.context import Context
-from datayoga.job import Job
+from datayoga.job import Job, validate_job, compile_job
 
 logger = logging.getLogger("dy")
 
 
 def compile(
         job_settings: Dict[str, Any],
-        context: Optional[Context] = None, whitelisted_blocks: Optional[List[str]] = None) -> Job:
+        whitelisted_blocks: Optional[List[str]] = None) -> Job:
     """
     Compiles a job in YAML 
 
     Args:
         job_settings (Dict[str, Any]): Job settings
-        context (Optional[Context], optional): Context. Defaults to None.
         whitelisted_blocks: (Optional[List[str]], optional): Whitelisted blocks. Defaults to None.
 
     Returns:
         Job: Compiled job
     """
     logger.debug("Compiling job")
-    job = Job(context=context, whitelisted_blocks=whitelisted_blocks)
-    job.load_json(job_settings)
-    return job
+    return compile_job(job_settings, whitelisted_blocks)
 
 
 def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
@@ -40,8 +37,10 @@ def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str
     """
     logger.debug("Validating job")
     try:
-        job = Job(whitelisted_blocks=whitelisted_blocks)
-        job.load_json(job_settings)
+        validate_job(
+            source=job_settings,
+            whitelisted_blocks=whitelisted_blocks
+        )
     except Exception as e:
         raise ValueError(e)
 
@@ -61,6 +60,7 @@ def transform(job_settings: Dict[str, Any],
     Returns:
         List[Dict[str, Any]]: Transformed data
     """
-    job = compile(job_settings, context, whitelisted_blocks)
+    job = compile(job_settings, whitelisted_blocks)
+    job.init(context)
     logger.debug("Transforming data")
     return job.transform(data)

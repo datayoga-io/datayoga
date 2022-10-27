@@ -1,3 +1,4 @@
+import asyncio
 from os import path
 import os
 import pytest
@@ -22,38 +23,35 @@ TEST_DATA = [
 
 
 @pytest.fixture
-def job_yaml():
-    filename = path.join(os.path.dirname(os.path.realpath(__file__)), "..", "resources", "test.yaml")
+def job_settings():
+    filename = path.join(os.path.dirname(os.path.realpath(__file__)),  "resources", "test.yaml")
     with open(filename, "r", encoding="utf8") as stream:
         job_settings = yaml.safe_load(stream)
 
     return job_settings
 
 
-def test_transform_oo(job_yaml):
-    job = dy.compile(job_yaml)
-
-    for data in TEST_DATA:
-        assert job.transform(data["before"]) == data["after"]
-
-
-def test_compile_and_transform_module():
-    job_settings = get_job_settings_from_yaml(TEST_YAML)
+def test_transform_oo(job_settings):
     job = dy.compile(job_settings)
 
     for data in TEST_DATA:
         assert job.transform(data["before"]) == data["after"]
 
 
-def test_transform_module():
-    job_settings = get_job_settings_from_yaml(TEST_YAML)
+def test_compile_and_transform_module(job_settings):
+    job = dy.compile(job_settings)
+
+    for data in TEST_DATA:
+        assert job.transform(data["before"]) == data["after"]
+
+
+def test_transform_module(job_settings):
 
     for data in TEST_DATA:
         assert dy.transform(job_settings, data["before"]) == data["after"]
 
 
-def test_validate_valid_job():
-    job_settings = get_job_settings_from_yaml(TEST_YAML)
+def test_validate_valid_job(job_settings):
     dy.validate(job_settings)
 
 
@@ -65,8 +63,7 @@ def test_validate_invalid_job():
         dy.validate(job_settings)
 
 
-def test_block_not_in_whitelisted_blocks():
-    job_settings = get_job_settings_from_yaml(TEST_YAML)
+def test_block_not_in_whitelisted_blocks(job_settings):
 
-    with pytest.raises(ValueError, match="map block"):
+    with pytest.raises(ValueError, match="map"):
         dy.compile(job_settings, whitelisted_blocks=["add_field", "rename_field", "remove_field"])

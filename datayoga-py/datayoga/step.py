@@ -17,6 +17,11 @@ class Step():
         self.concurrency = concurrency
         self.workers = [None]*self.concurrency
         self.done_callback = None
+
+    def init(self):
+        # initialize the block
+        self.block.init()
+        # start pool of workers for parallelization
         self.start_pool()
 
     def start_pool(self):

@@ -1,4 +1,5 @@
 from enum import Enum
+import importlib
 import logging
 import os
 import sys
@@ -59,23 +60,6 @@ class Block():
         """
         pass
 
-    def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Transforms data
-
-        Args:
-            data (List[Dict[str, Any]]): Data
-
-        Returns:
-            List[Dict[str, Any]]: Transformed data
-        """
-        logger.debug(f"Transforming data, data before: {data}")
-
-        transformed_data = self.run(data)
-        logger.debug(f"Data after: {transformed_data}")
-
-        return transformed_data
-
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         """ Transforms data (abstract, should be implemented by the sub class)
 
@@ -89,3 +73,14 @@ class Block():
 
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
+
+#
+# static utility methods
+#
+
+
+def create_block(block_name: str, properties: Dict[str, Any]) -> Block:
+    module_name = f"datayoga.blocks.{block_name}.block"
+    module = importlib.import_module(module_name)
+    block: Block = getattr(module, "Block")(properties)
+    return block
