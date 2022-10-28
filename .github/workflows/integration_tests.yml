@@ -32,6 +32,6 @@ jobs:
           pip install .[test]
 
       - name: Run tests
-      run: |
+        run: |
           cd integration_tests
           PYTHONPATH=. python -m pytest --log-cli-level=DEBUG
