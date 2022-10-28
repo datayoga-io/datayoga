@@ -13,7 +13,6 @@ class Step():
         self.id = id
         self.block = block
         self.next_step = None
-        self.queue = asyncio.Queue(maxsize=1)
         self.active_entries = set()
         self.concurrency = concurrency
         self.workers = [None]*self.concurrency
@@ -24,10 +23,10 @@ class Step():
         # initialize the block
         self.block.init(context)
         # start pool of workers for parallelization
-        self.start_pool()
-        self.initialized = True
 
-    def start_pool(self):
+    async def start_pool(self):
+        logger.debug("starting pool")
+        self.queue = asyncio.Queue(maxsize=1)
         for id in range(self.concurrency):
             worker = self.workers[id]
             if worker is None or not worker.done():
@@ -48,7 +47,8 @@ class Step():
 
     async def process(self, i):
         if not self.initialized:
-            self.init()
+            await self.start_pool()
+            self.initialized = True
         self.active_entries.update([x[Block.MSG_ID_FIELD] for x in i])
         await self.queue.put(i)
 

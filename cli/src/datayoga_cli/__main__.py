@@ -5,15 +5,14 @@ import os
 from os import path
 from pathlib import Path
 from typing import List
-import datayoga_cli.utils as utils
+from datayoga_cli import utils
 import click
 import jsonschema
 import datayoga as dy
 from pkg_resources import get_distribution
 from tqdm import tqdm
 
-from . import cli_helpers
-from . import actions
+from datayoga_cli import cli_helpers
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
