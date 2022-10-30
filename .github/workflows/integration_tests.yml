@@ -33,5 +33,5 @@ jobs:
 
       - name: Run tests
         run: |
-          cd datayoga-py/pytest
+          cd integration_tests
           PYTHONPATH=. python -m pytest --log-cli-level=DEBUG

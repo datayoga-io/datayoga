@@ -3,13 +3,13 @@ import os
 from csv import DictReader
 from typing import Any, Dict, List, Optional
 
-from datayoga.block import Block as DyBlock
 from datayoga.context import Context
+from datayoga.producer import Producer as DyProducer
 
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock):
+class Block(DyProducer):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
@@ -23,11 +23,11 @@ class Block(DyBlock):
         logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def produce(self) -> List[Dict[str, Any]]:
         logger.debug("Reading CSV")
 
-        with open(self.file, 'r') as read_obj:
+        with open(self.file, "r") as read_obj:
             records = list(DictReader(read_obj))
 
         for i, record in enumerate(records):
-            yield {"key": f"{i}", "value": record}
+            yield {self.MSG_ID_FIELD: str(i), **record}

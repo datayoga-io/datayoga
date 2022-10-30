@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 
 from datayoga import utils
 from datayoga.block import Block as DyBlock
+from datayoga.block import Result
 from datayoga.context import Context
 
 logger = logging.getLogger("dy")
@@ -13,8 +14,9 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.properties = utils.format_block_properties(self.properties)
 
-    def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def run(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         logger.debug(f"Running {self.get_block_name()}")
+        results = []
 
         for row in data:
             for property in self.properties["fields"]:
@@ -28,5 +30,6 @@ class Block(DyBlock):
                             del obj[key]
                         else:
                             obj = obj[key]
+        results.append(Result.SUCCESS)
 
-        return data
+        return data, results

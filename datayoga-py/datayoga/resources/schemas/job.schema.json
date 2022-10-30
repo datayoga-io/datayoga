@@ -1,23 +1,34 @@
 {
   "title": "Job",
   "description": "Job descriptor",
-  "type": "array",
-  "items": {
-    "type": "object",
-    "properties": {
-      "uses": {
-        "description": "Block type",
-        "type": "string"
-      },
-      "with": {
-        "description": "Properties",
-        "type": ["object", "array"]
-      }
+  "type": "object",
+  "properties": {
+    "input": {
+      "$ref": "#/definitions/block"
     },
-    "additionalProperties": false,
-    "required": ["uses", "with"],
-    "examples": [
-      [
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/block"
+      }
+    }
+  },
+  "definitions": {
+    "block": {
+      "type": "object",
+      "properties": {
+        "uses": {
+          "description": "Block type",
+          "type": "string"
+        },
+        "with": {
+          "description": "Properties",
+          "type": ["object", "array"]
+        }
+      },
+      "additionalProperties": false,
+      "required": ["uses", "with"],
+      "examples": [
         {
           "uses": "files.read_csv",
           "with": {
@@ -53,6 +64,6 @@
           }
         }
       ]
-    ]
+    }
   }
 }

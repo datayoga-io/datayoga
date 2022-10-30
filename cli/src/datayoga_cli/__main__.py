@@ -1,20 +1,16 @@
 #!/usr/bin/env python
+import asyncio
 import logging
 import os
 from os import path
 from pathlib import Path
-from typing import List
 
 import click
+import datayoga as dy
 import jsonschema
-from datayoga import utils
-from datayoga.context import Context
-from datayoga.job import Job
-from datayoga.utils import read_yaml
 from pkg_resources import get_distribution
-from tqdm import tqdm
 
-from . import cli_helpers
+from datayoga_cli import cli_helpers, utils
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
@@ -66,52 +62,29 @@ def run(
     try:
         logger.info("Runner started...")
 
-        job_settings = read_yaml(job_file)
+        job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
 
         job_path = path.dirname(job_file)
 
-        connections = read_yaml(path.join(job_path, "connections.yaml"))
-        jsonschema.validate(instance=connections, schema=utils.read_json(
-            utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
+        connections = utils.read_yaml(path.join(job_path, "connections.yaml"))
+        logger.debug(f"connections: {connections}")
 
-        context = Context({
+        jsonschema.validate(instance=connections, schema=utils.read_json(
+            dy.utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
+
+        context = dy.Context({
             "connections": connections,
             "data_path": path.join(job_path, "data"),
             "job_name": Path(job_file).stem
         })
 
-        job = Job(job_settings, context)
+        job = dy.compile(job_settings)
 
-        # assume the producer is the first block and remove it from job's steps
-        producer = job.steps.pop(0)
+        producer = job.input
         logger.info(f"Producing from {producer.__module__}")
-        batch_size = producer.properties.get("batch_size", 1)
-        batch = []
-        keys = []
-
-        def handle_batch(batch: List, keys: List):
-            job.transform(batch)
-
-            for key in keys:
-                producer.ack(key)
-
-        for record in tqdm(producer.run([])):
-            key = record["key"]
-            value = record["value"]
-            logger.debug(f"Retrieved record:\n\tKey: {key}\n\tValue: {value}")
-            keys.append(key)
-            batch.append(value)
-
-            if len(batch) == batch_size:
-                handle_batch(batch, keys)
-
-                batch = []
-                keys = []
-
-        # handle last batch
-        if len(batch) > 0:
-            handle_batch(batch, keys)
+        job.init(context)
+        asyncio.run(job.run())
 
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)
