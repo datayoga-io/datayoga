@@ -1,6 +1,6 @@
-from datayoga.blocks.add_field.block import Block
 import pytest
 from datayoga.block import Result
+from datayoga.blocks.add_field.block import Block
 
 
 @pytest.mark.asyncio
@@ -14,7 +14,7 @@ async def test_add_field():
     )
 
 
-@ pytest.mark.asyncio
+@pytest.mark.asyncio
 async def test_add_nested_field():
     block = Block({"field": "name.full_name",
                    "language": "jmespath",
@@ -24,7 +24,7 @@ async def test_add_nested_field():
         {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}], [Result.SUCCESS])
 
 
-@ pytest.mark.asyncio
+@pytest.mark.asyncio
 async def test_add_multiple_fields():
     block = Block({"fields": [{"field": "name.full_name", "language": "jmespath", "expression": "concat([name.fname, ' ', name.lname])"}, {
                   "field": "name.fname_upper", "language": "jmespath", "expression": "upper(name.fname)"}]})
@@ -33,7 +33,7 @@ async def test_add_multiple_fields():
         {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}], [Result.SUCCESS])
 
 
-@ pytest.mark.asyncio
+@pytest.mark.asyncio
 async def test_add_field_with_dot():
     block = Block({"field": "name\.full_name",
                    "language": "jmespath",

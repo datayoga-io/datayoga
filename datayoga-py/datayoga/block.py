@@ -1,8 +1,8 @@
-from enum import Enum
 import importlib
 import logging
 import os
 import sys
+from enum import Enum
 from os import path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -14,7 +14,7 @@ from datayoga.context import Context
 logger = logging.getLogger("dy")
 
 
-Result = Enum('Result', 'SUCCESS REJECTED FILTERED')
+Result = Enum("Result", "SUCCESS REJECTED FILTERED")
 
 
 class Block():
@@ -26,13 +26,12 @@ class Block():
         properties Dict[str, Any]: Block properties
     """
 
-    def __init__(self, properties: Dict[str, Any] = {}, context: Optional[Context] = None):
+    def __init__(self, properties: Dict[str, Any] = {}):
         """
         Constructs a block
 
         Args:
             properties (Dict[str, Any]): Block [properties]
-            context (Optional[Context], optional): Context. Defaults to None.
         """
         self.properties = properties
         self.validate()
@@ -73,10 +72,10 @@ class Block():
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
+
 #
 # static utility methods
 #
-
 
 def create_block(block_name: str, properties: Dict[str, Any]) -> Block:
     module_name = f"datayoga.blocks.{block_name}.block"

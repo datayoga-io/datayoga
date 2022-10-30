@@ -1,11 +1,11 @@
 import asyncio
 import datetime
 import logging
-import pytest
-import time
-from datayoga.step import Step
-from datayoga.block import Block, Result
+
 import mock
+import pytest
+from datayoga.block import Block, Result
+from datayoga.step import Step
 
 logger = logging.getLogger("dy")
 
@@ -40,7 +40,6 @@ class EchoBlock():
 
 @pytest.mark.asyncio
 async def test_step_continuous_in_order():
-    start = datetime.datetime.now()
     results_block = mock.Mock(wraps=EchoBlock())
     root = Step("A", SleepBlock(), concurrency=1)
     root | Step("B", results_block, concurrency=1)

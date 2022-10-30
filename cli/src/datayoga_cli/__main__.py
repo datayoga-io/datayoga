@@ -4,15 +4,13 @@ import logging
 import os
 from os import path
 from pathlib import Path
-from typing import List
-from datayoga_cli import utils
-import click
-import jsonschema
-import datayoga as dy
-from pkg_resources import get_distribution
-from tqdm import tqdm
 
-from datayoga_cli import cli_helpers
+import click
+import datayoga as dy
+import jsonschema
+from pkg_resources import get_distribution
+
+from datayoga_cli import cli_helpers, utils
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
@@ -70,6 +68,8 @@ def run(
         job_path = path.dirname(job_file)
 
         connections = utils.read_yaml(path.join(job_path, "connections.yaml"))
+        logger.debug(f"connections: {connections}")
+
         jsonschema.validate(instance=connections, schema=utils.read_json(
             dy.utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
@@ -83,7 +83,6 @@ def run(
 
         producer = job.input
         logger.info(f"Producing from {producer.__module__}")
-        print(connections)
         job.init(context)
         asyncio.run(job.run())
 

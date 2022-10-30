@@ -17,19 +17,18 @@
     "block": {
       "type": "object",
       "properties": {
-      "uses": {
-        "description": "Block type",
-        "type": "string"
+        "uses": {
+          "description": "Block type",
+          "type": "string"
+        },
+        "with": {
+          "description": "Properties",
+          "type": ["object", "array"]
+        }
       },
-      "with": {
-        "description": "Properties",
-        "type": ["object", "array"]
-      }
-    },
-    "additionalProperties": false,
-    "required": ["uses", "with"],
-    "examples": 
-      [
+      "additionalProperties": false,
+      "required": ["uses", "with"],
+      "examples": [
         {
           "uses": "files.read_csv",
           "with": {

@@ -1,8 +1,8 @@
 import logging
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
 
 from datayoga.context import Context
-from datayoga.job import Job, validate_job, compile_job
+from datayoga.job import Job, compile_job, validate_job
 
 logger = logging.getLogger("dy")
 
@@ -33,7 +33,7 @@ def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str
         whitelisted_blocks: (Optional[List[str]], optional): Whitelisted blocks. Defaults to None.
 
     Raises:
-        ValueError: when the job is invalid
+        ValueError: When the job is invalid
     """
     logger.debug("Validating job")
     try:

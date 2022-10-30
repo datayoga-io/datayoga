@@ -1,6 +1,6 @@
-from datayoga.blocks.filter.block import Block
 import pytest
 from datayoga.block import Result
+from datayoga.blocks.filter.block import Block
 
 
 @pytest.mark.asyncio

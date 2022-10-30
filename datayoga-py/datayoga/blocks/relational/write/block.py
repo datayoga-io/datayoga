@@ -2,7 +2,8 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 import sqlalchemy as sa
-from datayoga.block import Block as DyBlock, Result
+from datayoga.block import Block as DyBlock
+from datayoga.block import Result
 from datayoga.context import Context
 from datayoga.utils import get_connection_details
 

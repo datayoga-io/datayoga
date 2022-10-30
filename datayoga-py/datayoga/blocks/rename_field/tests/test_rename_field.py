@@ -1,6 +1,6 @@
-from datayoga.blocks.rename_field.block import Block
 import pytest
 from datayoga.block import Result
+from datayoga.blocks.rename_field.block import Block
 
 
 @pytest.mark.asyncio

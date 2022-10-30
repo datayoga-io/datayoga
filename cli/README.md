@@ -4,30 +4,30 @@
 
 To set up environment in development mode:
 
-### Set up venv
+### Set Up Virtual Environment
 
-```
+```bash
 python -m venv venv
 source venv/bin/activate
 ```
 
-### Upgrade pip to latest version
+### Upgrade `pip` to Latest Version
 
-Pip version 22 and up is needed for editable install
+> [Pip](https://pypi.org/project/pip) version 22 and up is needed for editable install.
 
-```
+```bash
 python -m pip install --upgrade pip
 ```
 
-### Install dependencies
+### Install Dependencies
 
-```
+```bash
 cd datayoga-py
 python -m pip install -e .
 ```
 
-## Run CLI in development mode
+## Run CLI in Development Mode
 
-```
+```bash
 python ./cli/src/datayoga_cli/__main__.py
 ```

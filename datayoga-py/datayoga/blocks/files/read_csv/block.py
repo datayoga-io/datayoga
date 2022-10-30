@@ -3,8 +3,8 @@ import os
 from csv import DictReader
 from typing import Any, Dict, List, Optional
 
-from datayoga.producer import Producer as DyProducer
 from datayoga.context import Context
+from datayoga.producer import Producer as DyProducer
 
 logger = logging.getLogger("dy")
 
@@ -26,7 +26,7 @@ class Block(DyProducer):
     def produce(self) -> List[Dict[str, Any]]:
         logger.debug("Reading CSV")
 
-        with open(self.file, 'r') as read_obj:
+        with open(self.file, "r") as read_obj:
             records = list(DictReader(read_obj))
 
         for i, record in enumerate(records):

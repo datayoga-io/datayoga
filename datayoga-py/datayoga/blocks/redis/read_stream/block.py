@@ -3,8 +3,8 @@ import logging
 from typing import Any, Dict, List, Optional
 
 import datayoga.blocks.redis.utils as utils
-from datayoga.producer import Producer as DyProducer
 from datayoga.context import Context
+from datayoga.producer import Producer as DyProducer
 from datayoga.utils import get_connection_details
 
 logger = logging.getLogger("dy")

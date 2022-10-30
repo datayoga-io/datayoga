@@ -1,6 +1,5 @@
 import asyncio
 import copy
-import importlib
 import logging
 import os
 from typing import Any, Dict, List, Optional
@@ -9,8 +8,8 @@ import jsonschema
 
 from datayoga import utils
 from datayoga.block import Block, create_block
-from datayoga.step import Step
 from datayoga.context import Context
+from datayoga.step import Step
 
 logger = logging.getLogger("dy")
 
@@ -29,10 +28,8 @@ class Job():
         Constructs a job and its blocks
 
         Args:
-            job_steps (List[Dict[str, Any]]): Job steps
-            context (Optional[Context], optional): Context. Defaults to None.
-            input (Dict[str, Any]): Block to be used as a producer
-            whitelisted_blocks: (Optional[List[str]], optional): Whitelisted blocks. Defaults to None.
+            steps (List[Dict[str, Any]]): Job steps
+            input (Optional[Block]): Block to be used as a producer
         """
         self.input = input
         self.steps = steps
@@ -87,10 +84,10 @@ class Job():
         # graceful shutdown
         await root.stop()
 
+
 #
 # static utility methods
 #
-
 
 def validate_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
     # validate against the schema
@@ -104,7 +101,7 @@ def validate_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]]
                 raise ValueError(f"use of invalid block type: {step.get('uses')}")
 
 
-def compile_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
+def compile_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None) -> Job:
     validate_job(source, whitelisted_blocks=whitelisted_blocks)
     steps: List[Step] = []
     # parse the steps

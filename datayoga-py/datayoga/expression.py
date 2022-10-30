@@ -1,8 +1,9 @@
 import json
+import logging
 import sqlite3
 from enum import Enum, unique
 from typing import Any, Dict, List
-import logging
+
 import jmespath
 
 from datayoga.jmespath_custom_functions import JmespathCustomFunctions

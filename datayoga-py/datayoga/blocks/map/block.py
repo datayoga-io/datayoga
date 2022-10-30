@@ -2,8 +2,9 @@ import json
 import logging
 from typing import Any, Dict, List, Tuple
 
-from datayoga.block import Block as DyBlock, Result
 from datayoga import expression
+from datayoga.block import Block as DyBlock
+from datayoga.block import Result
 from datayoga.context import Context
 
 logger = logging.getLogger("dy")

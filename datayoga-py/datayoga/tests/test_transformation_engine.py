@@ -1,12 +1,10 @@
-import asyncio
-from os import path
-import os
-import pytest
 import logging
-import yaml
+import os
+from os import path
+
 import datayoga as dy
 import pytest
-from datayoga.job import Job
+import yaml
 
 logger = logging.getLogger("dy")
 
