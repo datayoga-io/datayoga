@@ -9,7 +9,7 @@ logger = logging.getLogger("dy")
 
 
 class Step():
-    def __init__(self, id, block, concurrency=1):
+    def __init__(self, id: str, block: Block, concurrency=1):
         self.id = id
         self.block = block
         self.next_step = None
@@ -72,7 +72,7 @@ class Step():
                     # indicate rejected records if any
                     if Result.REJECTED in results:
                         self.done([entry[i][Block.MSG_ID_FIELD]
-                                   for i, v in enumerate(results) if v == Result.REJECTED], Result.REJECTED)
+                                  for i, v in enumerate(results) if v == Result.REJECTED], Result.REJECTED)
             except Exception as e:
                 # we caught an exception. the entire batch is considered rejected
                 logger.exception(e)
@@ -105,4 +105,5 @@ class Step():
 
         # stop all workers in the pool
         for worker in self.workers:
-            worker.cancel()
+            if worker:
+                worker.cancel()

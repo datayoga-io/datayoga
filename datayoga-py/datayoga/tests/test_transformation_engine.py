@@ -46,7 +46,6 @@ def test_compile_and_transform_module(job_settings):
 
 
 def test_transform_module(job_settings):
-
     for data in TEST_DATA:
         assert dy.transform(job_settings, data["before"]) == data["after"]
 
@@ -64,6 +63,5 @@ def test_validate_invalid_job():
 
 
 def test_block_not_in_whitelisted_blocks(job_settings):
-
     with pytest.raises(ValueError, match="map"):
         dy.compile(job_settings, whitelisted_blocks=["add_field", "rename_field", "remove_field"])

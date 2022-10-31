@@ -1,6 +1,6 @@
 import json
 import logging
-import pytest
+
 import common.pg as pg
 import common.redis as redis
 from common.utils import run_job
@@ -10,8 +10,7 @@ logger = logging.getLogger("dy")
 REDIS_PORT = 12554
 
 
-@pytest.mark.asyncio
-async def test_redis_to_pg():
+def test_redis_to_pg():
     redis_container = redis.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
 
