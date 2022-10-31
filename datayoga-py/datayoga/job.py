@@ -2,16 +2,23 @@ import asyncio
 import copy
 import logging
 import os
+import sys
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import jsonschema
 
 from datayoga import utils
-from datayoga.block import Block, create_block
+from datayoga.block import Block, Result, create_block
 from datayoga.context import Context
 from datayoga.step import Step
 
 logger = logging.getLogger("dy")
+
+
+class ErrorHandling(Enum):
+    ABORT = "abort"
+    IGNORE = "ignore"
 
 
 class Job():
@@ -22,26 +29,39 @@ class Job():
         steps List[Block]: List of steps
     """
 
-    def __init__(self, steps: Optional[List[Step]] = None, input: Optional[Block] = None
-                 ):
+    def __init__(self, steps: Optional[List[Step]] = None, input: Optional[Block] = None,
+                 error_handling: Optional[ErrorHandling] = None):
         """
         Constructs a job and its blocks
 
         Args:
             steps (List[Dict[str, Any]]): Job steps
             input (Optional[Block]): Block to be used as a producer
+            error_handling (Optional[ErrorHandling]): error handling strategy
         """
         self.input = input
         self.steps = steps
+        self.error_handling = error_handling if error_handling else ErrorHandling.IGNORE
         self.initialized = False
 
     def init(self, context: Optional[Context] = None):
         # open any connections or setup needed
         self.context = context
+        self.root = None
         for step in self.steps:
             step.init(context)
+
+            # create the step sequence
+            if self.root is None:
+                self.root = step
+                last_step = self.root
+            else:
+                last_step = last_step.append(step)
+
         if self.input:
             self.input.init(context)
+
+        self.root.add_done_callback(self.handle_result)
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -63,26 +83,25 @@ class Job():
         return transformed_data
 
     async def run(self):
-        # create the step sequence
-        root = None
-        for step in self.steps:
-            if root is None:
-                root = step
-                last_step = root
-            else:
-                last_step = last_step.append(step)
-
-        root.add_done_callback(lambda msg_ids, result, reason: self.input.ack(msg_ids))
-
         for record in self.input.produce():
             logger.debug(f"Retrieved record:\n\t{record}")
-            await root.process([record])
+            await self.root.process([record])
 
+        await self.shutdown()
+
+    async def shutdown(self):
         # wait for in-flight records to finish
-        await root.join()
+        await self.root.join()
 
-        # graceful shutdown
-        await root.stop()
+        # # graceful shutdown
+        await self.root.stop()
+
+    def handle_result(self, msg_ids: List[str], result: Result, reason: str):
+        if result == Result.REJECTED and self.error_handling == ErrorHandling.ABORT.value:
+            logger.critical("Aborting due to rejected record(s)")
+            sys.exit(1)
+
+        self.input.ack(msg_ids)
 
 
 #
@@ -118,4 +137,4 @@ def compile_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] 
         input_definition = source.get("input")
         input = create_block(input_definition.get("uses"), input_definition.get("with"))
 
-    return Job(steps, input)
+    return Job(steps, input, source.get("error_handling"))

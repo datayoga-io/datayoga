@@ -16,10 +16,10 @@ class Producer(Block):
         """
         pass
 
-    def ack(self, msg_id: str):
-        """ Sends acknowledge for the message ID of a record that has been processed
+    def ack(self, msg_ids: List[str]):
+        """ Sends acknowledge for the message IDs of the records that have been processed (abstract, should be implemented by the sub class)
 
         Args:
-            msg_id (str): Message ID
+            msg_ids (List[str]): Message IDs
         """
         pass

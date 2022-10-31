@@ -85,7 +85,6 @@ def run(
         logger.info(f"Producing from {producer.__module__}")
         job.init(context)
         asyncio.run(job.run())
-
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)
 
@@ -144,5 +143,5 @@ def main():
     cli()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

@@ -14,6 +14,15 @@ Job descriptor
 |----|----|-----------|--------|
 |[**input**](#input)|`object`||yes|
 |[**steps**](#steps)|`array`|||
+|**error\_handling**|`string`|Error handling strategy: abort - terminate job, ignore - skip<br/>Default: `"ignore"`<br/>Enum: `"abort"`, `"ignore"`<br/>||
+
+**Additional Properties:** not allowed  
+**Example**
+
+```yaml
+error_handling: ignore
+
+```
 
 <a name="input"></a>
 ## input: object

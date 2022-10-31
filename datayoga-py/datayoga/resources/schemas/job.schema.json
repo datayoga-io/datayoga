@@ -11,8 +11,15 @@
       "items": {
         "$ref": "#/definitions/block"
       }
+    },
+    "error_handling": {
+      "description": "Error handling strategy: abort - terminate job, ignore - skip",
+      "type": "string",
+      "enum": ["abort", "ignore"],
+      "default": "ignore"
     }
   },
+  "additionalProperties": false,
   "definitions": {
     "block": {
       "type": "object",
