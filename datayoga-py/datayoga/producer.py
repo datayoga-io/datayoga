@@ -1,18 +1,19 @@
 import logging
-from typing import Any, Dict, List, TypedDict
+from typing import Any, Dict, Generator, List, TypedDict
 
 from .block import Block
 
 logger = logging.getLogger("dy")
+Message = TypedDict("Message", msg_id=str, value=Dict[str, Any])
 
 
 class Producer(Block):
 
-    def produce(self) -> List[TypedDict("Message", msg_id=str, value=Dict[str, Any])]:
+    def produce(self) -> Generator[Message, None, None]:
         """ Produces data (abstract, should be implemented by the sub class)
 
         Returns:
-            List[Dict[str, Any]]: Produced data
+            Generator[Message]: Produced data
         """
         pass
 

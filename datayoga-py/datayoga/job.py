@@ -93,7 +93,7 @@ class Job():
         # wait for in-flight records to finish
         await self.root.join()
 
-        # # graceful shutdown
+        # graceful shutdown
         await self.root.stop()
 
     def handle_result(self, msg_ids: List[str], result: Result, reason: str):

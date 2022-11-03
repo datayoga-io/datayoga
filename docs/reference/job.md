@@ -32,7 +32,7 @@ error_handling: ignore
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**uses**|`string`|Block type<br/>|yes|
-|[**with**](#inputwith)|`array`|Properties<br/>|yes|
+|[**with**](#inputwith)|`array`|Properties<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**

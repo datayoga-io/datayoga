@@ -34,7 +34,7 @@
         }
       },
       "additionalProperties": false,
-      "required": ["uses", "with"],
+      "required": ["uses"],
       "examples": [
         {
           "uses": "files.read_csv",
