@@ -24,7 +24,7 @@ class Block(DyProducer):
         logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)
 
-    def produce(self) -> Generator[Message, None, None]:
+    async def produce(self) -> Generator[Message, None, None]:
         logger.debug("Reading CSV")
 
         with open(self.file, "r") as read_obj:

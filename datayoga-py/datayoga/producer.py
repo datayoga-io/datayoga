@@ -9,7 +9,7 @@ Message = TypedDict("Message", msg_id=str, value=Dict[str, Any])
 
 class Producer(Block):
 
-    def produce(self) -> Generator[Message, None, None]:
+    async def produce(self) -> Generator[Message, None, None]:
         """ Produces data (abstract, should be implemented by the sub class)
 
         Returns:
