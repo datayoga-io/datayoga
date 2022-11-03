@@ -46,13 +46,13 @@ async def test_step_continuous_in_order():
     producer_mock = mock.MagicMock()
     root.add_done_callback(producer_mock.ack)
 
-    input = [{Block.MSG_ID_FIELD: k, "key": k, "sleep": v} for k, v in enumerate([0.3, 0.4, 0.5, 1])]
-    for i in input:
-        await root.process([i])
+    messages = [{Block.MSG_ID_FIELD: k, "key": k, "sleep": v} for k, v in enumerate([0.3, 0.4, 0.5, 1])]
+    for message in messages:
+        await root.process([message])
     await root.stop()
-    assert results_block.run.call_args_list == [mock.call.run([i]) for i in input]
+    assert results_block.run.call_args_list == [mock.call.run([i]) for i in messages]
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], Result.SUCCESS, None) for i in input]
+        [i[Block.MSG_ID_FIELD]], Result.SUCCESS, None) for i in messages]
 
 
 @pytest.mark.asyncio

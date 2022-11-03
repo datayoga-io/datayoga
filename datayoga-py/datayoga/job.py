@@ -83,7 +83,7 @@ class Job():
         return transformed_data
 
     async def run(self):
-        async for record in self.input.produce():
+        for record in self.input.produce():
             logger.debug(f"Retrieved record:\n\t{record}")
             await self.root.process([record])
 
@@ -93,7 +93,7 @@ class Job():
         # wait for in-flight records to finish
         await self.root.join()
 
-        # # graceful shutdown
+        # graceful shutdown
         await self.root.stop()
 
     def handle_result(self, msg_ids: List[str], result: Result, reason: str):

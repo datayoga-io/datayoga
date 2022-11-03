@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import logging
-from typing import Callable, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from datayoga.block import Block, Result
 from datayoga.context import Context
@@ -37,22 +39,23 @@ class Step():
     def add_done_callback(self, callback: Callable[[str], None]):
         self.done_callback = callback
 
-    def __or__(self, other):
+    def __or__(self, other: Step):
         return self.append(other)
 
-    def append(self, next_step):
+    def append(self, next_step: Step):
         self.next_step = next_step
         self.next_step.add_done_callback(self.done)
         return self.next_step
 
-    async def process(self, i):
+    async def process(self, messages: List[Dict[str, Any]]):
         if not self.initialized:
             await self.start_pool()
             self.initialized = True
-        self.active_entries.update([x[Block.MSG_ID_FIELD] for x in i])
-        await self.queue.put(i)
 
-    async def run(self, worker_id):
+        self.active_entries.update([x[Block.MSG_ID_FIELD] for x in messages])
+        await self.queue.put(messages)
+
+    async def run(self, worker_id: int):
         while True:
             entry = await self.queue.get()
             logger.debug(f"{self.id}-{worker_id} processing {[i[Block.MSG_ID_FIELD] for i in entry]}")

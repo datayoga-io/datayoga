@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 from typing import Any, Dict, List, Optional, Tuple
@@ -16,7 +17,7 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         for record in data:
-            sys.stdout.write(f"{record}\n")
+            sys.stdout.write(f"{json.dumps(record)}\n")
 
         # if we made it here, it is a success. return the data and the success result
         return data, [Result.SUCCESS]*len(data)
