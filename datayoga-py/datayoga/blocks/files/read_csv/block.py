@@ -1,9 +1,10 @@
 import logging
 import os
 from csv import DictReader
-from typing import Any, Dict, List, Optional
+from typing import Generator, Optional
 
 from datayoga.context import Context
+from datayoga.producer import Message
 from datayoga.producer import Producer as DyProducer
 
 logger = logging.getLogger("dy")
@@ -23,7 +24,7 @@ class Block(DyProducer):
         logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)
 
-    def produce(self) -> List[Dict[str, Any]]:
+    def produce(self) -> Generator[Message, None, None]:
         logger.debug("Reading CSV")
 
         with open(self.file, "r") as read_obj:

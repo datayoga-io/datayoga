@@ -1,9 +1,10 @@
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Generator, List, Optional
 
 import datayoga.blocks.redis.utils as utils
 from datayoga.context import Context
+from datayoga.producer import Message
 from datayoga.producer import Producer as DyProducer
 from datayoga.utils import get_connection_details
 
@@ -29,7 +30,7 @@ class Block(DyProducer):
             logger.info(f"Creating a new {self.consumer_group} consumer group associated with the {self.stream}")
             self.redis_client.xgroup_create(self.stream, self.consumer_group, 0)
 
-    def produce(self) -> List[Dict[str, Any]]:
+    def produce(self) -> Generator[Message, None, None]:
         logger.debug(f"Running {self.get_block_name()}")
 
         while True:

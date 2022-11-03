@@ -83,7 +83,7 @@ class Job():
         return transformed_data
 
     async def run(self):
-        for record in self.input.produce():
+        async for record in self.input.produce():
             logger.debug(f"Retrieved record:\n\t{record}")
             await self.root.process([record])
 
