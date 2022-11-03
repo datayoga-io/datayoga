@@ -22,7 +22,7 @@ TEST_DATA = [
 
 @pytest.fixture
 def job_settings():
-    filename = path.join(os.path.dirname(os.path.realpath(__file__)),  "resources", "test.yaml")
+    filename = path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "test.yaml")
     with open(filename, "r", encoding="utf8") as stream:
         job_settings = yaml.safe_load(stream)
 
@@ -55,8 +55,8 @@ def test_validate_valid_job(job_settings):
 
 
 def test_validate_invalid_job():
-    # `with` key is missing in this block
-    job_settings = {"steps": [{"uses": "add_field"}]}
+    # unsupported property specified this block
+    job_settings = {"steps": [{"uses": "remove_field", "params": {"field": "my_field"}}]}
 
     with pytest.raises(ValueError):
         dy.validate(job_settings)
