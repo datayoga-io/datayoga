@@ -17,7 +17,9 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         for record in data:
-            sys.stdout.write(f"{json.dumps(record)}\n")
+            # remove the internal $$msg_id column
+            filtered_record = {i: record[i] for i in record if i != Block.MSG_ID_FIELD}
+            sys.stdout.write(f"{json.dumps(filtered_record)}\n")
 
         # if we made it here, it is a success. return the data and the success result
         return data, [Result.SUCCESS]*len(data)

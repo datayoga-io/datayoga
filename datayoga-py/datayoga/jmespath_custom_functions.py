@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Union
 from uuid import uuid4
 
-import orjson
+import json
 from jmespath import functions
 
 
@@ -86,7 +86,7 @@ class JmespathCustomFunctions(functions.Functions):
             if isinstance(obj, str):
                 return obj.encode()
 
-            return orjson.dumps(obj)
+            return json.dumps(obj)
 
         h = hashlib.new(hash_name)
         h.update(prepare())
