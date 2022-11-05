@@ -38,7 +38,7 @@ SQLAlchemy = { version = "^1.4.41", optional = true}
 [tool.poetry.extras]
 redis = ["redis"]
 pg = ["psycopg2","SQLAlchemy"]
-test = ["mock", "pytest", "pytest-describe", "pytest-mock", "pytest-timeout", "requests-mock", "redis", "psycopg2","SQLAlchemy", "testcontainers"]
+test = ["mock", "pytest", "pytest-describe", "pytest-mock", "pytest-timeout", "requests-mock", "redis", "psycopg2","SQLAlchemy", "testcontainers", "pytest-asyncio"]
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
