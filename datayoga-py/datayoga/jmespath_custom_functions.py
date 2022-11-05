@@ -1,6 +1,6 @@
 import hashlib
 import string
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Union
 from uuid import uuid4
 
@@ -86,7 +86,8 @@ class JmespathCustomFunctions(functions.Functions):
             if isinstance(obj, str):
                 return obj.encode()
 
-            return json.dumps(obj)
+            # the 'separators' arg is needed to remove whitespace in the resulting string
+            return json.dumps(obj, separators=(',', ':')).encode("utf-8")
 
         h = hashlib.new(hash_name)
         h.update(prepare())
@@ -102,9 +103,10 @@ class JmespathCustomFunctions(functions.Functions):
         If `dt` is a number, Unix timestamp (1320365123, for example) is assumed.
         """
 
-        dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
+        dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt, timezone.utc)
+        print(dt.now(dt.tzinfo), datetime.now(dt.tzinfo), dt)
         delta = dt.now(dt.tzinfo) - dt
-
+        print(delta)
         return delta.days
 
     @functions.signature({"types": ["string", "number"]})
@@ -117,7 +119,7 @@ class JmespathCustomFunctions(functions.Functions):
         If `dt` is a number, Unix timestamp (1320365123, for example) is assumed.
         """
 
-        dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt)
+        dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt, timezone.utc)
         delta = dt.now(dt.tzinfo) - dt
 
         return delta.days * 86400 + delta.seconds
