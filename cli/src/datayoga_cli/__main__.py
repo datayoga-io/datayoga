@@ -2,15 +2,17 @@
 import asyncio
 import logging
 import os
+import shutil
 from os import path
 from pathlib import Path
 
 import click
 import datayoga as dy
 import jsonschema
+from datayoga import utils
+from datayoga_cli import cli_helpers
+from datayoga_cli.cli_helpers import handle_critical
 from pkg_resources import get_distribution
-
-from datayoga_cli import cli_helpers, utils
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
@@ -34,12 +36,30 @@ def cli():
 
 
 @cli.command(name="init", help="Scaffolds a new folder with sample configuration files")
+@click.argument("project_name")
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def init(
     project_name: str,
     loglevel: str
 ):
     set_logging_level(loglevel)
+
+    try:
+        if os.path.exists(project_name):
+            raise ValueError(f"{project_name} is already exists")
+
+        logger.debug(f"Creating {project_name} directory")
+        shutil.copytree(utils.get_resource_path("scaffold"), project_name)
+
+        # Explicitly set permissions for created files and directories, because in some cases this may not be correct.
+        for root, dirs, files in os.walk(project_name):
+            for paths, permissions in ((files, "644"), (dirs, "755")):
+                for path in paths:
+                    os.chmod(os.path.join(root, path), int(permissions, 8))
+
+        print(f"Initialized {project_name} successfully")
+    except Exception as e:
+        handle_critical(logger, f"Error while initializing {project_name}", e)
 
 
 @cli.command(name="validate", help="Validates a job in dry run mode")
@@ -51,31 +71,31 @@ def validate(
 
 
 @cli.command(name="run", help="Runs a job", context_settings=CONTEXT_SETTINGS)
-@click.argument("job-file")
+@click.argument("job")
+@click.option('--dir', help="DataYoga directory", default=".", show_default=True)
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def run(
-    job_file: str,
+    job: str,
+    dir: str,
     loglevel: str
 ):
     set_logging_level(loglevel)
 
     try:
         logger.info("Runner started...")
-
+        job_file = path.join(dir, "jobs", job.replace(".", os.sep) + ".yaml")
         job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
 
-        job_path = path.dirname(job_file)
-
-        connections = utils.read_yaml(path.join(job_path, "connections.yaml"))
+        connections = utils.read_yaml(path.join(dir, "connections.yaml"))
         logger.debug(f"connections: {connections}")
 
         jsonschema.validate(instance=connections, schema=utils.read_json(
-            dy.utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
+            utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
         context = dy.Context({
             "connections": connections,
-            "data_path": path.join(job_path, "data"),
+            "data_path": path.join(dir, "data"),
             "job_name": Path(job_file).stem
         })
 

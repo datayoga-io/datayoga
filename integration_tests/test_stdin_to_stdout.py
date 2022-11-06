@@ -8,7 +8,7 @@ def test_stdin_to_stdout(tmpdir: str):
     tested_data = '{"id": 121, "fname": "joe", "lname": "allen", "country_code": "US", "country_name": "united states", "gender": "M"}'
 
     output_file = tmpdir.join("test_stdin_to_stdout.txt")
-    run_job("test_stdin_to_stdout.yaml", f"echo '{tested_data}'", output_file)
+    run_job("tests.stdin_to_stdout", f"echo '{tested_data}'", output_file)
 
     result = json.loads(output_file.read())
 

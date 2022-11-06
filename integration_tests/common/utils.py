@@ -28,9 +28,9 @@ def execute_program(command: str):
         raise ValueError(f"command {command} failed")
 
 
-def run_job(job_file: str, piped_from: Optional[str] = None, piped_to: Optional[str] = None):
+def run_job(job: str, piped_from: Optional[str] = None, piped_to: Optional[str] = None):
     piped_from_cmd = f"{piped_from} | " if piped_from else ""
     piped_to_cmd = f" > {piped_to}" if piped_to else ""
 
     execute_program(
-        f'{piped_from_cmd}datayoga run {path.join(os.path.dirname(os.path.realpath(__file__)), "..", "resources", job_file)} --loglevel DEBUG{piped_to_cmd}')
+        f'{piped_from_cmd}datayoga run {job} --dir {path.join(os.path.dirname(os.path.realpath(__file__)), "..", "resources")} --loglevel DEBUG{piped_to_cmd}')
