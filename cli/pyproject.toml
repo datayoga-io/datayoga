@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "datayoga-cli"
+name = "datayoga"
 version = "0.0.0"
 description = "DataYoga command line interface"
 authors = ["DataYoga <admin@datayoga.io>"]
