@@ -6,7 +6,6 @@ from os import path
 from typing import Any, Dict, List
 
 import yaml
-
 from datayoga.context import Context
 
 

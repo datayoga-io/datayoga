@@ -7,7 +7,7 @@ REDIS_PORT = 12554
 def test_csv_to_redis():
     redis_container = redis.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
-    run_job("test_csv_to_redis.yaml")
+    run_job("tests.csv_to_redis")
 
     redis_client = redis.get_redis_client("localhost", REDIS_PORT)
 

@@ -33,7 +33,7 @@ def test_redis_to_pg():
     engine = pg.get_engine(postgres_container)
     pg.create_emp_table(engine, "hr")
 
-    run_job("test_redis_to_pg.yaml")
+    run_job("tests.redis_to_pg")
 
     total_employees = pg.select_one_row(engine, "select count(*) as total from hr.emp")
     assert total_employees["total"] == 2
