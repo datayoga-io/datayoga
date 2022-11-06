@@ -104,9 +104,7 @@ class JmespathCustomFunctions(functions.Functions):
         """
 
         dt = datetime.fromisoformat(dt) if isinstance(dt, str) else datetime.fromtimestamp(dt, timezone.utc)
-        print(dt.now(dt.tzinfo), datetime.now(dt.tzinfo), dt)
         delta = dt.now(dt.tzinfo) - dt
-        print(delta)
         return delta.days
 
     @functions.signature({"types": ["string", "number"]})
