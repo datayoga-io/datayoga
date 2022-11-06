@@ -22,7 +22,6 @@ jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
 python = "^3.7"
 PyYAML = "^6.0"
-orjson = "^3.8.0"
 
 mock = { version = "^4.0.3", optional = true }
 pytest = { version = "^7.1.2", optional = true }
@@ -39,7 +38,7 @@ SQLAlchemy = { version = "^1.4.41", optional = true}
 [tool.poetry.extras]
 redis = ["redis"]
 pg = ["psycopg2","SQLAlchemy"]
-test = ["mock", "pytest", "pytest-describe", "pytest-mock", "pytest-timeout", "requests-mock", "redis", "psycopg2","SQLAlchemy", "testcontainers"]
+test = ["mock", "pytest", "pytest-asyncio", "pytest-describe", "pytest-mock", "pytest-timeout", "requests-mock", "redis", "psycopg2","SQLAlchemy", "testcontainers"]
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
