@@ -4,11 +4,10 @@ nav_order: 2
 
 # Getting Started
 
-## Create Python Virtual Environment
+## Upgrade [Pip](https://pypi.org/project/pip/)
 
 ```bash
-python -m venv venv
-source venv/bin/activate
+pip install --upgrade pip
 ```
 
 ## Install DataYoga CLI
