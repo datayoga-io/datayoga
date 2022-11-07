@@ -7,7 +7,7 @@ from os import path
 from pathlib import Path
 
 import click
-import datayoga as dy
+import datayoga_core as dy
 import jsonschema
 from datayoga import cli_helpers
 from datayoga.cli_helpers import handle_critical
