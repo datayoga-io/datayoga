@@ -29,24 +29,22 @@ jobs:
       - if: github.ref != 'refs/heads/main'
         run: |
           echo "BUMP_TYPE=patch" >> $GITHUB_ENV
-
       - id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
-      - name: Update datayoga-core's pyproject.toml
+      - name: Update version of datayoga-core
         run: |
           cd datayoga-py
-          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
+          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
           more pyproject.toml
-      - name: Update CLI's pyproject.toml
+      - name: Update version of CLI
         run: |
           cd cli
-          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
+          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
           more pyproject.toml
-
       #
       # build
       #
