@@ -37,9 +37,9 @@ jobs:
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
       - name: Update version of datayoga-core
         run: |
-          cd datayoga-py
+          cd core
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
-      - name: Update version of CLI
+      - name: Update version of datayoga (CLI)
         run: |
           cd cli
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
@@ -48,19 +48,19 @@ jobs:
       #
       - name: Build datayoga-core
         run: |
-          cd datayoga-py
+          cd datayoga-core
           poetry build
       - name: Publish datayoga-core package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
-          packages_dir: datayoga-py/dist/
+          packages_dir: core/dist/
       - name: "Build CLI"
         run: |
           cd cli
           poetry build
-      - name: Publish CLI package
+      - name: Publish datayoga (CLI) package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__

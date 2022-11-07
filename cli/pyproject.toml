@@ -38,7 +38,7 @@ test = ["mock", "pytest", "pytest-describe", "pytest-mock", "pytest-timeout", "r
 url = "https://datayoga.io"
 
 [tool.poetry.scripts]
-datayoga = "datayoga.__main__:main"
+datayoga = "datayoga_cli.__main__:main"
 
 
 [build-system]
