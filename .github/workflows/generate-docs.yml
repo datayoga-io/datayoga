@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  docs:
+  generate-docs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -26,7 +26,7 @@ jobs:
           mkdir ./docs/reference
 
           nav_order=1
-          for schema in ./datayoga-py/datayoga_core/resources/schemas/*.schema.json
+          for schema in ./core/src/datayoga_core/resources/schemas/*.schema.json
           do
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Reference" --fm.nav_order "${nav_order}" > \
@@ -42,7 +42,7 @@ jobs:
           rm -rf ./docs/reference/blocks
           mkdir ./docs/reference/blocks
 
-          blocks_dir="./datayoga-py/datayoga_core/blocks"
+          blocks_dir="./core/src/datayoga_core/blocks"
           for schema in $(find ${blocks_dir} -name '*.schema.json')
           do
             doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"

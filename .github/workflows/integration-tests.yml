@@ -1,10 +1,10 @@
-name: unit-tests
+name: integration-tests
 on:
   workflow_dispatch:
   pull_request:
 
 jobs:
-  unit-tests:
+  integration-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -18,13 +18,20 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Build and Install CLI
+        run: |
+          cd cli
+          pip install poetry
+          poetry build
+          pip install dist/*.whl
+
       - name: Install dependencies
         run: |
-          cd datayoga-py
+          cd core
           pip install . 
           pip install .[test]
 
       - name: Run tests
         run: |
-          cd datayoga-py/datayoga_core
+          cd integration-tests
           PYTHONPATH=. python -m pytest --log-cli-level=DEBUG
