@@ -2,64 +2,41 @@
 nav_order: 2
 ---
 
-# Getting started
+# Getting Started
 
-## Download the CLI
-
-UBUNTU20.04
+## Create Python Virtual Environment
 
 ```bash
-wget https://datayoga.io/releases/dy_cli/latest/dy_cli-ubuntu20.04-latest.tar.gz -O /tmp/dy_cli.tar.gz
+python -m venv venv
+source venv/bin/activate
 ```
 
-UBUNTU18.04
+## Install DataYoga CLI
 
 ```bash
-wget https://datayoga.io/releases/dy_cli/latest/dy_cli-ubuntu18.04-latest.tar.gz -O /tmp/dy_cli.tar.gz
+pip install datayoga
 ```
 
-RHEL8
-
-```bash
-wget https://datayoga.io/releases/dy_cli/latest/dy_cli-rhel8-latest.tar.gz -O /tmp/dy_cli.tar.gz
-```
-
-RHEL7
-
-```bash
-wget https://datayoga.io/releases/dy_cli/latest/dy_cli-rhel7-latest.tar.gz -O /tmp/dy_cli.tar.gz
-```
-
-For other platforms, see installing from pip
-
-## Install the CLI
-
-Unpack the downloaded file into /usr/local/bin/ directory:
-
-```bash
-sudo tar xvf /tmp/dy_cli.tar.gz -C /usr/local/bin/
-```
-
-Verify that the installation completed successfully by running the following command:
+Verify that the installation completed successfully by running this command:
 
 ```bash
 datayoga --version
 ```
 
-\*Note: Non-root users should unpack to a directory with write permission and run `datayoga` directly from it.
+## Create New DataYoga Project
 
-## Create a new DataYoga Project
-
-To create a new DataYoga project, use the init command.
+To create a new DataYoga project, use the `init` command:
 
 ```bash
 datayoga init hello_world
 cd hello_world
 ```
 
-## Validating the Install
+> [Directory structure](directory-structure.md)
 
-Let's run our first job. It is pre-defined in the samples folder as part of the init command.
+## Validate the Install
+
+Let's run our first job. It is pre-defined in the samples folder as part of the `init` command:
 
 ```bash
 datayoga run sample.hello
@@ -67,12 +44,10 @@ datayoga run sample.hello
 
 If all goes well, you should see some startup logs, and eventually:
 
-```bash
-+-----+-----+
-| id  | name|
-+-----+-----+
-|hello|world|
-+-----+-----+
+```yaml
+{"greeting": "Hello Mr. John Doe"}
+{"greeting": "Hello Ms. Jane Doe"}
+{"greeting": "Hello Mr. Bill Adams"}
 ```
 
-That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the reference to see the different block types currently available.
+That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the [reference](reference/blocks.md) to see the different block types currently available.
