@@ -1,9 +1,9 @@
 import logging
 from typing import Any, Dict, List
 
-from datayoga import expression
 from datayoga.block import Block as DyBlock
 from datayoga.context import Context
+from datayoga_core import expression
 
 logger = logging.getLogger("dy")
 

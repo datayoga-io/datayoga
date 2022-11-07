@@ -7,11 +7,10 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import jsonschema
-
-from datayoga import utils
 from datayoga.block import Block, Result, create_block
 from datayoga.context import Context
 from datayoga.step import Step
+from datayoga_core import utils
 
 logger = logging.getLogger("dy")
 

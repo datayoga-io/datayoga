@@ -1,7 +1,6 @@
 name: generate docs for jsonschema
 on:
   pull_request:
-    types: [opened, edited, synchronize]
 
 jobs:
   docs:

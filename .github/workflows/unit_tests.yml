@@ -1,7 +1,6 @@
 name: unit-tests
 on:
   pull_request:
-    types: [opened, edited, synchronize]
 
 jobs:
   unit-tests:
@@ -26,5 +25,5 @@ jobs:
 
       - name: Run tests
         run: |
-          cd datayoga-py/datayoga
+          cd datayoga-py/datayoga_core
           PYTHONPATH=. python -m pytest --log-cli-level=DEBUG

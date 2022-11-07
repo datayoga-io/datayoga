@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-from datayoga.context import Context
-from datayoga.job import Job, compile_job, validate_job
+from datayoga_core.context import Context
+from datayoga_core.job import Job, compile_job, validate_job
 
 logger = logging.getLogger("dy")
 
