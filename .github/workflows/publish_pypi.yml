@@ -39,12 +39,10 @@ jobs:
         run: |
           cd datayoga-py
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
-          more pyproject.toml
       - name: Update version of CLI
         run: |
           cd cli
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
-          more pyproject.toml
       #
       # build
       #
