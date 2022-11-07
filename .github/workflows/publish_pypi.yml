@@ -43,11 +43,11 @@ jobs:
       - name: update datayoga-core's pyproject.toml
         run: |
           cd datayoga-py
-          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.vars.outputs.new_version}}" patch pyproject.toml
+          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.vars.outputs.new_version}}" pyproject.toml
       - name: Update CLI's pyproject.toml
         run: |
           cd cli
-          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.vars.outputs.new_version}}" patch pyproject.toml
+          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.vars.outputs.new_version}}" pyproject.toml
       #
       # build
       #
