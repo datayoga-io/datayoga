@@ -34,7 +34,7 @@ cd hello_world
 
 > [Directory structure](directory-structure.md)
 
-## Validate the Install
+## Run Your First Job
 
 Let's run our first job. It is pre-defined in the samples folder as part of the `init` command:
 
