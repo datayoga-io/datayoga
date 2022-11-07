@@ -3,6 +3,7 @@
 name: upload python packages
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

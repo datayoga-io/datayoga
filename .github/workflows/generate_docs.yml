@@ -1,5 +1,6 @@
 name: generate docs for jsonschema
 on:
+  workflow_dispatch:
   pull_request:
 
 jobs:
