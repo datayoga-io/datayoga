@@ -36,18 +36,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
-      - name: update datayoga-core's pyproject.toml
+      - name: Update datayoga-core's pyproject.toml
         run: |
           cd datayoga-py
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
+          more pyproject.toml
       - name: Update CLI's pyproject.toml
         run: |
           cd cli
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
+          more pyproject.toml
+
       #
       # build
       #
-      - name: "Build datayoga-core"
+      - name: Build datayoga-core
         run: |
           cd datayoga-py
           poetry build
