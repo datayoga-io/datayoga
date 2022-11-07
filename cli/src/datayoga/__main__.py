@@ -9,9 +9,9 @@ from pathlib import Path
 import click
 import datayoga as dy
 import jsonschema
-from datayoga import utils
-from datayoga_cli import cli_helpers
-from datayoga_cli.cli_helpers import handle_critical
+from datayoga import cli_helpers
+from datayoga.cli_helpers import handle_critical
+from datayoga_core import utils
 from pkg_resources import get_distribution
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
@@ -30,7 +30,7 @@ logger.addHandler(ch)
 
 
 @click.group(name="datayoga", help="DataYoga command line tool")
-@click.version_option(get_distribution("datayoga_cli").version)
+@click.version_option(get_distribution("datayoga").version)
 def cli():
     pass
 
