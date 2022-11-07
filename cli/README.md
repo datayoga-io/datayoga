@@ -29,5 +29,5 @@ python -m pip install -e .
 ## Run CLI in Development Mode
 
 ```bash
-python ./cli/src/datayoga_cli/__main__.py
+python ./cli/src/datayoga/__main__.py
 ```

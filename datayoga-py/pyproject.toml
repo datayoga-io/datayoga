@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "datayoga"
+name = "datayoga-core"
 version = "0.0.0"
 description = "DataYoga for Python"
 authors = ["DataYoga <admin@datayoga.io>"]

@@ -1,8 +1,9 @@
-# This workflows will upload a Python Package upon merge
+# This workflows will upload a Python Packages upon merge
 
-name: upload python package
+name: upload python packages
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -20,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel poetry twine
+          pip install setuptools wheel poetry twine bump2version
       # bump version type based on branch
       - if: github.ref == 'refs/heads/main'
         run: |
@@ -28,31 +29,40 @@ jobs:
       - if: github.ref != 'refs/heads/main'
         run: |
           echo "BUMP_TYPE=patch" >> $GITHUB_ENV
-
       - id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
-      - name: Set output with new version tag with v prefix
-        id: vars
-        run: echo ::set-output name=new_version::$(echo ${{steps.bump_version.outputs.new_tag}} | cut -c 2-)
-      - name: update pyproject.toml
+      - name: Update version of datayoga-core
         run: |
           cd datayoga-py
-          pip install bump2version
-          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
+          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
+      - name: Update version of CLI
+        run: |
+          cd cli
+          bump2version --current-version 0.0.0 --allow-dirty --new-version "${{ steps.bump_version.outputs.new_tag }}" patch pyproject.toml
       #
       # build
       #
-      - name: Build
+      - name: Build datayoga-core
         run: |
           cd datayoga-py
           poetry build
-      - name: Publish package
+      - name: Publish datayoga-core package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
           packages_dir: datayoga-py/dist/
+      - name: "Build CLI"
+        run: |
+          cd cli
+          poetry build
+      - name: Publish CLI package
+        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          packages_dir: cli/dist/

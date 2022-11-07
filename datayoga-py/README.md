@@ -59,9 +59,9 @@ Use this `example.yaml`:
 Use this code snippet to transform a data record using the job defined [above](#create-a-job):
 
 ```python
-import datayoga as dy
-from datayoga.job import Job
-from datayoga.utils import read_yaml
+import datayoga_core as dy
+from datayoga_core.job import Job
+from datayoga_core.utils import read_yaml
 
 job_settings = read_yaml("example.yaml")
 job = dy.compile(job_settings)

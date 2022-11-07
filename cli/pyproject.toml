@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "datayoga-cli"
+name = "datayoga"
 version = "0.0.0"
 description = "DataYoga command line interface"
 authors = ["DataYoga <admin@datayoga.io>"]
@@ -18,7 +18,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 click = "^8.0.3"
-datayoga  = "0.*"
+datayoga-core = "1.*"
 jsonschema = "^4.4.0"
 python = "^3.7"
 PyYAML = "^6.0"
@@ -38,7 +38,7 @@ test = ["mock", "pytest", "pytest-describe", "pytest-mock", "pytest-timeout", "r
 url = "https://datayoga.io"
 
 [tool.poetry.scripts]
-datayoga = "datayoga_cli.__main__:main"
+datayoga = "datayoga.__main__:main"
 
 
 [build-system]
