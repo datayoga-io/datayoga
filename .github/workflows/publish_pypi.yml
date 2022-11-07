@@ -1,6 +1,6 @@
-# This workflows will upload a Python Package upon merge
+# This workflows will upload a Python Packages upon merge
 
-name: upload python package
+name: upload python packages
 
 on:
   push:
@@ -38,12 +38,12 @@ jobs:
       - name: Set output with new version tag with v prefix
         id: vars
         run: echo ::set-output name=new_version::$(echo ${{steps.bump_version.outputs.new_tag}} | cut -c 2-)
-      - name: "datayoga-py: update pyproject.toml"
+      - name: update datayoga-core's pyproject.toml
         run: |
           cd datayoga-py
           pip install bump2version
           bump2version --current-version 0.0.0 --allow-dirty --new-version "${{steps.bump_version.outputs.new_tag}}" patch pyproject.toml
-      - name: "cli: update pyproject.toml"
+      - name: Update CLI's pyproject.toml
         run: |
           cd cli
           pip install bump2version
@@ -51,21 +51,21 @@ jobs:
       #
       # build
       #
-      - name: "datayoga-py: build"
+      - name: "Build datayoga-core"
         run: |
           cd datayoga-py
           poetry build
-      - name: Publish package
+      - name: Publish datayoga-core package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
           packages_dir: datayoga-py/dist/
-      - name: "cli: build"
+      - name: "Build CLI"
         run: |
           cd cli
           poetry build
-      - name: Publish package
+      - name: Publish CLI package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
