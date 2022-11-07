@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  publish-pypi:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -48,7 +48,7 @@ jobs:
       #
       - name: Build datayoga-core
         run: |
-          cd datayoga-core
+          cd core
           poetry build
       - name: Publish datayoga-core package
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29

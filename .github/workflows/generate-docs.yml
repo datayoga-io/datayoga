@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  docs:
+  generate-docs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
