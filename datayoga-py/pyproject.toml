@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datayoga-core"
-version = "1.0.1b6"
+version = "0.0.0"
 description = "DataYoga for Python"
 authors = ["DataYoga <admin@datayoga.io>"]
 license = "Apache-2.0"
