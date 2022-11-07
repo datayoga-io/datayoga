@@ -36,9 +36,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: ${{ env.BUMP_TYPE }}
-      - name: Set output with new version tag with v prefix
+      - name: Set output with new version tag without v prefix and new_version tag where beta is changed to b
         id: vars
-        run: echo ::set-output name=new_version::$(echo ${{steps.bump_version.outputs.new_tag}} | cut -c 2-)
+        run: |
+          echo ::set-output name=new_version::$(echo ${{steps.bump_version.outputs.new_tag}} | cut -c 2- | sed -E 's/-beta./b/')
       - name: update datayoga-core's pyproject.toml
         run: |
           cd datayoga-py
