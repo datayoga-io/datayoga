@@ -1,4 +1,4 @@
-# datayoga-py
+# DataYoga Core
 
 ## Introduction
 

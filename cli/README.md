@@ -22,7 +22,7 @@ python -m pip install --upgrade pip
 ### Install Dependencies
 
 ```bash
-cd datayoga-py
+cd core
 python -m pip install -e .
 ```
 
