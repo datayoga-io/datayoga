@@ -1,0 +1,13 @@
+input:
+  uses: redis.read_stream
+  with:
+    connection: cache
+    stream_name: emp
+    snapshot: true
+steps:
+  - uses: map
+    with:
+      expression: { full_name: fname || ' ' || lname }
+      language: sql
+  - uses: std.write
+error_handling: abort

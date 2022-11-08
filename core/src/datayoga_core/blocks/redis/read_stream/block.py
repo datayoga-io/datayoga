@@ -33,17 +33,24 @@ class Block(DyProducer):
     def produce(self) -> Generator[Message, None, None]:
         logger.debug(f"Running {self.get_block_name()}")
 
+        read_pending = True
         while True:
-            streams = self.redis_client.xreadgroup(
-                self.consumer_group, self.requesting_consumer, {self.stream: ">"}, None, 0)
+            # Read pending messages (fetched by us before but not acknowledged) in the first time, then consume new messages
+            streams = self.redis_client.xreadgroup(self.consumer_group, self.requesting_consumer, {
+                                                   self.stream: "0" if read_pending else ">"}, None, 100 if self.snapshot else 0)
+
             for stream in streams:
+                logger.debug(f"Messages in {self.stream} stream (pending: {read_pending}):\n\t{stream}")
                 for key, value in stream[1]:
                     payload = json.loads(value[next(iter(value))])
                     payload[self.MSG_ID_FIELD] = key
                     yield payload
 
-            if self.snapshot:
+            # Quit after consuming pending current messages in case of snapshot
+            if self.snapshot and not read_pending:
                 break
+
+            read_pending = False
 
     def ack(self, msg_ids: List[str]):
         for msg_id in msg_ids:
