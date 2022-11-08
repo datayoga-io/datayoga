@@ -16,20 +16,10 @@ def test_redis_read_pending_messages(tmpdir: str):
     redis_container.start()
 
     redis_client = redis.get_redis_client("localhost", REDIS_PORT)
-    redis_client.xadd(
-        "emp",
-        {"message":
-         json.dumps({"id": 1, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
-                     "credit_card": "1234-1234-1234-1234", "gender": "M"})})
-
-    # malformed record
+    redis_client.xadd("emp", {"message": json.dumps({"id": 1, "fname": "john", "lname": "doe"})})
+    # malformed record (missing fname and lname properties)
     redis_client.xadd("emp", {"message": json.dumps({"id": 3})})
-
-    redis_client.xadd(
-        "emp",
-        {"message":
-         json.dumps({"id": 2, "fname": "jane", "lname": "doe", "country_code": 972, "country_name": "israel",
-                     "credit_card": "1000-2000-3000-4000", "gender": "F"})})
+    redis_client.xadd("emp", {"message": json.dumps({"id": 2, "fname": "jane", "lname": "doe"})})
 
     output_file = tmpdir.join("test_redis_read_pending_messages.txt")
 
