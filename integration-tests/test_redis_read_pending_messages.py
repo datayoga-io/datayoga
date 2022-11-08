@@ -27,13 +27,11 @@ def test_redis_read_pending_messages(tmpdir: str):
     with pytest.raises(ValueError):
         run_job("tests.redis.abort.redis_to_stdout", piped_to=output_file)
 
-    result = json.loads(output_file.read())
-
     # only the first record processed successfully
+    result = json.loads(output_file.read())
     assert result.get("full_name") == "john doe"
 
     # start over and verify that we still fail as the rejected record is read from the pending messages
-    os.remove(output_file)
     with pytest.raises(ValueError):
         run_job("tests.redis.abort.redis_to_stdout", piped_to=output_file)
 
@@ -41,6 +39,7 @@ def test_redis_read_pending_messages(tmpdir: str):
     run_job("tests.redis.ignore.redis_to_stdout", piped_to=output_file)
 
     # the last record was processed successfully
+    result = json.loads(output_file.read())
     assert result.get("full_name") == "jane doe"
 
     os.remove(output_file)
