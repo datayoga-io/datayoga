@@ -1,0 +1,56 @@
+import json
+import logging
+import os
+
+import common.redis as redis
+import pytest
+from common.utils import run_job
+
+logger = logging.getLogger("dy")
+
+REDIS_PORT = 12554
+
+
+def test_redis_read_pending_messages(tmpdir: str):
+    redis_container = redis.get_redis_oss_container(REDIS_PORT)
+    redis_container.start()
+
+    redis_client = redis.get_redis_client("localhost", REDIS_PORT)
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"id": 1, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M"})})
+
+    # malformed record
+    redis_client.xadd("emp", {"message": json.dumps({"id": 3})})
+
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"id": 2, "fname": "jane", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1000-2000-3000-4000", "gender": "F"})})
+
+    output_file = tmpdir.join("test_redis_read_pending_messages.txt")
+
+    # the runner should terminate with an error because of the rejected record
+    with pytest.raises(ValueError):
+        run_job("tests.redis.abort.redis_to_stdout", piped_to=output_file)
+
+    result = json.loads(output_file.read())
+
+    # only the first record processed successfully
+    assert result.get("full_name") == "john doe"
+
+    # start over and verify that we still fail as the rejected record is read from the pending messages
+    with pytest.raises(ValueError):
+        run_job("tests.redis.abort.redis_to_stdout", piped_to=output_file)
+
+    # run the same job (with the same name so the same consumer group will be used) but with ignore error_handling
+    run_job("tests.redis.ignore.redis_to_stdout", piped_to=output_file)
+
+    # the last record was processed successfully
+    assert result.get("full_name") == "jane doe"
+
+    os.remove(output_file)
+    redis_container.stop()
