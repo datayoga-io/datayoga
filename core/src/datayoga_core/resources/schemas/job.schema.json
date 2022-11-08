@@ -1,0 +1,76 @@
+{
+  "title": "Job",
+  "description": "Job descriptor",
+  "type": "object",
+  "properties": {
+    "input": {
+      "$ref": "#/definitions/block"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/block"
+      }
+    },
+    "error_handling": {
+      "description": "Error handling strategy: abort - terminate job, ignore - skip",
+      "type": "string",
+      "enum": ["abort", "ignore"],
+      "default": "ignore"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "block": {
+      "type": "object",
+      "properties": {
+        "uses": {
+          "description": "Block type",
+          "type": "string"
+        },
+        "with": {
+          "description": "Properties",
+          "type": ["object", "array"]
+        }
+      },
+      "additionalProperties": false,
+      "required": ["uses"],
+      "examples": [
+        {
+          "uses": "files.read_csv",
+          "with": {
+            "file": "employees.csv",
+            "batch_size": 2500
+          }
+        },
+        {
+          "uses": "add_field",
+          "with": {
+            "field": "full_name",
+            "language": "jmespath",
+            "expression": "concat([capitalize(fname), ' ' , capitalize(lname)])"
+          }
+        },
+        {
+          "uses": "map",
+          "with": {
+            "expression": {
+              "id": "id",
+              "full_name": "full_name",
+              "country": "country_code || ' - ' || UPPER(country_name)",
+              "gender": "gender"
+            }
+          }
+        },
+        {
+          "uses": "redis.write",
+          "with": {
+            "connection": "cache",
+            "command": "HSET",
+            "key_field": "id"
+          }
+        }
+      ]
+    }
+  }
+}

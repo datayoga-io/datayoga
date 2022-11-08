@@ -1,0 +1,4 @@
+id,fname,lname,credit_card,country_code,country_name,gender
+1,john,doe,1234-1234-1234-1234,972,israel,M
+2,jane,doe,1000-2000-3000-4000,972,israel,F
+3,bill,adams,9999-8888-7777-666,1,usa,M

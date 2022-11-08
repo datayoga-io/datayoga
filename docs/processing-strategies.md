@@ -19,7 +19,7 @@ The Steps are defined as follows:
 
 In sequential processing, each record (or a batch of records) passes through each of the Steps. The second record waits for the first to finish. In this example, each record would take 2.5 seconds to complete, showing a total of 7.5 seconds to process the dataset.
 
-![sequential processing of records](./images/stream_process_sequential.png "Sequential processing")
+![sequential processing of records](./images/stream-process-sequential.png "Sequential processing")
 
 ## Continuous Sequential Processing
 
@@ -27,14 +27,14 @@ Continuous sequential processing allows to increase throughput by allowing each 
 
 In our example, we can reduce the processing time of the dataset to 4.5 seconds.
 
-![continuous processing of records](./images/stream_process_continuous.png "Continuous processing")
+![continuous processing of records](./images/stream-process-continuous.png "Continuous processing")
 
 ## Parallel Processing
 
 Parallel processing allows to process more than one record within a transformation Step at the same time. Each Step can have a different degree of parallelism. By default, Parallelism uses an asynchronous event loop to maximize performance. However, in case of CPU-bound activities, parallelism can also be performed using multiple OS processes. In case a Step reaches its maximum parallelism, backpressure will be applied to pause upstream Steps from producing additional activity until a slot frees up within the congested Step.
 In this example, a parallel setting of 2 has been applied to steps B and C, while step A only processes one record at a time (parallelism of 1). These settings reduce the time to process the dataset to 3.5 seconds.
 
-![parallel processing of records](./images/stream_process_parallel.png "Continuous processing")
+![parallel processing of records](./images/stream-process-parallel.png "Parallel processing")
 
 ## Sharded Parallel Processing
 
@@ -48,7 +48,7 @@ In some cases, batch processing may be more efficient than handling individual r
 
 In this example, a buffer size of 3 was applied, and is assumed that Step B and C can handle batches as well as individual records.
 
-![buffering of records](./images/stream_process_buffer.png "Buffering records")
+![buffering of records](./images/stream-process-buffer.png "Buffering records")
 
 ## Buffering with Flush Interval
 
@@ -56,7 +56,7 @@ When using buffering, we need to add a mechanism that will allow incomplete buff
 
 In this example, a buffer size of 3 was applied, and a flush interval of 1 second.
 
-![buffering of records](./images/stream_process_buffer.png "Buffering records with interval")
+![buffering of records](./images/stream-process-buffer.png "Buffering records with interval")
 
 ## Rate Limit
 
