@@ -2,12 +2,12 @@
 
 ## Introduction
 
-`datayoga-py` is the transformation engine used in `DataYoga`, a framework for building and generating data pipelines.
+`datayoga-core` is the transformation engine used in `DataYoga`, a framework for building and generating data pipelines.
 
 ## Installation
 
 ```bash
-pip install datayoga
+pip install datayoga-core
 ```
 
 ## Quick Start
@@ -19,42 +19,43 @@ This demonstrates how to transform data using a DataYoga job.
 Use this `example.yaml`:
 
 ```yaml
-- uses: add_field
-  with:
-    fields:
-      - field: full_name
-        language: jmespath
-        expression: concat([fname, ' ' , lname])
-      - field: country
+- steps:
+    - uses: add_field
+      with:
+        fields:
+          - field: full_name
+            language: jmespath
+            expression: concat([fname, ' ' , lname])
+          - field: country
+            language: sql
+            expression: country_code || ' - ' || UPPER(country_name)
+    - uses: rename_field
+      with:
+        fields:
+          - from_field: fname
+            to_field: first_name
+          - from_field: lname
+            to_field: last_name
+    - uses: remove_field
+      with:
+        fields:
+          - field: credit_card
+          - field: country_name
+          - field: country_code
+    - uses: map
+      with:
+        expression:
+          {
+            first_name: first_name,
+            last_name: last_name,
+            greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
+            country: country,
+            full_name: full_name,
+          }
         language: sql
-        expression: country_code || ' - ' || UPPER(country_name)
-- uses: rename_field
-  with:
-    fields:
-      - from_field: fname
-        to_field: first_name
-      - from_field: lname
-        to_field: last_name
-- uses: remove_field
-  with:
-    fields:
-      - field: credit_card
-      - field: country_name
-      - field: country_code
-- uses: map
-  with:
-    expression:
-      {
-        first_name: first_name,
-        last_name: last_name,
-        greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
-        country: country,
-        full_name: full_name
-      }
-    language: sql
 ```
 
-### Transform Data Using `datayoga-py`
+### Transform Data Using `datayoga-core`
 
 Use this code snippet to transform a data record using the job defined [above](#create-a-job):
 
