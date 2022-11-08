@@ -12,8 +12,4 @@ steps:
         - field: greeting
           language: sql
           expression: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
-  - uses: map
-    with:
-      expression: { greeting: greeting }
-      language: jmespath
   - uses: std.write

@@ -65,9 +65,9 @@ datayoga run sample.hello
 If all goes well, you should see some startup logs, and eventually:
 
 ```yaml
-{"greeting": "Hello Mr. John Doe"}
-{"greeting": "Hello Ms. Jane Doe"}
-{"greeting": "Hello Mr. Bill Adams"}
+{"id": "1", "fname": "john", "lname": "doe", "credit_card": "1234-1234-1234-1234", "country_code": "972", "country_name": "israel", "gender": "M", "full_name": "John Doe", "greeting": "Hello Mr. John Doe"}
+{"id": "2", "fname": "jane", "lname": "doe", "credit_card": "1000-2000-3000-4000", "country_code": "972", "country_name": "israel", "gender": "F", "full_name": "Jane Doe", "greeting": "Hello Ms. Jane Doe"}
+{"id": "3", "fname": "bill", "lname": "adams", "credit_card": "9999-8888-7777-666", "country_code": "1", "country_name": "usa", "gender": "M", "full_name": "Bill Adams", "greeting": "Hello Mr. Bill Adams"}
 ```
 
 That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the [reference](docs/reference/blocks.md) to see the different block types currently available.
