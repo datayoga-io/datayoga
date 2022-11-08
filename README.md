@@ -1,14 +1,14 @@
 # Introduction
 
-DataYoga is a framework for building and running streaming or batch data pipelines. DataYoga uses low-code to easily define data pipelines using a declarative markup language using yaml files.
+DataYoga is a framework for building and running streaming or batch data pipelines. DataYoga uses low-code to easily define data pipelines using a declarative markup language using YAML files.
 
-![DataYoga overview](docs/images/datayoga_overview.png "Datayoga Overview")
+![DataYoga overview](docs/images/datayoga-overview.png "DataYoga Overview")
 
 ## Concepts
 
-<img align="right" src="docs/images/datayoga_job.png">
+<img align="right" src="docs/images/datayoga-job.png" />
 
-`Job` - A Job is composed of a series of `Steps` that reads information from a source, performs transformations, and write to a target. Many sources and targets are suported, including relational databases, non relational databases, file formats, cloud storage, and HTTP servers.
+`Job` - A Job is composed of a series of `Steps` that reads information from a source, performs transformations, and write to a target. Many sources and targets are supported, including relational databases, non relational databases, file formats, cloud storage, and HTTP servers.
 
 `Step` - Each Step runs a `Block` that uses specific business logic. The output of each Step is fed into the next Step, creating a chain of transformations.
 
@@ -28,7 +28,7 @@ DataYoga provides a standalone stream processing engine, the DataYoga Runtime th
 - Metrics and observability
 - Credentials management
 
-The Runtime supports multiple stream [processing strategies](processing-strategies.md) including buffering and rate limiting.
+The Runtime supports multiple stream [processing strategies](docs/processing-strategies.md) including buffering and rate limiting.
 It supports both async processing, multi-threading, and multi-processing to enable maximum throughput with a low footprint.
 
 ## Quickstart
