@@ -33,6 +33,7 @@ def test_redis_read_pending_messages(tmpdir: str):
     assert result.get("full_name") == "john doe"
 
     # start over and verify that we still fail as the rejected record is read from the pending messages
+    os.remove(output_file)
     with pytest.raises(ValueError):
         run_job("tests.redis.abort.redis_to_stdout", piped_to=output_file)
 
