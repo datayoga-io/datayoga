@@ -6,7 +6,7 @@ nav_order: 1
 
 DataYoga is a framework for building and running streaming or batch data pipelines. The DataYoga CLI helps define and deploy data pipelines using a declarative markup language using YAML files.
 
-![DataYoga overview](images/datayoga_overview.png "Datayoga Overview")
+![DataYoga Overview](images/datayoga_overview.png "Datayoga Overview")
 
 DataYoga runs Transformation Jobs that read or react to incoming data. Each Transformation Job contains a series of Transformation Steps. Steps can produce data, transform data, or output data to external sources. For example, a Step can read data from a Kafka source, or add a calculated field, or enrich data using a Twitter API. A Step can perform NLP analysis on text to identify sentiment using an AI model, or write data to a data lake on S3 in Parquet format.
 
