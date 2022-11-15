@@ -64,7 +64,8 @@ class SQLExpression(Expression):
             List[Dict[str, Any]]: Filtered data
         """
         # flattened structure
-        data_inner = [flatten(row,sep=".") for row in data]
+        data_inner = data if isinstance(data, list) else [data]
+        data_inner = [flatten(row,sep=".") for row in data_inner]
         cte_clause = self._get_cte(data_inner)
 
         column_names = data_inner[0].keys()
@@ -114,7 +115,7 @@ class SQLExpression(Expression):
         # use a CTE to create the in memory data structure
         data_inner = data if isinstance(data, list) else [data]
         # flattened structure
-        data_inner = [flatten(row,sep=".") for row in data]
+        data_inner = [flatten(row,sep=".") for row in data_inner]
         cte_clause = self._get_cte(data_inner)
 
         column_names = data_inner[0].keys()
