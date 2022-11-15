@@ -57,9 +57,9 @@ Let's customize the structure of the resulting JSON.
 
 The jobs are located under the `jobs` folder and can be arrange into modules. The `sample.hello` job you just ran is located in `jobs/sample/hello.yaml`.
 
-Add a new step of type `map` into the chain of steps. To do this, open the job definition in a text editor and add the section highlighted in bold to the job definition:
+Add a new step of type `map` into the chain of steps. To do this, open the job definition in a text editor and add the `map` section below the comment to the job definition:
 
-<pre><code>
+```yaml
 input:
   uses: files.read_csv
   with:
@@ -74,22 +74,19 @@ steps:
         - field: greeting
           language: sql
           expression: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
-<b>
+  #
+  # map block
+  #
   - uses: map
     with:
       expression:
-        { greeting: greeting,
-          details: {
-              id: id,
-              first_name: fname,
-              last_name: lname
-          }
+        {
+          greeting: greeting,
+          details: { id: id, first_name: fname, last_name: lname },
         }
       language: jmespath
-</b>
   - uses: std.write
-</code>
-</pre>
+```
 
 Run the job again:
 
