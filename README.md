@@ -2,6 +2,10 @@
 
 DataYoga is a framework for building and running streaming or batch data pipelines. DataYoga uses low-code to easily define data pipelines using a declarative markup language using YAML files.
 
+![PyPI - License](https://img.shields.io/pypi/l/datayoga)
+![PyPI](https://img.shields.io/pypi/v/datayoga)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/datayoga)
+
 ![DataYoga overview](docs/images/datayoga-overview.png "DataYoga Overview")
 
 ## Concepts
@@ -52,7 +56,7 @@ datayoga init hello_world
 cd hello_world
 ```
 
-> [Directory structure](docs/directory-structure.md)
+> [Directory structure](https://datayoga-io.github.io/datayoga/directory-structure.html)
 
 ## Run Your First Job
 
@@ -70,4 +74,4 @@ If all goes well, you should see some startup logs, and eventually:
 {"id": "3", "fname": "bill", "lname": "adams", "credit_card": "9999-8888-7777-666", "country_code": "1", "country_name": "usa", "gender": "M", "full_name": "Bill Adams", "greeting": "Hello Mr. Bill Adams"}
 ```
 
-That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the [reference](docs/reference/blocks.md) to see the different block types currently available.
+That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the [reference](https://datayoga-io.github.io/datayoga/reference/blocks.html) to see the different block types currently available.
