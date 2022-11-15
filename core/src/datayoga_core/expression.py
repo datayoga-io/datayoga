@@ -3,6 +3,8 @@ import logging
 import sqlite3
 from enum import Enum, unique
 from typing import Any, Dict, List
+from collections.abc import MutableMapping
+
 
 import jmespath
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
@@ -15,6 +17,15 @@ class Language(Enum):
     JMESPATH = "jmespath"
     SQL = "sql"
 
+def flatten(d, parent_key='', sep='_'):
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, MutableMapping):
+            items.extend(flatten(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 class Expression():
     def compile(self, expression: str):
@@ -52,12 +63,14 @@ class SQLExpression(Expression):
         Returns:
             List[Dict[str, Any]]: Filtered data
         """
-        # use a CTE to create the in memory data structure
-        cte_clause = self._get_cte(data)
+        # flattened structure
+        data_inner = [flatten(row,sep=".") for row in data]
+        cte_clause = self._get_cte(data_inner)
 
-        column_names = data[0].keys()
+        column_names = data_inner[0].keys()
+
         # fetch the CTE and bind the variables
-        data_values = [row.get(colname) for row in data for colname in column_names]
+        data_values = [row.get(colname) for row in data_inner for colname in column_names]
         self.conn.row_factory = sqlite3.Row
 
         cursor = self.conn.execute(
@@ -100,6 +113,8 @@ class SQLExpression(Expression):
         """
         # use a CTE to create the in memory data structure
         data_inner = data if isinstance(data, list) else [data]
+        # flattened structure
+        data_inner = [flatten(row,sep=".") for row in data]
         cte_clause = self._get_cte(data_inner)
 
         column_names = data_inner[0].keys()
