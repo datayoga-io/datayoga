@@ -73,6 +73,10 @@ class Job():
         Returns:
             List[Dict[str, Any]]: Transformed data
         """
+        if not self.initialized:
+            logger.debug("job has not been initialized yet, initializing...")
+            self.init()
+
         transformed_data = copy.deepcopy(data)
         for step in self.steps:
             transformed_data, results = asyncio.run(step.block.run(transformed_data))
