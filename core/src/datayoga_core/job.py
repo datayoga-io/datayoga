@@ -74,9 +74,8 @@ class Job():
             List[Dict[str, Any]]: Transformed data
         """
         transformed_data = copy.deepcopy(data)
-        loop = asyncio.get_event_loop()
         for step in self.steps:
-            transformed_data, results = loop.run_until_complete(step.block.run(transformed_data))
+            transformed_data, results = asyncio.run(step.block.run(transformed_data))
             logger.debug(transformed_data)
 
         return transformed_data
