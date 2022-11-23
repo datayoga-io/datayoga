@@ -1,11 +1,11 @@
-- name: hr
+hr:
   type: postgresql
   host: localhost
   port: 5432
   database: postgres
   user: postgres
   password: postgres
-- name: cache
+cache:
   type: redis
   host: localhost
   port: 6379
