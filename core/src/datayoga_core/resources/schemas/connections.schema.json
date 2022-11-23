@@ -1,76 +1,78 @@
 {
   "title": "Connections",
   "description": "Connection catalog",
-  "type": ["array", "null"],
-  "items": {
-    "type": "object",
-    "anyOf": [
-      {
-        "description": "SQL database",
-        "properties": {
-          "name": { "description": "Connection name", "type": "string" },
-          "type": {
-            "description": "DB type",
-            "type": "string",
-            "pattern": "^(?!redis$)"
+  "type": ["object", "null"],
+  "patternProperties": {
+    ".": {
+      "type": "object",
+      "anyOf": [
+        {
+          "description": "SQL database",
+          "properties": {
+            "type": {
+              "description": "DB type",
+              "type": "string",
+              "pattern": "^(?!redis$)"
+            },
+            "host": { "description": "DB host", "type": "string" },
+            "port": {
+              "description": "DB port",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "database": { "description": "DB name", "type": "string" },
+            "user": { "description": "DB user", "type": "string" },
+            "password": { "description": "DB password", "type": "string" }
           },
-          "host": { "description": "DB host", "type": "string" },
-          "port": {
-            "description": "DB port",
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 65535
-          },
-          "database": { "description": "DB name", "type": "string" },
-          "user": { "description": "DB user", "type": "string" },
-          "password": { "description": "DB password", "type": "string" }
+          "additionalProperties": false,
+          "required": ["type", "host", "database", "user"],
+          "examples": [
+            {
+              "name": "hr",
+              "type": "postgresql",
+              "host": "localhost",
+              "port": 5432,
+              "database": "postgres",
+              "user": "postgres",
+              "password": "postgres"
+            }
+          ]
         },
-        "additionalProperties": false,
-        "required": ["type", "host", "database", "user"],
-        "examples": [
-          {
-            "name": "hr",
-            "type": "postgresql",
-            "host": "localhost",
-            "port": 5432,
-            "database": "postgres",
-            "user": "postgres",
-            "password": "postgres"
-          }
-        ]
-      },
-      {
-        "description": "Redis",
-        "properties": {
-          "name": { "description": "Connection name", "type": "string" },
-          "type": {
-            "description": "DB type",
-            "type": "string",
-            "enum": ["redis"]
+        {
+          "description": "Redis",
+          "properties": {
+            "type": {
+              "description": "DB type",
+              "type": "string",
+              "enum": ["redis"]
+            },
+            "host": { "description": "Redis DB host", "type": "string" },
+            "port": {
+              "description": "Redis DB port",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "password": {
+              "description": "Redis DB password",
+              "type": "string"
+            }
           },
-          "host": { "description": "Redis DB host", "type": "string" },
-          "port": {
-            "description": "Redis DB port",
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 65535
-          },
-          "password": {
-            "description": "Redis DB password",
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "required": ["name", "type", "host", "port"],
-        "examples": [
-          {
-            "name": "cache",
-            "type": "redis",
-            "host": "localhost",
-            "port": 6379
-          }
-        ]
-      }
-    ]
-  }
+          "additionalProperties": false,
+          "required": ["type", "host", "port"],
+          "examples": [
+            {
+              "cache": {
+                "type": "redis",
+                "host": "localhost",
+                "port": 6379
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
 }

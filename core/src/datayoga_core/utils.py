@@ -83,7 +83,7 @@ def unescape_field(field: str) -> str:
 
 def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
     if context:
-        connection = next(filter(lambda x: x["name"] == connection_name, context.properties.get("connections")), None)
+        connection = context.properties.get("connections").get(connection_name)
         if connection:
             return connection
 

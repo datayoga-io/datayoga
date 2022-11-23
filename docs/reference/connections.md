@@ -8,7 +8,15 @@ nav_order: 1
 Connection catalog
 
 
-**Items**
+**Properties (Pattern)**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|[**\.**](#)|`object`|||
+
+**Additional Properties:** not allowed  
+<a name=""></a>
+### \.: object
 
    
 **Option 1 (optional):** 
@@ -19,7 +27,6 @@ SQL database
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**name**|`string`|Connection name<br/>|no|
 |**type**|`string`|DB type<br/>Pattern: ^\(?\!redis$\)<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
@@ -51,7 +58,6 @@ Redis
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**name**|`string`|Connection name<br/>|yes|
 |**type**|`string`|DB type<br/>Enum: `"redis"`<br/>|yes|
 |**host**|`string`|Redis DB host<br/>|yes|
 |**port**|`integer`|Redis DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|yes|
@@ -61,10 +67,10 @@ Redis
 **Example**
 
 ```yaml
-name: cache
-type: redis
-host: localhost
-port: 6379
+cache:
+  type: redis
+  host: localhost
+  port: 6379
 
 ```
 
