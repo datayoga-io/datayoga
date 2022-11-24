@@ -33,7 +33,7 @@ class Block(DyBlock):
         pipeline = self.redis_client.pipeline()
         for record in data:
             dict_as_list = list(reduce(lambda x, y: x + y, record.items()))
-            pipeline.execute_command(self.command, self.key.search(record), *dict_as_list)
+            pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
 
         pipeline.execute()
 
