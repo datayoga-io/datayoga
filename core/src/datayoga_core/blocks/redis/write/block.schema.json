@@ -3,19 +3,31 @@
   "description": "Write to a Redis data structure",
   "type": "object",
   "properties": {
-    "connection": { "description": "Connection name", "type": "string" },
+    "connection": { "title": "Connection name", "type": "string" },
     "command": {
       "enum": ["HSET", "SADD", "XADD", "RPUSH", "LPUSH", "SET", "ZADD"],
+      "default": "HSET",
       "type": "string",
       "title": "Redis command",
       "description": "Redis command"
     },
-    "key_field": {
-      "type": "string",
-      "title": "Key field",
-      "description": "Field to use as the Redis key"
+    "key": {
+      "description": "Field to use as the Redis key",
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Expression",
+          "type": "string"
+        },
+        "language": {
+          "description": "Language",
+          "type": "string",
+          "enum": ["jmespath", "sql"]
+        }
+      },
+      "required": ["expression", "language"]
     }
   },
   "additionalProperties": false,
-  "required": ["connection", "key_field", "command"]
+  "required": ["connection", "key"]
 }
