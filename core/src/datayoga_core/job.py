@@ -121,6 +121,10 @@ def validate_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]]
             if step.get("uses") not in whitelisted_blocks:
                 raise ValueError(f"use of invalid block type: {step.get('uses')}")
 
+    # validate each block against its schema
+    for step_definition in source.get("steps"):
+        create_block(step_definition.get("uses"), step_definition.get("with"))
+
 
 def compile_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None) -> Job:
     validate_job(source, whitelisted_blocks=whitelisted_blocks)
@@ -128,8 +132,7 @@ def compile_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] 
     # parse the steps
     for step_definition in source.get("steps"):
         block_type = step_definition.get("uses")
-        block_properties = step_definition.get("with")
-        block: Block = create_block(block_type, block_properties)
+        block: Block = create_block(block_type, step_definition.get("with"))
         step: Step = Step(step_definition.get("id", block_type), block)
         steps.append(step)
 
