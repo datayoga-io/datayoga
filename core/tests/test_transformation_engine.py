@@ -56,7 +56,7 @@ def test_validate_valid_job(job_settings):
 
 def test_validate_invalid_job():
     # unsupported property specified in this block
-    job_settings = {"steps": [{"uses": "remove_field", "params": {"field": "my_field"}}]}
+    job_settings = {"steps": [{"uses": "remove_field", "with": {"field": "my_field", "bla": "xxx"}}]}
 
     with pytest.raises(ValueError):
         dy.validate(job_settings)
