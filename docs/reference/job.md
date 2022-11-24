@@ -76,7 +76,9 @@ uses: redis.write
 with:
   connection: cache
   command: HSET
-  key_field: id
+  key:
+    expression: id
+    language: jmespath
 
 ```
 
