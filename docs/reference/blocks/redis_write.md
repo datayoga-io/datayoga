@@ -12,9 +12,30 @@ Write to a Redis data structure
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**connection**|`string`|Connection name<br/>|yes|
-|**command**<br/>(Redis command)|`string`|Redis command<br/>Enum: `"HSET"`, `"SADD"`, `"XADD"`, `"RPUSH"`, `"LPUSH"`, `"SET"`, `"ZADD"`<br/>|yes|
-|**key\_field**|`string`|Field to use as the Redis key<br/>|yes|
+|**connection**<br/>(Connection name)|`string`||yes|
+|**command**<br/>(Redis command)|`string`|Redis command<br/>Default: `"HSET"`<br/>Enum: `"HSET"`, `"SADD"`, `"XADD"`, `"RPUSH"`, `"LPUSH"`, `"SET"`, `"ZADD"`<br/>|no|
+|[**key**](#key)|`object`|Field to use as the Redis key<br/>|yes|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+command: HSET
+key: {}
+
+```
+
+<a name="key"></a>
+## key: object
+
+Field to use as the Redis key
+
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**expression**|`string`|Expression<br/>|yes|
+|**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
+
 
