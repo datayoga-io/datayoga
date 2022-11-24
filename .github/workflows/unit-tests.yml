@@ -27,4 +27,4 @@ jobs:
       - name: Run tests
         run: |
           cd core
-          PYTHONPATH=. python -m pytest -s --log-cli-level=DEBUG
+          PYTHONPATH=src python -m pytest -s --log-cli-level=DEBUG
