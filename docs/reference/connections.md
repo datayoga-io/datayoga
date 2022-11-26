@@ -38,13 +38,13 @@ SQL database
 **Example**
 
 ```yaml
-name: hr
-type: postgresql
-host: localhost
-port: 5432
-database: postgres
-user: postgres
-password: postgres
+hr:
+  type: postgresql
+  host: localhost
+  port: 5432
+  database: postgres
+  user: postgres
+  password: postgres
 
 ```
 
