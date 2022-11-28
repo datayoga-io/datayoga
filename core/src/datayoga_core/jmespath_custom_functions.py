@@ -1,14 +1,14 @@
 import hashlib
+import json
 import string
 from datetime import datetime, timezone
 from typing import Union
 from uuid import uuid4
 
-import json
 from jmespath import functions
 
 
-# custom functions for Jmespath
+# custom functions for JMESPath
 class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["string", "null"]})
@@ -29,7 +29,12 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["string"]}, {"types": ["string"]})
     def _func_replace(self, element, old_value, new_value):
-        return str(element).replace(old_value, new_value) if element is not None else None
+        if element is None:
+            return None
+
+        # Unexpected behavior when `old_value` is an empty string in Python's builtin replace
+        # https://bugs.python.org/issue28029
+        return str(element).replace(old_value, new_value) if old_value != "" else str(element)
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["number"]})
     def _func_right(self, element, amount):
