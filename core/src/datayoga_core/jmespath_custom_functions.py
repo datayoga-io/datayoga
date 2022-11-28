@@ -34,7 +34,7 @@ class JmespathCustomFunctions(functions.Functions):
 
         # Unexpected behavior when `old_value` is an empty string in Python's builtin replace
         # https://bugs.python.org/issue28029
-        return str(element).replace(old_value, new_value) if old_value != "" else new_value
+        return str(element).replace(old_value, new_value) if old_value != "" else str(element)
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["number"]})
     def _func_right(self, element, amount):
