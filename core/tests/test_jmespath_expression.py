@@ -40,6 +40,11 @@ def test_jmespath_upper_expression_null():
     assert expression.search({"product": None}) == None
 
 
+def test_jmespath_replace_empty_string():
+    expression.compile(f"replace(sentence, '', 'two')")
+    assert expression.search({"sentence": "one four three four!"}) == "one four three four!"
+
+
 def test_jmespath_replace_expression():
     expression.compile(f"replace(sentence, 'four', 'two')")
     assert expression.search({"sentence": "one four three four!"}) == "one two three two!"
