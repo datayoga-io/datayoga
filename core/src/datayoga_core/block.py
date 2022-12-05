@@ -17,7 +17,8 @@ Result = Enum("Result", "SUCCESS REJECTED FILTERED")
 
 
 class Block():
-    MSG_ID_FIELD = "__$$msg_id"
+    INTERNAL_FIELD_PREFIX = "__$$"
+    MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
     """
     Block
 

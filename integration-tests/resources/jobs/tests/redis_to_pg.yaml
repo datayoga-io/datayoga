@@ -14,7 +14,7 @@ steps:
     with:
       expression:
         {
-          id: id,
+          _id: _id,
           full_name: full_name,
           country: country_code || ' - ' || UPPER(country_name),
           gender: gender
@@ -25,3 +25,11 @@ steps:
       connection: hr
       schema: hr
       table: emp
+      opcode_field: __$$opcode
+      mapping:
+        - id: _id
+        - full_name
+        - country
+        - gender
+      keys:
+        - id: _id
