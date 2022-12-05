@@ -22,7 +22,7 @@ class OpCode(Enum):
 def get_fields(mapping: Union[Dict[str, Any], str]) -> Dict[str, Any]:
     return [{"column": str(next(iter(item.keys()))),
              "key": str(next(iter(item.values())))}
-            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping]
+            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else None
 
 
 def generate_upsert_stmt(table: str, primary_keys: Dict[str, Any], mapping_fields: Dict[str, Any], db_type: str) -> Any:
