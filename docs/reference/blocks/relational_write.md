@@ -15,13 +15,23 @@ Write into a SQL-compatible data store
 |**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.yaml<br/>|yes|
 |**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |**schema**<br/>(The table schema of the target table)|`string`|If left blank, the default schema of this connection will be used as defined in the connections.yaml<br/>|yes|
-|[**keys**](#keys)<br/>(Business keys to use for upsert in case of an UPSERT)|`string[]`||no|
-|[**mapping**](#mapping)<br/>(Fields to write)|`string[]`||no|
+|[**keys**](#keys)<br/>(Business keys to use in case of \`load\_strategy\` is UPSERT or working with \`opcode\_field\`)|`array`||no|
+|[**mapping**](#mapping)<br/>(Fields to write)|`array`||no|
+|**opcode\_field**|`string`|Name of the field in the payload that holds the operation (c - create, d - delete, u - update) for this record in the DB<br/>|no|
 |**load\_strategy**|`string`|type of target<br/>Default: `"APPEND"`<br/>Enum: `"APPEND"`, `"REPLACE"`, `"UPSERT"`, `"TYPE2"`<br/>|no|
 |**active\_record\_indicator**|`string`|Used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active<br/>|no|
 |[**inactive\_record\_mapping**](#inactive_record_mapping)<br/>(Used for \`TYPE2\` load\_strategy\. The columns mapping to use to close out an active record)|`array`|A list of columns to use. Use any valid SQL expression for the source. If 'target' is omitted, will default to the name of the source column<br/>Default: <br/>|no|
 
 **Additional Properties:** not allowed  
+   
+
+**No properties.**
+
+   
+**Not [required1]:** 
+**No properties.**
+
+
 **Example**
 
 ```yaml
@@ -36,16 +46,17 @@ properties:
 ```
 
 <a name="keys"></a>
-## keys\[\]: Business keys to use for upsert in case of an UPSERT
+## keys\[\]: Business keys to use in case of \`load\_strategy\` is UPSERT or working with \`opcode\_field\`
 
 **Items: name of column**
 
-**Item Type:** `string`  
+**No properties.**
+
 **Example**
 
 ```yaml
 - fname
-- lname
+- lname: last_name
 
 ```
 
@@ -54,12 +65,13 @@ properties:
 
 **Items: name of column**
 
-**Item Type:** `string`  
+**No properties.**
+
 **Example**
 
 ```yaml
 - fname
-- lname
+- lname: last_name
 - address
 - gender
 
