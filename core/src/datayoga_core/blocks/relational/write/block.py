@@ -19,15 +19,17 @@ class OpCode(Enum):
     UPDATE = "u"
 
 
-def get_fields(mapping: Union[Dict[str, Any], str]) -> Dict[str, Any]:
+def get_fields(mapping: Optional[Union[Dict[str, Any], str]]) -> List[Dict[str, Any]]:
     return [{"column": str(next(iter(item.keys()))),
              "key": str(next(iter(item.values())))}
-            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else None
+            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else []
 
 
-def generate_upsert_stmt(table: str, primary_keys: Dict[str, Any], mapping_fields: Dict[str, Any], db_type: str) -> Any:
+def generate_upsert_stmt(
+        table: str, primary_keys: List[Dict[str, Any]],
+        mapping_fields: List[Dict[str, Any]],
+        db_type: str) -> Any:
     if db_type.lower() == "postgresql":
-
         update_fields = [f"{field['column']} = {sa.bindparam(field['key'])}" for field in mapping_fields]
 
         insert_fields = ", ".join([field["column"] for field in mapping_fields])
@@ -35,8 +37,10 @@ def generate_upsert_stmt(table: str, primary_keys: Dict[str, Any], mapping_field
 
         insert_bind_params = ", ".join([f"{sa.bindparam(field['key'])}" for field in mapping_fields])
 
-        return sa.text(
-            f"INSERT INTO {table} ({insert_fields}) VALUES ({insert_bind_params}) ON CONFLICT({pk_fields}) DO UPDATE SET {', '.join(update_fields)}")
+        return sa.text(f"""INSERT INTO {table} ({insert_fields})
+                           VALUES ({insert_bind_params})
+                           ON CONFLICT({pk_fields}) DO UPDATE
+                           SET {', '.join(update_fields)}""")
 
     raise ValueError(f"upsert for {db_type} is not supported yet")
 
@@ -67,10 +71,11 @@ class Block(DyBlock):
         self.engine = sa.create_engine(engine_url, echo=False)
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
-        primary_keys = get_fields(self.keys)
-        mapping_fields = get_fields(self.mapping)
 
         if self.opcode_field:
+            primary_keys = get_fields(self.keys)
+            mapping_fields = get_fields(self.mapping)
+
             self.delete_stmt = self.tbl.delete(
                 sa.and_(*[sa.text(f"{self.tbl.columns.get(field['column'])} = {sa.bindparam(field['key'])}")
                           for field in primary_keys]))
@@ -107,7 +112,7 @@ class Block(DyBlock):
                                 logger.warning(f"{key} key does not exist for record:\n\{record}")
                                 break
 
-                    keys_to_delete.append(key_to_delete)
+                        keys_to_delete.append(key_to_delete)
 
                     self.conn.execute(self.delete_stmt, keys_to_delete)
         else:

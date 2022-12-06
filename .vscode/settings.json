@@ -33,7 +33,9 @@
     "pytest",
     "PYTHONDEVMODE",
     "PYTHONPATH",
-    "venv"
+    "sqlalchemy",
+    "venv",
+    "xadd"
   ],
   "python.analysis.typeCheckingMode": "basic",
   "python.languageServer": "Default",
