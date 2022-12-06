@@ -195,3 +195,8 @@ def test_regex_replace():
 
     assert expression.search({"text": "Banana Bannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple Apple"
     assert expression.search({"text": "Bana\nBannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple\nApple"
+
+    expression.compile(r"regex_replace(text, 'Ban\w+', 'Apple')")
+
+    assert expression.search({"text": "Banana Bannnana"}) == "Apple Apple"
+    assert expression.search({"text": "Bana\nBannnana"}) == "Apple\nApple"
