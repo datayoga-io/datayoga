@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import string
 from datetime import datetime, timezone
 from typing import Union
@@ -126,3 +127,11 @@ class JmespathCustomFunctions(functions.Functions):
         delta = dt.now(dt.tzinfo) - dt
 
         return delta.days * 86400 + delta.seconds
+
+    @functions.signature({"types": ["string"]}, {"types": ["string"]}, {"types": ["string"]})
+    def _func_regex_replace(self, text: str, pattern: str, replacement: str) -> str:
+        """\
+        Replaces matched patterns in the string by the given replacement
+        """
+
+        return re.sub(pattern, replacement, text)

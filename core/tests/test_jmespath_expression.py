@@ -188,3 +188,10 @@ def test_jmespath_time_delta_seconds():
 
     dt = datetime.now() - timedelta(days=-10)
     assert expression.search({"dt": dt.timestamp()}) == -864000
+
+
+def test_regex_replace():
+    expression.compile(f"regex_replace(text, pattern, replacement)")
+
+    assert expression.search({"text": "Banana Bannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple Apple"
+    assert expression.search({"text": "Bana\nBannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple\nApple"
