@@ -28,4 +28,4 @@ class Block(DyBlock):
 
             return_data.append(mapped_row)
 
-        return return_data, [Result.SUCCESS]*len(return_data)
+        return return_data, [Result.SUCCESS] * len(return_data)
