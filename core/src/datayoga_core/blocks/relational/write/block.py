@@ -94,11 +94,13 @@ class Block(DyBlock):
                 data, key=lambda record: record.get(self.opcode_field, "").replace(OpCode.CREATE.value, OpCode.UPDATE.value))]
 
             for records_by_opcode in opcodes:
+                opcode = records_by_opcode["opcode"]
                 records = records_by_opcode["records"]
-                if records_by_opcode["opcode"] == OpCode.UPDATE.value:
+
+                if opcode == OpCode.UPDATE.value:
                     logger.info(f"Upserting {len(records)} record(s) to {self.table} table")
                     self.conn.execute(self.upsert_stmt, records)
-                else:
+                elif opcode == OpCode.DELETE.value:
                     logger.info(f"Deleting {len(records)} record(s) from {self.table} table")
 
                     keys_to_delete = []
@@ -110,14 +112,18 @@ class Block(DyBlock):
                                 key_to_delete[key] = record[key]
                             else:
                                 logger.warning(f"{key} key does not exist for record:\n\{record}")
+                                record[Block.RESULT_FIELD] = Result.REJECTED
                                 break
 
                         keys_to_delete.append(key_to_delete)
 
                     self.conn.execute(self.delete_stmt, keys_to_delete)
+                else:
+                    for record in records:
+                        record[Block.RESULT_FIELD] = Result.REJECTED
+                    logger.warning(f"{opcode} - unsupported opcode")
         else:
             logger.info(f"Inserting {len(data)} record(s) to {self.table} table")
             self.conn.execute(self.tbl.insert(), data)
 
-        # if we made it here, it is a success. return the data and the success result
-        return data, [Result.SUCCESS]*len(data)
+        return DyBlock.produce_data_and_results(data)

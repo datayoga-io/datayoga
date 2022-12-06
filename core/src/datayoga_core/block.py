@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import logging
 import os
@@ -19,6 +21,7 @@ Result = Enum("Result", "SUCCESS REJECTED FILTERED")
 class Block():
     INTERNAL_FIELD_PREFIX = "__$$"
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
+    RESULT_FIELD = f"{INTERNAL_FIELD_PREFIX}result"
     """
     Block
 
@@ -72,13 +75,20 @@ class Block():
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
+    @staticmethod
+    def create(block_name: str, properties: Dict[str, Any]) -> Block:
+        module_name = f"datayoga_core.blocks.{block_name}.block"
+        module = importlib.import_module(module_name)
+        block: Block = getattr(module, "Block")(properties)
+        return block
 
-#
-# static utility methods
-#
+    @staticmethod
+    def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+        results = []
+        for record in data:
+            results.append(record.get(Block.RESULT_FIELD, Result.SUCCESS))
+            if Block.RESULT_FIELD in record:
+                del record[Block.RESULT_FIELD]
 
-def create_block(block_name: str, properties: Dict[str, Any]) -> Block:
-    module_name = f"datayoga_core.blocks.{block_name}.block"
-    module = importlib.import_module(module_name)
-    block: Block = getattr(module, "Block")(properties)
-    return block
+        logger.debug(f"data:{data}\nresults:{results}")
+        return data, results

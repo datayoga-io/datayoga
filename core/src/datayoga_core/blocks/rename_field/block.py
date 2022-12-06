@@ -16,8 +16,6 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
-        results = []
-
         for row in data:
             for property in self.properties["fields"]:
                 key_found = True
@@ -55,5 +53,4 @@ class Block(DyBlock):
 
                     obj[utils.unescape_field(to_field_path[-1:][0])] = value
 
-        results.append(Result.SUCCESS)
-        return data, results
+        return data, [Result.SUCCESS] * len(data)
