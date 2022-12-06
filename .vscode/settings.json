@@ -1,0 +1,51 @@
+{
+  // this is the default formatter for everything except Python
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.configPath": "dev/.prettierrc.json",
+  "editor.formatOnSave": true,
+  // for Python we use a differnet formatter
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
+    "editor.formatOnSaveMode": "modifications"
+  },
+  "python.formatting.provider": "autopep8",
+  "python.formatting.autopep8Args": [
+    "--max-line-length",
+    "120",
+    "--experimental"
+  ],
+  "python.linting.enabled": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": ["--rcfile", "${workspaceFolder}/dev/.pylintrc"],
+  "cSpell.words": [
+    "autopep",
+    "datayoga",
+    "isort",
+    "jdbc",
+    "jsonschema",
+    "loglevel",
+    "Pylance",
+    "pylintrc",
+    "pytest",
+    "PYTHONDEVMODE",
+    "PYTHONPATH",
+    "venv"
+  ],
+  "python.analysis.typeCheckingMode": "basic",
+  "python.languageServer": "Default",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.trimAutoWhitespace": true,
+  // all diagnostic settings for Pylance are described here:
+  // https://github.com/microsoft/pyright/blob/main/docs/configuration.md#type-check-diagnostics-settings
+  "python.analysis.diagnosticSeverityOverrides": {
+    // change this to "none" to ignore all of them across the board
+    // alternatively use '# type: ignore' hint
+    // to ignore the specific type issue in the source code
+    "reportGeneralTypeIssues": "information"
+  }
+}

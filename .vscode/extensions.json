@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "esbenp.prettier-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "njpwerner.autodocstring"
+  ]
+}
