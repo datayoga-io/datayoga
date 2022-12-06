@@ -198,3 +198,8 @@ def test_jmespath_in():
 
     assert not expression.search({"el": 0, "itr": [1, 2, 3, 4]})
     assert not expression.search({"el": "x", "itr": ["a", "b", "c", "d"]})
+
+    expression.compile(f"in(el, `[1, 2, 3, 4, 5]`)")
+
+    assert expression.search({"el": 1})
+    assert not expression.search({"el": 0})
