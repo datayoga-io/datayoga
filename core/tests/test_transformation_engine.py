@@ -34,7 +34,7 @@ def test_transform_oo(job_settings):
     job.init()
 
     for data in TEST_DATA:
-        assert job.transform(data["before"]) == data["after"]
+        assert job.transform(data["before"])[0] == data["after"]
 
 
 def test_compile_and_transform_module(job_settings):
@@ -42,12 +42,12 @@ def test_compile_and_transform_module(job_settings):
     job.init()
 
     for data in TEST_DATA:
-        assert job.transform(data["before"]) == data["after"]
+        assert job.transform(data["before"])[0] == data["after"]
 
 
 def test_transform_module(job_settings):
     for data in TEST_DATA:
-        assert dy.transform(job_settings, data["before"]) == data["after"]
+        assert dy.transform(job_settings, data["before"])[0] == data["after"]
 
 
 def test_validate_valid_job(job_settings):

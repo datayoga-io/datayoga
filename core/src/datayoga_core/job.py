@@ -6,7 +6,7 @@ import logging
 import os
 import sys
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import jsonschema
 from datayoga_core import utils
@@ -65,7 +65,8 @@ class Job():
         self.root.add_done_callback(self.handle_result)
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def transform(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+
         """
         Transforms data
 
@@ -73,18 +74,19 @@ class Job():
             data (List[Dict[str, Any]]): Data
 
         Returns:
-            List[Dict[str, Any]]: Transformed data
+            Tuple[List[Dict[str, Any]], List[Result]]: Transformed data and results
         """
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
             self.init()
 
         transformed_data = copy.deepcopy(data)
+        results = []
         for step in self.steps:
             transformed_data, results = asyncio.run(step.block.run(transformed_data))
             logger.debug(transformed_data)
 
-        return transformed_data
+        return transformed_data, results
 
     async def run(self):
         for record in self.input.produce():
