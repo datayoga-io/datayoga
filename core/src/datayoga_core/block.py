@@ -90,5 +90,5 @@ class Block():
             if Block.RESULT_FIELD in record:
                 del record[Block.RESULT_FIELD]
 
-        logger.debug(f"data:{data}\nresults:{results}")
+        logger.debug(f"data:{data}, results:{results}")
         return data, results
