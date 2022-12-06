@@ -2,7 +2,7 @@ import hashlib
 import json
 import string
 from datetime import datetime, timezone
-from typing import Union
+from typing import Any, Iterable, Union
 from uuid import uuid4
 
 from jmespath import functions
@@ -126,3 +126,17 @@ class JmespathCustomFunctions(functions.Functions):
         delta = dt.now(dt.tzinfo) - dt
 
         return delta.days * 86400 + delta.seconds
+
+    @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"]}, {"types": ["array"]})
+    def _func_in(self, element: Any, iterable: Iterable) -> bool:
+        """\
+        Returns True if the iterable contains the given element.
+        """
+        return element in iterable
+
+    @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"]}, {"types": ["array"]})
+    def _func_nin(self, element: Any, iterable: Iterable) -> bool:
+        """\
+        Returns True if the iterable does not contain the given element.
+        """
+        return element not in iterable
