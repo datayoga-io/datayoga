@@ -133,10 +133,3 @@ class JmespathCustomFunctions(functions.Functions):
         Returns True if the iterable contains the given element.
         """
         return element in iterable
-
-    @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"]}, {"types": ["array"]})
-    def _func_nin(self, element: Any, iterable: Iterable) -> bool:
-        """\
-        Returns True if the iterable does not contain the given element.
-        """
-        return element not in iterable
