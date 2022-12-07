@@ -1,0 +1,20 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    // this is a sample configuration to debug datayoga in VSCode
+    {
+      "name": "Python Debug: datayoga",
+      "type": "python",
+      "request": "launch",
+      "env": {
+        "PYTHONDEVMODE": "1"
+      },
+      "program": "${workspaceFolder}/cli/src/datayoga/__main__.py",
+      "args": ["run", "sample.hello", "--dir", "/path/to/datayoga-dir"],
+      "justMyCode": false
+    }
+  ]
+}

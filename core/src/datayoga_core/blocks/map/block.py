@@ -17,14 +17,15 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
-        results = []
         return_data = []
         for row in data:
             mapped_row = self.expression.search(row)
-            # we always add the msg_id back
-            if Block.MSG_ID_FIELD in row:
-                mapped_row[Block.MSG_ID_FIELD] = row[Block.MSG_ID_FIELD]
+
+            # we always add the internal fields back
+            internal_fields = [(k, v) for (k, v) in row.items() if k.startswith(Block.INTERNAL_FIELD_PREFIX)]
+            for (key, value) in internal_fields:
+                mapped_row[key] = value
+
             return_data.append(mapped_row)
 
-        results.append(Result.SUCCESS)
-        return return_data, results
+        return return_data, [Result.SUCCESS] * len(return_data)
