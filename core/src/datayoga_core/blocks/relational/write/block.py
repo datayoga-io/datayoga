@@ -98,10 +98,10 @@ class Block(DyBlock):
                 records = records_by_opcode["records"]
 
                 if opcode == OpCode.UPDATE.value:
-                    logger.info(f"Upserting {len(records)} record(s) to {self.table} table")
+                    logger.debug(f"Upserting {len(records)} record(s) to {self.table} table")
                     self.conn.execute(self.upsert_stmt, records)
                 elif opcode == OpCode.DELETE.value:
-                    logger.info(f"Deleting {len(records)} record(s) from {self.table} table")
+                    logger.debug(f"Deleting {len(records)} record(s) from {self.table} table")
 
                     keys_to_delete = []
                     for record in records:
@@ -123,7 +123,7 @@ class Block(DyBlock):
                         record[Block.RESULT_FIELD] = Result.REJECTED
                     logger.warning(f"{opcode} - unsupported opcode")
         else:
-            logger.info(f"Inserting {len(data)} record(s) to {self.table} table")
+            logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.conn.execute(self.tbl.insert(), data)
 
         return DyBlock.produce_data_and_results(data)
