@@ -188,3 +188,18 @@ def test_jmespath_time_delta_seconds():
 
     dt = datetime.now() - timedelta(days=-10)
     assert expression.search({"dt": dt.timestamp()}) == -864000
+
+
+def test_jmespath_in():
+    expression.compile(f"in(el, itr)")
+
+    assert expression.search({"el": 2, "itr": [1, 2, 3, 4]})
+    assert expression.search({"el": "c", "itr": ["a", "b", "c", "d"]})
+
+    assert not expression.search({"el": 0, "itr": [1, 2, 3, 4]})
+    assert not expression.search({"el": "x", "itr": ["a", "b", "c", "d"]})
+
+    expression.compile(f"in(el, `[1, 2, 3, 4, 5]`)")
+
+    assert expression.search({"el": 1})
+    assert not expression.search({"el": 0})
