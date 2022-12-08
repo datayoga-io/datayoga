@@ -190,6 +190,18 @@ def test_jmespath_time_delta_seconds():
     assert expression.search({"dt": dt.timestamp()}) == -864000
 
 
+def test_regex_replace():
+    expression.compile(f"regex_replace(text, pattern, replacement)")
+
+    assert expression.search({"text": "Banana Bannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple Apple"
+    assert expression.search({"text": "Bana\nBannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple\nApple"
+
+    expression.compile(r"regex_replace(text, 'Ban\w+', 'Apple')")
+
+    assert expression.search({"text": "Banana Bannnana"}) == "Apple Apple"
+    assert expression.search({"text": "Bana\nBannnana"}) == "Apple\nApple"
+
+
 def test_jmespath_in():
     expression.compile(f"in(el, itr)")
 
