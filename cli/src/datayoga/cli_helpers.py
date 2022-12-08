@@ -43,7 +43,7 @@ def add_options(options: List[str]):
     return _add_options
 
 
-def handle_critical(logger: Logger, msg: str, e: Union[ValueError, str]):
+def handle_critical(logger: Logger, msg: str, e: Exception):
     logger.critical(f"{msg}:\n{e}")
     if logger and logger.isEnabledFor(logging.DEBUG):
         traceback.print_exc()

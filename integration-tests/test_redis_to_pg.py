@@ -18,38 +18,49 @@ def test_redis_to_pg():
     redis_client.xadd(
         "emp",
         {"message":
-         json.dumps({"id": 1, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
-                     "credit_card": "1234-1234-1234-1234", "gender": "M"})})
+         json.dumps({"_id": 1, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M", "__$$opcode": "d"})})
 
     redis_client.xadd(
         "emp",
         {"message":
-         json.dumps({"id": 2, "fname": "jane", "lname": "doe", "country_code": 972, "country_name": "israel",
-                     "credit_card": "1000-2000-3000-4000", "gender": "F"})})
+         json.dumps({"_id": 2, "fname": "jane", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1000-2000-3000-4000", "gender": "F", "__$$opcode": "u"})})
+
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"_id": 12, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M", "__$$opcode": "u"})})
 
     postgres_container = pg.get_postgres_container()
     postgres_container.start()
 
     engine = pg.get_engine(postgres_container)
     pg.create_emp_table(engine, "hr")
+    engine.execute("INSERT INTO hr.emp VALUES (1, 'John Doe', '972 - ISRAEL', 'M')")
+    engine.execute("INSERT INTO hr.emp VALUES (10, 'john doe', '972 - ISRAEL', 'M')")
+    engine.execute("INSERT INTO hr.emp VALUES (12, 'steve steve', '972 - ISRAEL', 'M')")
 
     run_job("tests.redis_to_pg")
 
     total_employees = pg.select_one_row(engine, "select count(*) as total from hr.emp")
-    assert total_employees["total"] == 2
+    assert total_employees["total"] == 3
 
     first_employee = pg.select_one_row(engine, "select * from hr.emp where id = 1")
-
-    assert first_employee["id"] == 1
-    assert first_employee["full_name"] == "John Doe"
-    assert first_employee["country"] == "972 - ISRAEL"
-    assert first_employee["gender"] == "M"
+    assert first_employee is None
 
     second_employee = pg.select_one_row(engine, "select * from hr.emp where id = 2")
     assert second_employee["id"] == 2
     assert second_employee["full_name"] == "Jane Doe"
     assert second_employee["country"] == "972 - ISRAEL"
     assert second_employee["gender"] == "F"
+
+    second_employee = pg.select_one_row(engine, "select * from hr.emp where id = 12")
+    assert second_employee["id"] == 12
+    assert second_employee["full_name"] == "John Doe"
+    assert second_employee["country"] == "972 - ISRAEL"
+    assert second_employee["gender"] == "M"
 
     redis_container.stop()
     postgres_container.stop()
