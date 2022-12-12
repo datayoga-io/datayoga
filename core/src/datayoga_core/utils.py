@@ -3,10 +3,12 @@ import os
 import re
 import sys
 from os import path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import yaml
+from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.result import Result
 
 
 def read_json(filename: str) -> Any:
@@ -88,3 +90,17 @@ def get_connection_details(connection_name: str, context: Context) -> Dict[str, 
             return connection
 
     raise ValueError(f"{connection_name} connection not found")
+
+
+def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    results: List[Result] = []
+    for record in data:
+        results.append(record.get(Block.RESULT_FIELD, Result.success()))
+        if Block.RESULT_FIELD in record:
+            del record[Block.RESULT_FIELD]
+
+    return data, results
+
+
+def all_success(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    return data, [Result.success()] * len(data)

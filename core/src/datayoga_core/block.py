@@ -81,18 +81,3 @@ class Block(metaclass=ABCMeta):
         module = importlib.import_module(module_name)
         block: Block = getattr(module, "Block")(properties)
         return block
-
-    @staticmethod
-    def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-        results: List[Result] = []
-        for record in data:
-            results.append(record.get(Block.RESULT_FIELD, Result.success()))
-            if Block.RESULT_FIELD in record:
-                del record[Block.RESULT_FIELD]
-
-        logger.debug(f"data:{data}, results:{results}")
-        return data, results
-
-    @staticmethod
-    def all_success(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-        return data, [Result.success()] * len(data)

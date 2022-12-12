@@ -29,4 +29,4 @@ class Block(DyBlock):
                         else:
                             obj = obj[key]
 
-        return Block.all_success(data)
+        return utils.all_success(data)

@@ -3,6 +3,7 @@ import logging
 import sys
 from typing import Any, Dict, List, Optional, Tuple
 
+from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.block import Result
 from datayoga_core.context import Context
@@ -22,4 +23,4 @@ class Block(DyBlock):
             sys.stdout.write(f"{json.dumps(filtered_record)}\n")
 
         # if we made it here, it is a success. return the data and the success result
-        return Block.all_success(data)
+        return utils.all_success(data)

@@ -3,6 +3,7 @@ import logging
 
 import mock
 import pytest
+from datayoga_core import utils
 from datayoga_core.block import Block
 from datayoga_core.result import Result
 from datayoga_core.step import Step
@@ -17,7 +18,7 @@ class SleepBlock():
 
     async def run(self, i):
         await asyncio.sleep(i[0]["sleep"])
-        return Block.all_success(i)
+        return utils.all_success(i)
 
 
 class ExceptionBlock():
@@ -28,7 +29,7 @@ class ExceptionBlock():
         if (i[0]):
             raise ValueError()
         else:
-            return Block.all_success(i)
+            return utils.all_success(i)
 
 
 class EchoBlock():
@@ -36,7 +37,7 @@ class EchoBlock():
         pass
 
     async def run(self, i):
-        return Block.all_success(i)
+        return utils.all_success(i)
 
 
 @pytest.mark.asyncio

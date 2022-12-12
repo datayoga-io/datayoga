@@ -4,10 +4,10 @@ from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
+from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.result import Result
-from datayoga_core.utils import get_connection_details
 
 logger = logging.getLogger("dy")
 
@@ -50,7 +50,7 @@ class Block(DyBlock):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection = get_connection_details(self.properties.get("connection"), context)
+        connection = utils.get_connection_details(self.properties.get("connection"), context)
         db_type = connection.get("type")
         engine_url = sa.engine.URL.create(
             drivername=db_type,
@@ -126,4 +126,4 @@ class Block(DyBlock):
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.conn.execute(self.tbl.insert(), data)
 
-        return Block.produce_data_and_results(data)
+        return utils.produce_data_and_results(data)
