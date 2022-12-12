@@ -19,11 +19,10 @@ class Producer(Block):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def ack(self, msg_ids: List[str]):
         """ Sends acknowledge for the message IDs of the records that have been processed
 
         Args:
             msg_ids (List[str]): Message IDs
         """
-        raise NotImplementedError
+        pass

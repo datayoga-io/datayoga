@@ -60,7 +60,6 @@ class Block(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    @abstractmethod
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         """ Transforms data
 
@@ -70,7 +69,7 @@ class Block(metaclass=ABCMeta):
         Returns:
             List[Dict[str, Any]]: Transformed data
         """
-        raise NotImplementedError
+        pass
 
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
