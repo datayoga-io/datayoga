@@ -85,14 +85,14 @@ async def test_step_parallel():
     results_block = mock.Mock(wraps=EchoBlock())
     root = Step("A", SleepBlock(), concurrency=2)
     root | Step("C", results_block, concurrency=2)
-    input = [
+    messages = [
         {Block.MSG_ID_FIELD: 0, 'key': 0, 'sleep': 0.6},
         {Block.MSG_ID_FIELD: 1, 'key': 1, 'sleep': 0.4},
         {Block.MSG_ID_FIELD: 2, 'key': 2, 'sleep': 0.6},
         {Block.MSG_ID_FIELD: 3, 'key': 3, 'sleep': 0.3}
     ]
 
-    for i in input:
+    for i in messages:
         await root.process([i])
     await root.stop()
     # we expect these to return in pairs where the shorter one in the pair returns first
@@ -111,28 +111,28 @@ async def test_step_parallel():
 async def test_acks_successful():
     # test success of a block propagates upward
     root = Step("A", SleepBlock(), concurrency=1)
-    input = [{Block.MSG_ID_FIELD: k, "key": k, "sleep": v} for k, v in enumerate([0.3, 0.4, 0.5, 1])]
+    messages = [{Block.MSG_ID_FIELD: k, "key": k, "sleep": v} for k, v in enumerate([0.3, 0.4, 0.5, 1])]
     producer = mock.MagicMock()
     root.add_done_callback(producer.ack)
-    for i in input:
-        await root.process([i])
+    for message in messages:
+        await root.process([message])
     logger.debug("waiting for in flight messages")
     await root.stop()
-    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [RESULT_SUCCESS]) for i in input])
+    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [RESULT_SUCCESS]) for i in messages])
 
 
 @pytest.mark.asyncio
 async def test_acks_exception():
     # test failure of a block propagates upward
     root = Step("A", ExceptionBlock(), concurrency=1)
-    input = [
+    messages = [
         {Block.MSG_ID_FIELD: "message1", "value": True},
         {Block.MSG_ID_FIELD: "message2", "value": True}
     ]
     producer_mock = mock.MagicMock()
     root.add_done_callback(producer_mock.ack)
-    for i in input:
-        await root.process([i])
+    for message in messages:
+        await root.process([message])
     await root.stop()
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], Result.reject("Error in step A: ValueError()")) for i in input]
+        [i[Block.MSG_ID_FIELD]], [Result.reject("Error in step A: ValueError()")]) for i in messages]

@@ -4,7 +4,7 @@ import os
 from common.utils import run_job
 
 
-def test_stdin_to_stdout(tmpdir: str):
+def test_stdin_to_stdout(tmpdir):
     tested_data = '{"id": 121, "fname": "joe", "lname": "allen", "country_code": "US", "country_name": "united states", "gender": "M"}'
 
     output_file = tmpdir.join("test_stdin_to_stdout.txt")

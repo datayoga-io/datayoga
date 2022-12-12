@@ -12,8 +12,6 @@ class Result():
         self.message = message
 
     def __eq__(self, other):
-        print(self.message)
-        print(other.message)
         return (
             isinstance(other, self.__class__) and
             self.status == other.status and
