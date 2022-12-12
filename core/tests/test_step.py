@@ -1,13 +1,14 @@
 import asyncio
-import datetime
 import logging
 
 import mock
 import pytest
-from datayoga_core.block import Block, Result
+from datayoga_core.block import Block
+from datayoga_core.result import Result
 from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
+RESULT_SUCCESS = Result.success()
 
 
 class SleepBlock():
@@ -16,7 +17,7 @@ class SleepBlock():
 
     async def run(self, i):
         await asyncio.sleep(i[0]["sleep"])
-        return i, [Result.SUCCESS]*len(i)
+        return Block.all_success(i)
 
 
 class ExceptionBlock():
@@ -27,7 +28,7 @@ class ExceptionBlock():
         if (i[0]):
             raise ValueError()
         else:
-            return i, [Result.SUCCESS]*len(i)
+            return Block.all_success(i)
 
 
 class EchoBlock():
@@ -35,7 +36,7 @@ class EchoBlock():
         pass
 
     async def run(self, i):
-        return i, [Result.SUCCESS]*len(i)
+        return Block.all_success(i)
 
 
 @pytest.mark.asyncio
@@ -52,7 +53,7 @@ async def test_step_continuous_in_order():
     await root.stop()
     assert results_block.run.call_args_list == [mock.call.run([i]) for i in messages]
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], Result.SUCCESS, None) for i in messages]
+        [i[Block.MSG_ID_FIELD]], [RESULT_SUCCESS]) for i in messages]
 
 
 @pytest.mark.asyncio
@@ -116,7 +117,7 @@ async def test_acks_successful():
         await root.process([i])
     logger.debug("waiting for in flight messages")
     await root.stop()
-    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], Result.SUCCESS, None) for i in input])
+    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [RESULT_SUCCESS]) for i in input])
 
 
 @pytest.mark.asyncio
@@ -132,5 +133,5 @@ async def test_acks_exception():
     for i in input:
         await root.process([i])
     await root.stop()
-    assert producer_mock.ack.call_args_list == [mock.call.ck([i[Block.MSG_ID_FIELD]], Result.REJECTED,
-                                                             "Error in step A: ValueError()") for i in input]
+    assert producer_mock.ack.call_args_list == [mock.call.ack(
+        [i[Block.MSG_ID_FIELD]], Result.reject("Error in step A: ValueError()")) for i in input]

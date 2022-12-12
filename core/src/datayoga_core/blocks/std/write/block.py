@@ -22,4 +22,4 @@ class Block(DyBlock):
             sys.stdout.write(f"{json.dumps(filtered_record)}\n")
 
         # if we made it here, it is a success. return the data and the success result
-        return data, [Result.SUCCESS]*len(data)
+        return Block.all_success(data)

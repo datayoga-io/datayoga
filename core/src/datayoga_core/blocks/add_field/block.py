@@ -36,4 +36,4 @@ class Block(DyBlock):
 
                 obj[utils.unescape_field(field_path[-1:][0])] = self.fields[field].search(row)
 
-        return data, [Result.SUCCESS] * len(data)
+        return Block.all_success(data)

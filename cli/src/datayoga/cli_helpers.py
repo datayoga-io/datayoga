@@ -2,7 +2,7 @@ import logging
 import sys
 import traceback
 from logging import Formatter, Logger
-from typing import List, Union
+from typing import Callable, Sequence
 
 
 class CustomFormatter(Formatter):
@@ -34,7 +34,7 @@ class CustomFormatter(Formatter):
         return formatter.format(record)
 
 
-def add_options(options: List[str]):
+def add_options(options: Sequence[Callable]):
     def _add_options(func):
         for option in reversed(options):
             func = option(func)

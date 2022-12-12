@@ -4,8 +4,9 @@ import asyncio
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
-from datayoga_core.block import Block, Result
+from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.result import Result
 
 logger = logging.getLogger("dy")
 
@@ -70,28 +71,24 @@ class Step():
                 else:
                     # we are a last channel, propagate the ack upstream
                     # TODO: verify that all entries have a msg id otherwise raise consistency error
-                    self.done([x[Block.MSG_ID_FIELD] for x in processed_entries], Result.SUCCESS)
+                    self.done([x[Block.MSG_ID_FIELD] for x in processed_entries], results)
 
-                    # indicate rejected records if any
-                    if Result.REJECTED in results:
-                        self.done([entry[i][Block.MSG_ID_FIELD]
-                                  for i, v in enumerate(results) if v == Result.REJECTED], Result.REJECTED)
             except Exception as e:
                 # we caught an exception. the entire batch is considered rejected
                 logger.exception(e)
                 # verify that all messages still have a msg_id property
                 # if next(filter(lambda x: not Block.MSG_ID_FIELD in x,entry),None) is not None
-                self.done([x[Block.MSG_ID_FIELD] for x in entry],
-                          Result.REJECTED, f"Error in step {self.id}: {repr(e)}")
+                self.done([x[Block.MSG_ID_FIELD] for x in entry], [
+                          Result.reject(f"Error in step {self.id}: {repr(e)}")] * len(entry))
             finally:
                 self.queue.task_done()
             logger.debug(f"{self.id}-{worker_id} done processing {entry[0][Block.MSG_ID_FIELD]}")
 
-    def done(self, msg_ids: List[str], result: Optional[Result] = None, reason: Optional[str] = None):
-        logger.debug(f"{self.id} acking {msg_ids} with result {result}")
+    def done(self, msg_ids: List[str], results: List[Result]):
+        logger.debug(f"{self.id} acking {msg_ids}")
         self.active_entries.difference_update(msg_ids)
         if self.done_callback is not None:
-            self.done_callback(msg_ids, result, reason)
+            self.done_callback(msg_ids, results)
 
     async def join(self):
         # wait for all active entries to be processed
