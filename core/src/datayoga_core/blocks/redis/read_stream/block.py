@@ -6,7 +6,6 @@ import datayoga_core.blocks.redis.utils as redis_utils
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer
-from datayoga_core.utils import get_connection_details
 
 logger = logging.getLogger("dy")
 
@@ -15,11 +14,11 @@ class Block(DyProducer):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection = get_connection_details(self.properties.get("connection"), context)
+        connection_details = redis_utils.get_redis_connection_details(self.properties.get("connection"), context)
         self.redis_client = redis_utils.get_client(
-            connection.get("host"),
-            connection.get("port"),
-            connection.get("password"))
+            connection_details.get("host"),
+            connection_details.get("port"),
+            connection_details.get("password"))
 
         self.stream = self.properties["stream_name"]
         self.snapshot = self.properties.get("snapshot", False)
