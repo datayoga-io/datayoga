@@ -9,10 +9,11 @@ from pathlib import Path
 import click
 import datayoga_core as dy
 import jsonschema
-from datayoga import cli_helpers
 from datayoga.cli_helpers import handle_critical
 from datayoga_core import utils
 from pkg_resources import get_distribution
+
+from datayoga import cli_helpers
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
@@ -71,23 +72,23 @@ def validate(
 
 
 @cli.command(name="run", help="Runs a job", context_settings=CONTEXT_SETTINGS)
-@click.argument("job")
-@click.option('--dir', help="DataYoga directory", default=".", show_default=True)
+@click.argument("job_name")
+@click.option('--dir', 'directory', help="DataYoga directory", default=".", show_default=True)
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def run(
-    job: str,
-    dir: str,
+    job_name: str,
+    directory: str,
     loglevel: str
 ):
     set_logging_level(loglevel)
 
     try:
         logger.info("Runner started...")
-        job_file = path.join(dir, "jobs", job.replace(".", os.sep) + ".yaml")
+        job_file = path.join(directory, "jobs", job_name.replace(".", os.sep) + ".yaml")
         job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
 
-        connections = utils.read_yaml(path.join(dir, "connections.yaml"))
+        connections = utils.read_yaml(path.join(directory, "connections.yaml"))
         logger.debug(f"connections: {connections}")
 
         jsonschema.validate(instance=connections, schema=utils.read_json(
@@ -95,7 +96,7 @@ def run(
 
         context = dy.Context({
             "connections": connections,
-            "data_path": path.join(dir, "data"),
+            "data_path": path.join(directory, "data"),
             "job_name": Path(job_file).stem
         })
 

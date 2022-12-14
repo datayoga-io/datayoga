@@ -53,4 +53,4 @@ class Block(DyBlock):
 
                     obj[utils.unescape_field(to_field_path[-1:][0])] = value
 
-        return data, [Result.SUCCESS] * len(data)
+        return utils.all_success(data)

@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Any, Dict, List, Tuple
 
-from datayoga_core import expression
+from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.block import Result
 from datayoga_core.context import Context
@@ -28,4 +28,4 @@ class Block(DyBlock):
 
             return_data.append(mapped_row)
 
-        return return_data, [Result.SUCCESS] * len(return_data)
+        return utils.all_success(return_data)

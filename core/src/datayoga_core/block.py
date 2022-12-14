@@ -4,21 +4,19 @@ import importlib
 import logging
 import os
 import sys
-from enum import Enum
+from abc import ABCMeta, abstractmethod
 from os import path
 from typing import Any, Dict, List, Optional, Tuple
 
 from datayoga_core import utils
 from datayoga_core.context import Context
+from datayoga_core.result import Result
 from jsonschema import validate
 
 logger = logging.getLogger("dy")
 
 
-Result = Enum("Result", "SUCCESS REJECTED FILTERED")
-
-
-class Block():
+class Block(metaclass=ABCMeta):
     INTERNAL_FIELD_PREFIX = "__$$"
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
     RESULT_FIELD = f"{INTERNAL_FIELD_PREFIX}result"
@@ -52,17 +50,18 @@ class Block():
         logger.debug(f"validating {self.properties} against {json_schema_file}")
         validate(instance=self.properties, schema=utils.read_json(json_schema_file))
 
+    @abstractmethod
     def init(self, context: Optional[Context] = None):
         """
-        Initializes block (abstract, should be implemented by the sub class)
+        Initializes block
 
         Args:
             context (Context, optional): Context. Defaults to None.
         """
-        pass
+        raise NotImplementedError
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-        """ Transforms data (abstract, should be implemented by the sub class)
+        """ Transforms data
 
         Args:
             data (List[Dict[str, Any]]): Data
@@ -81,14 +80,3 @@ class Block():
         module = importlib.import_module(module_name)
         block: Block = getattr(module, "Block")(properties)
         return block
-
-    @staticmethod
-    def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-        results = []
-        for record in data:
-            results.append(record.get(Block.RESULT_FIELD, Result.SUCCESS))
-            if Block.RESULT_FIELD in record:
-                del record[Block.RESULT_FIELD]
-
-        logger.debug(f"data:{data}, results:{results}")
-        return data, results

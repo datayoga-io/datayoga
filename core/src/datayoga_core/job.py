@@ -10,8 +10,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import jsonschema
 from datayoga_core import utils
-from datayoga_core.block import Block, Result
+from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.result import Result, Status
 from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
@@ -62,7 +63,7 @@ class Job():
         if self.input:
             self.input.init(context)
 
-        self.root.add_done_callback(self.handle_result)
+        self.root.add_done_callback(self.handle_results)
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
@@ -102,8 +103,8 @@ class Job():
         # graceful shutdown
         await self.root.stop()
 
-    def handle_result(self, msg_ids: List[str], result: Result, reason: str):
-        if result == Result.REJECTED and self.error_handling == ErrorHandling.ABORT.value:
+    def handle_results(self, msg_ids: List[str], results: List[Result]):
+        if any(x.status == Status.REJECTED for x in results) and self.error_handling == ErrorHandling.ABORT.value:
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 
