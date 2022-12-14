@@ -6,9 +6,10 @@ from os import path
 from typing import Any, Dict, List, Tuple
 
 import yaml
+from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
-from datayoga_core.result import Result, success
+from datayoga_core.result import Result
 
 
 def read_json(filename: str) -> Any:
@@ -95,7 +96,7 @@ def get_connection_details(connection_name: str, context: Context) -> Dict[str, 
 def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
     results: List[Result] = []
     for record in data:
-        results.append(record.get(Block.RESULT_FIELD, success))
+        results.append(record.get(Block.RESULT_FIELD, result.SUCCESS))
         if Block.RESULT_FIELD in record:
             del record[Block.RESULT_FIELD]
 
@@ -103,4 +104,4 @@ def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str,
 
 
 def all_success(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-    return data, [success] * len(data)
+    return data, [result.SUCCESS] * len(data)
