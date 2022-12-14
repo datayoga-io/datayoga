@@ -19,8 +19,3 @@ class Result():
     @staticmethod
     def reject(message: Optional[str] = None) -> Result:
         return Result(Status.REJECTED, message)
-
-
-@dataclass
-class SuccessResult:
-    Result.success()
