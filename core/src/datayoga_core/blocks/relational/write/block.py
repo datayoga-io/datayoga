@@ -19,6 +19,10 @@ class OpCode(Enum):
     UPDATE = "u"
 
 
+def get_field(item: Union[Dict[str, str], str]) -> str:
+    return str(next(iter(item.values()))) if isinstance(item, dict) else item
+
+
 def get_fields(mapping: Optional[Union[Dict[str, Any], str]]) -> List[Dict[str, Any]]:
     return [{"column": str(next(iter(item.keys()))),
              "key": str(next(iter(item.values())))}
@@ -43,6 +47,19 @@ def generate_upsert_stmt(
                            SET {', '.join(update_fields)}""")
 
     raise ValueError(f"upsert for {db_type} is not supported yet")
+
+
+def get_key_values(record: Dict[str, Any], keys: List[Union[Dict[str, Any], str]]) -> Dict[str, Any]:
+    key_values = {}
+    for item in keys:
+        key = get_field(item)
+        if key not in record:
+            logger.warning(f"{key} key does not exist in record:\n{record}")
+            raise ValueError(f"{key} key does not exist")
+
+        key_values[key] = record[key]
+
+    return key_values
 
 
 class Block(DyBlock):
@@ -71,7 +88,6 @@ class Block(DyBlock):
         self.engine = sa.create_engine(engine_url, echo=False)
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
-
         if self.opcode_field:
             primary_keys = get_fields(self.keys)
             mapping_fields = get_fields(self.mapping)
@@ -95,29 +111,13 @@ class Block(DyBlock):
 
             for records_by_opcode in opcodes:
                 opcode = records_by_opcode["opcode"]
-                records = records_by_opcode["records"]
+                records: List[Dict[str, Any]] = records_by_opcode["records"]
 
+                logger.debug(f"Total {len(records)} record(s) with {opcode} opcode")
                 if opcode == OpCode.UPDATE.value:
-                    logger.debug(f"Upserting {len(records)} record(s) to {self.table} table")
-                    self.conn.execute(self.upsert_stmt, records)
+                    self.execute_upsert(records)
                 elif opcode == OpCode.DELETE.value:
-                    logger.debug(f"Deleting {len(records)} record(s) from {self.table} table")
-
-                    keys_to_delete = []
-                    for record in records:
-                        key_to_delete = {}
-                        for item in self.keys:
-                            key = str(next(iter(item.values()))) if isinstance(item, dict) else item
-                            if key in record:
-                                key_to_delete[key] = record[key]
-                            else:
-                                logger.warning(f"{key} key does not exist for record:\n{record}")
-                                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{key} key does not exist")
-                                break
-
-                        keys_to_delete.append(key_to_delete)
-
-                    self.conn.execute(self.delete_stmt, keys_to_delete)
+                    self.execute_delete(records)
                 else:
                     for record in records:
                         record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{opcode} - unsupported opcode")
@@ -127,3 +127,36 @@ class Block(DyBlock):
             self.conn.execute(self.tbl.insert(), data)
 
         return utils.produce_data_and_results(data)
+
+    def execute_upsert(self, records: List[Dict[str, Any]]):
+        records_to_upsert = []
+        for record in records:
+            try:
+                get_key_values(record, self.keys)
+            except ValueError as e:
+                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
+
+            # add nulls for missing mapped fields
+            for item in self.mapping:
+                field = get_field(item)
+                if field not in record:
+                    record[field] = None
+
+            records_to_upsert.append(record)
+
+        logger.debug(f"Upserting {len(records_to_upsert)} record(s) to {self.table} table")
+        if records_to_upsert:
+            self.conn.execute(self.upsert_stmt, records_to_upsert)
+
+    def execute_delete(self, records: List[Dict[str, Any]]):
+        keys_to_delete = []
+        for record in records:
+            try:
+                key_to_delete = get_key_values(record, self.keys)
+                keys_to_delete.append(key_to_delete)
+            except ValueError as e:
+                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
+
+        logger.debug(f"Deleting {len(keys_to_delete)} record(s) from {self.table} table")
+        if keys_to_delete:
+            self.conn.execute(self.delete_stmt, keys_to_delete)
