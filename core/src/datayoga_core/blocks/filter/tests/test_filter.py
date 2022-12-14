@@ -1,8 +1,7 @@
 import pytest
 from datayoga_core.blocks.filter.block import Block
-from datayoga_core.result import Result
+from datayoga_core.result import success
 
-RESULT_SUCCESS = Result.success()
 
 @pytest.mark.asyncio
 async def test_filter_sql():
@@ -13,7 +12,7 @@ async def test_filter_sql():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == ([{"fname": "john", "lname": "doe", "age": 25}], [RESULT_SUCCESS])
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == ([{"fname": "john", "lname": "doe", "age": 25}], [success])
 
 
 @pytest.mark.asyncio
@@ -34,7 +33,7 @@ async def test_filter_sql_multiple():
     ) == ([
         {"fname": "john", "lname": "doe", "age": 25},
         {"fname": "john3", "lname": "doe3", "age": 22}
-    ], [RESULT_SUCCESS, RESULT_SUCCESS])
+    ], [success, success])
 
 
 @pytest.mark.asyncio
@@ -58,7 +57,7 @@ async def test_filter_jmespath():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == ([{"fname": "john", "lname": "doe", "age": 25}], [RESULT_SUCCESS])
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == ([{"fname": "john", "lname": "doe", "age": 25}], [success])
 
 
 @pytest.mark.asyncio
@@ -79,7 +78,7 @@ async def test_filter_jmespath_multiple_nested():
     ) == ([
         {"fname": "john", "lname": "doe", "age": {"years": 25, "months": 5}},
         {"fname": "john3", "lname": "doe3", "age": {"years": 22, "months": 2}}
-    ], [RESULT_SUCCESS, RESULT_SUCCESS])
+    ], [success, success])
 
 
 @pytest.mark.asyncio

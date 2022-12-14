@@ -5,11 +5,10 @@ import mock
 import pytest
 from datayoga_core import utils
 from datayoga_core.block import Block
-from datayoga_core.result import Result
+from datayoga_core.result import reject, success
 from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
-RESULT_SUCCESS = Result.success()
 
 
 class SleepBlock():
@@ -54,7 +53,7 @@ async def test_step_continuous_in_order():
     await root.stop()
     assert results_block.run.call_args_list == [mock.call.run([i]) for i in messages]
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], [RESULT_SUCCESS]) for i in messages]
+        [i[Block.MSG_ID_FIELD]], [success]) for i in messages]
 
 
 @pytest.mark.asyncio
@@ -118,7 +117,7 @@ async def test_acks_successful():
         await root.process([message])
     logger.debug("waiting for in flight messages")
     await root.stop()
-    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [RESULT_SUCCESS]) for i in messages])
+    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [success]) for i in messages])
 
 
 @pytest.mark.asyncio
@@ -135,4 +134,4 @@ async def test_acks_exception():
         await root.process([message])
     await root.stop()
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], [Result.reject("Error in step A: ValueError()")]) for i in messages]
+        [i[Block.MSG_ID_FIELD]], [reject("Error in step A: ValueError()")]) for i in messages]

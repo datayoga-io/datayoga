@@ -7,7 +7,7 @@ import sqlalchemy as sa
 from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import Result, reject
 
 logger = logging.getLogger("dy")
 
@@ -112,7 +112,7 @@ class Block(DyBlock):
                                 key_to_delete[key] = record[key]
                             else:
                                 logger.warning(f"{key} key does not exist for record:\n{record}")
-                                record[Block.RESULT_FIELD] = Result.reject(f"{key} key does not exist")
+                                record[Block.RESULT_FIELD] = reject(f"{key} key does not exist")
                                 break
 
                         keys_to_delete.append(key_to_delete)
@@ -120,7 +120,7 @@ class Block(DyBlock):
                     self.conn.execute(self.delete_stmt, keys_to_delete)
                 else:
                     for record in records:
-                        record[Block.RESULT_FIELD] = Result.reject(f"{opcode} - unsupported opcode")
+                        record[Block.RESULT_FIELD] = reject(f"{opcode} - unsupported opcode")
                     logger.warning(f"{opcode} - unsupported opcode")
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")

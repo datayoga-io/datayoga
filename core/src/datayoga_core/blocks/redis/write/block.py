@@ -7,6 +7,7 @@ from datayoga_core import expression
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.block import Result
 from datayoga_core.context import Context
+from datayoga_core.result import success
 from datayoga_core.utils import get_connection_details
 
 logger = logging.getLogger("dy")
@@ -38,4 +39,4 @@ class Block(DyBlock):
         pipeline.execute()
 
         # TODO: check the return value from the pipeline
-        return data, [Result.SUCCESS]*len(data)
+        return data, [success]*len(data)
