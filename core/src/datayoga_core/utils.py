@@ -1,15 +1,18 @@
 import json
+import logging
 import os
 import re
 import sys
 from os import path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
 from datayoga_core.result import Result
+
+logger = logging.getLogger("dy")
 
 
 def read_json(filename: str) -> Any:
@@ -105,3 +108,47 @@ def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str,
 
 def all_success(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
     return data, [result.SUCCESS] * len(data)
+
+
+def get_field(item: Union[Dict[str, str], str]) -> str:
+    return str(next(iter(item.values()))) if isinstance(item, dict) else item
+
+
+def get_fields(mapping: Optional[Union[Dict[str, Any], str]]) -> List[Dict[str, Any]]:
+    return [{"column": str(next(iter(item.keys()))),
+             "key": str(next(iter(item.values())))}
+            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else []
+
+def get_key_values(record: Dict[str, Any], keys: List[Union[Dict[str, Any], str]]) -> Dict[str, Any]:
+    key_values = {}
+    for item in keys:
+        key = get_field(item)
+        if key not in record:
+            logger.warning(f"{key} key does not exist in record:\n{record}")
+            raise ValueError(f"{key} key does not exist")
+
+        key_values[key] = record[key]
+
+    return key_values
+
+
+def get_field(item: Union[Dict[str, str], str]) -> str:
+    return str(next(iter(item.values()))) if isinstance(item, dict) else item
+
+
+def get_fields(mapping: Optional[Union[Dict[str, Any], str]]) -> List[Dict[str, Any]]:
+    return [{"column": str(next(iter(item.keys()))),
+             "key": str(next(iter(item.values())))}
+            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else []
+
+def get_key_values(record: Dict[str, Any], keys: List[Union[Dict[str, Any], str]]) -> Dict[str, Any]:
+    key_values = {}
+    for item in keys:
+        key = get_field(item)
+        if key not in record:
+            logger.warning(f"{key} key does not exist in record:\n{record}")
+            raise ValueError(f"{key} key does not exist")
+
+        key_values[key] = record[key]
+
+    return key_values

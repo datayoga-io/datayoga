@@ -7,7 +7,6 @@ from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.block import Result
 from datayoga_core.context import Context
-from datayoga_core.utils import get_connection_details
 
 logger = logging.getLogger("dy")
 
@@ -16,11 +15,11 @@ class Block(DyBlock):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection = get_connection_details(self.properties.get("connection"), context)
+        connection_details = redis_utils.get_redis_connection_details(self.properties.get("connection"), context)
         self.redis_client = redis_utils.get_client(
-            connection.get("host"),
-            connection.get("port"),
-            connection.get("password"))
+            connection_details.get("host"),
+            connection_details.get("port"),
+            connection_details.get("password"))
 
         self.command = self.properties.get("command", "HSET")
 

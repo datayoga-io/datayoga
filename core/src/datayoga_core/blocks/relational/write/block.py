@@ -1,32 +1,15 @@
 import logging
-from enum import Enum, unique
 from itertools import groupby
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import sqlalchemy as sa
 from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
+from datayoga_core.opcode import OpCode
 from datayoga_core.result import Result, Status
 
 logger = logging.getLogger("dy")
-
-
-@unique
-class OpCode(Enum):
-    CREATE = "c"
-    DELETE = "d"
-    UPDATE = "u"
-
-
-def get_field(item: Union[Dict[str, str], str]) -> str:
-    return str(next(iter(item.values()))) if isinstance(item, dict) else item
-
-
-def get_fields(mapping: Optional[Union[Dict[str, Any], str]]) -> List[Dict[str, Any]]:
-    return [{"column": str(next(iter(item.keys()))),
-             "key": str(next(iter(item.values())))}
-            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else []
 
 
 def generate_upsert_stmt(
@@ -49,33 +32,25 @@ def generate_upsert_stmt(
     raise ValueError(f"upsert for {db_type} is not supported yet")
 
 
-def get_key_values(record: Dict[str, Any], keys: List[Union[Dict[str, Any], str]]) -> Dict[str, Any]:
-    key_values = {}
-    for item in keys:
-        key = get_field(item)
-        if key not in record:
-            logger.warning(f"{key} key does not exist in record:\n{record}")
-            raise ValueError(f"{key} key does not exist")
-
-        key_values[key] = record[key]
-
-    return key_values
-
-
 class Block(DyBlock):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection = utils.get_connection_details(self.properties.get("connection"), context)
-        db_type = connection.get("type")
+        connection_name = self.properties.get("connection")
+        connection_details = utils.get_connection_details(connection_name, context)
+        db_type = connection_details.get("type")
+        if db_type in ["cassandra", "redis"]:
+            raise ValueError(
+                f"{connection_name} connection is not supported by this block, use `{db_type}.write` block instead")
+
         engine_url = sa.engine.URL.create(
             drivername=db_type,
-            host=connection.get("host"),
-            port=connection.get("port"),
-            username=connection.get("user"),
-            password=connection.get("password"),
-            database=connection.get("database")
+            host=connection_details.get("host"),
+            port=connection_details.get("port"),
+            username=connection_details.get("user"),
+            password=connection_details.get("password"),
+            database=connection_details.get("database")
         )
 
         self.schema = self.properties.get("schema")
@@ -89,8 +64,8 @@ class Block(DyBlock):
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         if self.opcode_field:
-            primary_keys = get_fields(self.keys)
-            mapping_fields = get_fields(self.mapping)
+            primary_keys = utils.get_fields(self.keys)
+            mapping_fields = utils.get_fields(self.mapping)
 
             self.delete_stmt = self.tbl.delete(
                 sa.and_(*[sa.text(f"{self.tbl.columns.get(field['column'])} = {sa.bindparam(field['key'])}")
@@ -98,7 +73,7 @@ class Block(DyBlock):
 
             self.upsert_stmt = generate_upsert_stmt(self.tbl.fullname, primary_keys, mapping_fields, db_type)
 
-        logger.debug(f"Connecting to {connection.get('type')}")
+        logger.debug(f"Connecting to {connection_details.get('type')}")
         self.conn = self.engine.connect()
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
@@ -132,13 +107,13 @@ class Block(DyBlock):
         records_to_upsert = []
         for record in records:
             try:
-                get_key_values(record, self.keys)
+                utils.get_key_values(record, self.keys)
             except ValueError as e:
                 record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
             # add nulls for missing mapped fields
             for item in self.mapping:
-                field = get_field(item)
+                field = utils.get_field(item)
                 if field not in record:
                     record[field] = None
 
@@ -152,7 +127,7 @@ class Block(DyBlock):
         keys_to_delete = []
         for record in records:
             try:
-                key_to_delete = get_key_values(record, self.keys)
+                key_to_delete = utils.get_key_values(record, self.keys)
                 keys_to_delete.append(key_to_delete)
             except ValueError as e:
                 record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
