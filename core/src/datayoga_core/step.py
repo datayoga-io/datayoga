@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from datayoga_core.block import Block
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import Result, Status
 
 logger = logging.getLogger("dy")
 
@@ -79,7 +79,7 @@ class Step():
                 # verify that all messages still have a msg_id property
                 # if next(filter(lambda x: not Block.MSG_ID_FIELD in x,entry),None) is not None
                 self.done([x[Block.MSG_ID_FIELD] for x in entry], [
-                          Result.reject(f"Error in step {self.id}: {repr(e)}")] * len(entry))
+                          Result(Status.REJECTED, f"Error in step {self.id}: {repr(e)}")] * len(entry))
             finally:
                 self.queue.task_done()
             logger.debug(f"{self.id}-{worker_id} done processing {entry[0][Block.MSG_ID_FIELD]}")

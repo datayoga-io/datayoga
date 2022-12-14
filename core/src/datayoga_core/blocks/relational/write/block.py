@@ -7,7 +7,7 @@ from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
-from datayoga_core.result import Result
+from datayoga_core.result import Result, Status
 
 logger = logging.getLogger("dy")
 
@@ -95,7 +95,7 @@ class Block(DyBlock):
                     self.execute_delete(records)
                 else:
                     for record in records:
-                        record[Block.RESULT_FIELD] = Result.reject(f"{opcode} - unsupported opcode")
+                        record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{opcode} - unsupported opcode")
                     logger.warning(f"{opcode} - unsupported opcode")
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
@@ -109,7 +109,7 @@ class Block(DyBlock):
             try:
                 utils.get_key_values(record, self.keys)
             except ValueError as e:
-                record[Block.RESULT_FIELD] = Result.reject(f"{e}")
+                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
             # add nulls for missing mapped fields
             for item in self.mapping:
@@ -130,7 +130,7 @@ class Block(DyBlock):
                 key_to_delete = utils.get_key_values(record, self.keys)
                 keys_to_delete.append(key_to_delete)
             except ValueError as e:
-                record[Block.RESULT_FIELD] = Result.reject(f"{e}")
+                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
         logger.debug(f"Deleting {len(keys_to_delete)} record(s) from {self.table} table")
         if keys_to_delete:

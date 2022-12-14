@@ -3,7 +3,7 @@ from functools import reduce
 from typing import Any, Dict, List, Optional, Tuple
 
 import datayoga_core.blocks.redis.utils as redis_utils
-from datayoga_core import expression
+from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.block import Result
 from datayoga_core.context import Context
@@ -37,4 +37,4 @@ class Block(DyBlock):
         pipeline.execute()
 
         # TODO: check the return value from the pipeline
-        return data, [Result.SUCCESS]*len(data)
+        return utils.all_success(data)

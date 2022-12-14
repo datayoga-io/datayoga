@@ -1,8 +1,6 @@
 import pytest
+from datayoga_core import result
 from datayoga_core.blocks.rename_field.block import Block
-from datayoga_core.result import Result
-
-RESULT_SUCCESS = Result.success()
 
 
 @pytest.mark.asyncio
@@ -14,7 +12,7 @@ async def test_rename_existing_field():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([{"first_name": "john", "lname": "doe"}], [RESULT_SUCCESS])
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([{"first_name": "john", "lname": "doe"}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -26,7 +24,7 @@ async def test_rename_missing_field():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([{"fname": "john", "lname": "doe"}], [RESULT_SUCCESS])
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([{"fname": "john", "lname": "doe"}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -39,7 +37,7 @@ async def test_rename_deep_nested_field():
     )
     block.init()
     assert await block.run([{"employee": {"name": {"fname": "john", "lname": "doe"}}}]) == ([
-        {"employee": {"name": {"first_name": "john", "lname": "doe"}}}], [RESULT_SUCCESS])
+        {"employee": {"name": {"first_name": "john", "lname": "doe"}}}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -52,7 +50,7 @@ async def test_rename_nested_field():
     )
     block.init()
     assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == ([
-        {"name": {"first_name": "john", "lname": "doe"}}], [RESULT_SUCCESS])
+        {"name": {"first_name": "john", "lname": "doe"}}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -65,7 +63,7 @@ async def test_rename_nested_field_missing_to_field_parent():
     )
     block.init()
     assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == ([
-        {"name": {"lname": "doe"}, "new_name": {"first_name": "john"}}], [RESULT_SUCCESS])
+        {"name": {"lname": "doe"}, "new_name": {"first_name": "john"}}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -77,4 +75,4 @@ async def test_rename_field_with_dot():
         }
     )
     block.init()
-    assert await block.run([{"name.fname": "john", "lname": "doe"}]) == ([{"name.first_name": "john", "lname": "doe"}], [RESULT_SUCCESS])
+    assert await block.run([{"name.fname": "john", "lname": "doe"}]) == ([{"name.first_name": "john", "lname": "doe"}], [result.SUCCESS])
