@@ -5,7 +5,6 @@ import mock
 import pytest
 from datayoga_core import result, utils
 from datayoga_core.block import Block
-from datayoga_core.result import Result, Status
 from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
@@ -134,4 +133,4 @@ async def test_acks_exception():
         await root.process([message])
     await root.stop()
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], [Result(Status.REJECTED, "Error in step A: ValueError()")]) for i in messages]
+        [i[Block.MSG_ID_FIELD]], [result.reject("Error in step A: ValueError()")]) for i in messages]
