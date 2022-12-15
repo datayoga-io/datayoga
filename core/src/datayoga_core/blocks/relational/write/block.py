@@ -8,6 +8,8 @@ from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.result import Result, Status
+from sqlalchemy import Table
+from sqlalchemy.dialects.postgresql import insert
 
 logger = logging.getLogger("dy")
 
@@ -19,32 +21,32 @@ class OpCode(Enum):
     UPDATE = "u"
 
 
-def get_field(item: Union[Dict[str, str], str]) -> str:
-    return str(next(iter(item.values()))) if isinstance(item, dict) else item
+def get_source_column(item: Union[Dict[str, str], str]) -> str:
+    return next(iter(item.values())) if isinstance(item, dict) else item
 
 
-def get_fields(mapping: Optional[Union[Dict[str, Any], str]]) -> List[Dict[str, Any]]:
-    return [{"column": str(next(iter(item.keys()))),
-             "key": str(next(iter(item.values())))}
-            if isinstance(item, dict) else {"column": item, "key": item} for item in mapping] if mapping else []
+def get_target_column(item: Union[Dict[str, str], str]) -> str:
+    return next(iter(item.keys())) if isinstance(item, dict) else item
 
 
-def generate_upsert_stmt(
-        table: str, primary_keys: List[Dict[str, Any]],
-        mapping_fields: List[Dict[str, Any]],
-        db_type: str) -> Any:
+def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[str, str]]:
+    return [{"column": next(iter(item.keys())), "key": next(iter(item.values()))} if isinstance(item, dict)
+            else {"column": item, "key": item} for item in mapping] if mapping else []
+
+
+def generate_upsert_stmt(table: Table, business_keys: List[Dict[str, Any]], db_type: str) -> Any:
     if db_type.lower() == "postgresql":
-        update_fields = [f"{field['column']} = {sa.bindparam(field['key'])}" for field in mapping_fields]
+        for field in business_keys:
+            if not field["column"] in table.columns:
+                raise ValueError(f"{field['column']} column does not exist in {table.fullname} table")
 
-        insert_fields = ", ".join([field["column"] for field in mapping_fields])
-        pk_fields = ", ".join([field["column"] for field in primary_keys])
+        insert_stmt = insert(table)
 
-        insert_bind_params = ", ".join([f"{sa.bindparam(field['key'])}" for field in mapping_fields])
+        do_update_stmt = insert_stmt .on_conflict_do_update(
+            index_elements=[table.columns[field["column"]] for field in business_keys],
+            set_=insert_stmt.excluded)
 
-        return sa.text(f"""INSERT INTO {table} ({insert_fields})
-                           VALUES ({insert_bind_params})
-                           ON CONFLICT({pk_fields}) DO UPDATE
-                           SET {', '.join(update_fields)}""")
+        return do_update_stmt
 
     raise ValueError(f"upsert for {db_type} is not supported yet")
 
@@ -52,7 +54,7 @@ def generate_upsert_stmt(
 def get_key_values(record: Dict[str, Any], keys: List[Union[Dict[str, Any], str]]) -> Dict[str, Any]:
     key_values = {}
     for item in keys:
-        key = get_field(item)
+        key = get_source_column(item)
         if key not in record:
             logger.warning(f"{key} key does not exist in record:\n{record}")
             raise ValueError(f"{key} key does not exist")
@@ -89,14 +91,13 @@ class Block(DyBlock):
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         if self.opcode_field:
-            primary_keys = get_fields(self.keys)
-            mapping_fields = get_fields(self.mapping)
+            business_keys = get_column_mapping(self.keys)
 
             self.delete_stmt = self.tbl.delete(
                 sa.and_(*[sa.text(f"{self.tbl.columns.get(field['column'])} = {sa.bindparam(field['key'])}")
-                          for field in primary_keys]))
+                          for field in business_keys]))
 
-            self.upsert_stmt = generate_upsert_stmt(self.tbl.fullname, primary_keys, mapping_fields, db_type)
+            self.upsert_stmt = generate_upsert_stmt(self.tbl, business_keys, db_type)
 
         logger.debug(f"Connecting to {connection.get('type')}")
         self.conn = self.engine.connect()
@@ -136,13 +137,15 @@ class Block(DyBlock):
             except ValueError as e:
                 record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
+            # map the record to upsert based on the mapping definitions
             # add nulls for missing mapped fields
+            record_to_upsert = {}
             for item in self.mapping:
-                field = get_field(item)
-                if field not in record:
-                    record[field] = None
+                source = get_source_column(item)
+                target = get_target_column(item)
+                record_to_upsert[target] = None if source not in record else record[source]
 
-            records_to_upsert.append(record)
+            records_to_upsert.append(record_to_upsert)
 
         logger.debug(f"Upserting {len(records_to_upsert)} record(s) to {self.table} table")
         if records_to_upsert:

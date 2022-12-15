@@ -12,6 +12,3 @@ class Result():
 
 
 SUCCESS = Result(Status.SUCCESS)
-
-def reject(message: Optional[str] = None) -> Result:
-    return Result(Status.REJECTED, message)
