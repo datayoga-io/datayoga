@@ -42,7 +42,10 @@ class Block(metaclass=ABCMeta):
         Validates block against its JSON Schema
         """
         json_schema_file = path.join(
-            utils.get_bundled_dir(), "blocks", self.get_block_name(),
+            utils.get_bundled_dir(),
+            os.path.relpath(
+                os.path.dirname(sys.modules[self.__module__].__file__),
+                start=os.path.dirname(__file__)),
             "block.schema.json") if utils.is_bundled() else path.join(
             os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
             "block.schema.json")
