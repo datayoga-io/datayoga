@@ -63,7 +63,7 @@ def is_bundled() -> bool:
 
 
 def get_bundled_dir() -> str:
-    datayoga_dir = path.join(sys._MEIPASS, "datayoga")
+    datayoga_dir = path.join(sys._MEIPASS, "datayoga_core")
     return datayoga_dir if os.path.isdir(datayoga_dir) else sys._MEIPASS
 
 
