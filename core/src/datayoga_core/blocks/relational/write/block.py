@@ -4,10 +4,10 @@ from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
-from datayoga_core import result, utils
+from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import Result, Status
 from sqlalchemy import Table
 from sqlalchemy.dialects.postgresql import insert
 
@@ -34,16 +34,16 @@ def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[s
             else {"column": item, "key": item} for item in mapping] if mapping else []
 
 
-def generate_upsert_stmt(table: Table, primary_keys: List[Dict[str, Any]], db_type: str) -> Any:
+def generate_upsert_stmt(table: Table, business_keys: List[Dict[str, Any]], db_type: str) -> Any:
     if db_type.lower() == "postgresql":
-        for field in primary_keys:
+        for field in business_keys:
             if not field["column"] in table.columns:
                 raise ValueError(f"{field['column']} column does not exist in {table.fullname} table")
 
         insert_stmt = insert(table)
 
         do_update_stmt = insert_stmt .on_conflict_do_update(
-            index_elements=[table.columns[field["column"]] for field in primary_keys],
+            index_elements=[table.columns[field["column"]] for field in business_keys],
             set_=insert_stmt.excluded)
 
         return do_update_stmt
@@ -91,13 +91,13 @@ class Block(DyBlock):
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         if self.opcode_field:
-            primary_keys = get_column_mapping(self.keys)
+            business_keys = get_column_mapping(self.keys)
 
             self.delete_stmt = self.tbl.delete(
                 sa.and_(*[sa.text(f"{self.tbl.columns.get(field['column'])} = {sa.bindparam(field['key'])}")
-                          for field in primary_keys]))
+                          for field in business_keys]))
 
-            self.upsert_stmt = generate_upsert_stmt(self.tbl, primary_keys, db_type)
+            self.upsert_stmt = generate_upsert_stmt(self.tbl, business_keys, db_type)
 
         logger.debug(f"Connecting to {connection.get('type')}")
         self.conn = self.engine.connect()
@@ -121,7 +121,7 @@ class Block(DyBlock):
                     self.execute_delete(records)
                 else:
                     for record in records:
-                        record[Block.RESULT_FIELD] = result.reject(f"{opcode} - unsupported opcode")
+                        record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{opcode} - unsupported opcode")
                     logger.warning(f"{opcode} - unsupported opcode")
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
@@ -135,7 +135,7 @@ class Block(DyBlock):
             try:
                 get_key_values(record, self.keys)
             except ValueError as e:
-                record[Block.RESULT_FIELD] = result.reject(f"{e}")
+                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
             # map the record to upsert based on the mapping definitions
             # add nulls for missing mapped fields
@@ -158,7 +158,7 @@ class Block(DyBlock):
                 key_to_delete = get_key_values(record, self.keys)
                 keys_to_delete.append(key_to_delete)
             except ValueError as e:
-                record[Block.RESULT_FIELD] = result.reject(f"{e}")
+                record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
         logger.debug(f"Deleting {len(keys_to_delete)} record(s) from {self.table} table")
         if keys_to_delete:
