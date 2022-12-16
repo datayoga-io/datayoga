@@ -26,10 +26,9 @@ steps:
       schema: hr
       table: emp
       opcode_field: __$$opcode
-      mapping:
+      keys:
         - id: _id
+      mapping:
         - full_name
         - country
         - gender
-      keys:
-        - id: _id

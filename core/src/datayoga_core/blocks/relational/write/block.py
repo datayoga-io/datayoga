@@ -34,19 +34,12 @@ def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[s
             else {"column": item, "key": item} for item in mapping] if mapping else []
 
 
-def generate_upsert_stmt(table: Table, business_keys: List[Dict[str, Any]], db_type: str) -> Any:
+def generate_upsert_stmt(table: Table, business_key_columns: List[str], columns: List[str], db_type: str) -> Any:
     if db_type.lower() == "postgresql":
-        for field in business_keys:
-            if not field["column"] in table.columns:
-                raise ValueError(f"{field['column']} column does not exist in {table.fullname} table")
-
-        insert_stmt = insert(table)
-
-        do_update_stmt = insert_stmt .on_conflict_do_update(
-            index_elements=[table.columns[field["column"]] for field in business_keys],
-            set_=insert_stmt.excluded)
-
-        return do_update_stmt
+        insert_stmt = insert(table).values(columns)
+        return insert_stmt.on_conflict_do_update(
+            index_elements=[table.columns[column] for column in business_key_columns],
+            set_={col: getattr(insert_stmt.excluded, col) for col in columns})
 
     raise ValueError(f"upsert for {db_type} is not supported yet")
 
@@ -54,12 +47,12 @@ def generate_upsert_stmt(table: Table, business_keys: List[Dict[str, Any]], db_t
 def get_key_values(record: Dict[str, Any], keys: List[Union[Dict[str, Any], str]]) -> Dict[str, Any]:
     key_values = {}
     for item in keys:
-        key = get_source_column(item)
-        if key not in record:
-            logger.warning(f"{key} key does not exist in record:\n{record}")
-            raise ValueError(f"{key} key does not exist")
+        source_key = get_source_column(item)
+        if source_key not in record:
+            logger.warning(f"{source_key} key does not exist in record:\n{record}")
+            raise ValueError(f"{source_key} key does not exist")
 
-        key_values[key] = record[key]
+        key_values[get_target_column(item)] = record[source_key]
 
     return key_values
 
@@ -91,15 +84,21 @@ class Block(DyBlock):
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         if self.opcode_field:
-            business_keys = get_column_mapping(self.keys)
+            business_key_columns = [column["column"] for column in get_column_mapping(self.keys)]
+            mapping_columns = [column["column"] for column in get_column_mapping(self.mapping)]
 
-            self.delete_stmt = self.tbl.delete(
-                sa.and_(*[sa.text(f"{self.tbl.columns.get(field['column'])} = {sa.bindparam(field['key'])}")
-                          for field in business_keys]))
+            columns = business_key_columns + [x for x in mapping_columns if x not in business_key_columns]
 
-            self.upsert_stmt = generate_upsert_stmt(self.tbl, business_keys, db_type)
+            for column in columns:
+                if not column in self.tbl.columns:
+                    raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
-        logger.debug(f"Connecting to {connection.get('type')}")
+            self.delete_stmt = self.tbl.delete().where(
+                sa.and_(*[(self.tbl.columns[column] == sa.bindparam(column)) for column in business_key_columns]))
+
+            self.upsert_stmt = generate_upsert_stmt(self.tbl, business_key_columns, columns, db_type)
+
+        logger.debug(f"Connecting to {db_type}")
         self.conn = self.engine.connect()
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
@@ -140,7 +139,7 @@ class Block(DyBlock):
             # map the record to upsert based on the mapping definitions
             # add nulls for missing mapped fields
             record_to_upsert = {}
-            for item in self.mapping:
+            for item in self.keys + self.mapping:
                 source = get_source_column(item)
                 target = get_target_column(item)
                 record_to_upsert[target] = None if source not in record else record[source]
@@ -155,8 +154,7 @@ class Block(DyBlock):
         keys_to_delete = []
         for record in records:
             try:
-                key_to_delete = get_key_values(record, self.keys)
-                keys_to_delete.append(key_to_delete)
+                keys_to_delete.append(get_key_values(record, self.keys))
             except ValueError as e:
                 record[Block.RESULT_FIELD] = Result(Status.REJECTED, f"{e}")
 
