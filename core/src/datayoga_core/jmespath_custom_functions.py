@@ -1,8 +1,9 @@
 import hashlib
 import json
+import re
 import string
 from datetime import datetime, timezone
-from typing import Union
+from typing import Any, Iterable, Union
 from uuid import uuid4
 
 from jmespath import functions
@@ -126,3 +127,18 @@ class JmespathCustomFunctions(functions.Functions):
         delta = dt.now(dt.tzinfo) - dt
 
         return delta.days * 86400 + delta.seconds
+
+    @functions.signature({"types": ["string"]}, {"types": ["string"]}, {"types": ["string"]})
+    def _func_regex_replace(self, text: str, pattern: str, replacement: str) -> str:
+        """\
+        Replaces matched patterns in the string by the given replacement.
+        """
+
+        return re.sub(pattern, replacement, text)
+
+    @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"]}, {"types": ["array"]})
+    def _func_in(self, element: Any, iterable: Iterable) -> bool:
+        """\
+        Returns True if the iterable contains the given element.
+        """
+        return element in iterable

@@ -15,7 +15,6 @@
       }
     }
   ],
-  "required": ["connection", "table", "schema"],
   "properties": {
     "connection": {
       "type": "string",
@@ -37,21 +36,25 @@
     },
     "keys": {
       "type": "array",
-      "title": "Business keys to use for upsert in case of an UPSERT",
+      "title": "Business keys to use in case of `load_strategy` is UPSERT or working with `opcode_field`",
       "items": {
-        "type": "string",
+        "type": ["string", "object"],
         "title": "name of column"
       },
-      "examples": [["fname", "lname"]]
+      "examples": [["fname", { "lname": "last_name" }]]
     },
     "mapping": {
       "type": "array",
       "title": "Fields to write",
       "items": {
-        "type": "string",
+        "type": ["string", "object"],
         "title": "name of column"
       },
-      "examples": [["fname", "lname", "address", "gender"]]
+      "examples": [["fname", { "lname": "last_name" }, "address", "gender"]]
+    },
+    "opcode_field": {
+      "type": "string",
+      "description": "Name of the field in the payload that holds the operation (c - create, d - delete, u - update) for this record in the DB"
     },
     "load_strategy": {
       "type": "string",
@@ -82,5 +85,7 @@
         ]
       ]
     }
-  }
+  },
+  "required": ["connection", "table", "schema"],
+  "allOf": [{ "not": { "required": ["opcode_field", "load_strategy"] } }]
 }

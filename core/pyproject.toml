@@ -17,6 +17,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
+certifi = "^2022.12.7"
 click = "^8.0.3"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"

@@ -1,23 +1,25 @@
+from __future__ import annotations
+
 import importlib
 import logging
 import os
 import sys
-from enum import Enum
+from abc import ABCMeta, abstractmethod
 from os import path
 from typing import Any, Dict, List, Optional, Tuple
 
 from datayoga_core import utils
 from datayoga_core.context import Context
+from datayoga_core.result import Result
 from jsonschema import validate
 
 logger = logging.getLogger("dy")
 
 
-Result = Enum("Result", "SUCCESS REJECTED FILTERED")
-
-
-class Block():
-    MSG_ID_FIELD = "__$$msg_id"
+class Block(metaclass=ABCMeta):
+    INTERNAL_FIELD_PREFIX = "__$$"
+    MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
+    RESULT_FIELD = f"{INTERNAL_FIELD_PREFIX}result"
     """
     Block
 
@@ -50,24 +52,28 @@ class Block():
             Dict
         """
         json_schema_file = path.join(
-            utils.get_bundled_dir(), "blocks", self.get_block_name(),
+            utils.get_bundled_dir(),
+            os.path.relpath(
+                os.path.dirname(sys.modules[self.__module__].__file__),
+                start=os.path.dirname(__file__)),
             "block.schema.json") if utils.is_bundled() else path.join(
             os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
             "block.schema.json")
         logger.debug(f"loading schema from {json_schema_file}")
         return utils.read_json(json_schema_file)
 
+    @abstractmethod
     def init(self, context: Optional[Context] = None):
         """
-        Initializes block (abstract, should be implemented by the sub class)
+        Initializes block
 
         Args:
             context (Context, optional): Context. Defaults to None.
         """
-        pass
+        raise NotImplementedError
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-        """ Transforms data (abstract, should be implemented by the sub class)
+        """ Transforms data
 
         Args:
             data (List[Dict[str, Any]]): Data
@@ -80,13 +86,9 @@ class Block():
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
-
-#
-# static utility methods
-#
-
-def create_block(block_name: str, properties: Dict[str, Any]) -> Block:
-    module_name = f"datayoga_core.blocks.{block_name}.block"
-    module = importlib.import_module(module_name)
-    block: Block = getattr(module, "Block")(properties)
-    return block
+    @staticmethod
+    def create(block_name: str, properties: Dict[str, Any]) -> Block:
+        module_name = f"datayoga_core.blocks.{block_name}.block"
+        module = importlib.import_module(module_name)
+        block: Block = getattr(module, "Block")(properties)
+        return block

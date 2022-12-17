@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import asyncio
 import copy
 import logging
 import os
 import sys
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import jsonschema
 from datayoga_core import utils
-from datayoga_core.block import Block, Result, create_block
+from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.result import Result, Status
 from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
@@ -60,10 +63,11 @@ class Job():
         if self.input:
             self.input.init(context)
 
-        self.root.add_done_callback(self.handle_result)
+        self.root.add_done_callback(self.handle_results)
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def transform(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+
         """
         Transforms data
 
@@ -71,18 +75,19 @@ class Job():
             data (List[Dict[str, Any]]): Data
 
         Returns:
-            List[Dict[str, Any]]: Transformed data
+            Tuple[List[Dict[str, Any]], List[Result]]: Transformed data and results
         """
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
             self.init()
 
         transformed_data = copy.deepcopy(data)
+        results = []
         for step in self.steps:
             transformed_data, results = asyncio.run(step.block.run(transformed_data))
             logger.debug(transformed_data)
 
-        return transformed_data
+        return transformed_data, results
 
     async def run(self):
         for record in self.input.produce():
@@ -98,48 +103,44 @@ class Job():
         # graceful shutdown
         await self.root.stop()
 
-    def handle_result(self, msg_ids: List[str], result: Result, reason: str):
-        if result == Result.REJECTED and self.error_handling == ErrorHandling.ABORT.value:
+    def handle_results(self, msg_ids: List[str], results: List[Result]):
+        if any(x.status == Status.REJECTED for x in results) and self.error_handling == ErrorHandling.ABORT.value:
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 
         self.input.ack(msg_ids)
 
+    @staticmethod
+    def validate(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
+        # validate against the schema
+        jsonschema.validate(instance=source, schema=utils.read_json(
+            utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
 
-#
-# static utility methods
-#
+        # validate that steps do not use any non whitelisted blocks
+        if whitelisted_blocks is not None:
+            for step in source.get("steps"):
+                if step.get("uses") not in whitelisted_blocks:
+                    raise ValueError(f"use of invalid block type: {step.get('uses')}")
 
-def validate_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
-    # validate against the schema
-    jsonschema.validate(instance=source, schema=utils.read_json(
-        utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
+        # validate each block against its schema
+        for step_definition in source.get("steps"):
+            Block.create(step_definition.get("uses"), step_definition.get("with"))
 
-    # validate that steps do not use any non whitelisted blocks
-    if whitelisted_blocks is not None:
-        for step in source.get("steps"):
-            if step.get("uses") not in whitelisted_blocks:
-                raise ValueError(f"use of invalid block type: {step.get('uses')}")
+    @staticmethod
+    def compile(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None) -> Job:
+        Job.validate(source, whitelisted_blocks=whitelisted_blocks)
+        steps: List[Step] = []
+        # parse the steps
+        for step_definition in source.get("steps"):
+            block_type = step_definition.get("uses")
+            block: Block = Block.create(block_type, step_definition.get("with"))
+            step: Step = Step(step_definition.get("id", block_type), block)
+            steps.append(step)
 
-    # validate each block against its schema
-    for step_definition in source.get("steps"):
-        create_block(step_definition.get("uses"), step_definition.get("with"))
+        # parse the input
+        input = None
+        if source.get("input") is not None:
+            input_definition = source.get("input")
+            input = Block.create(input_definition.get("uses"), input_definition.get("with"))
 
-
-def compile_job(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None) -> Job:
-    validate_job(source, whitelisted_blocks=whitelisted_blocks)
-    steps: List[Step] = []
-    # parse the steps
-    for step_definition in source.get("steps"):
-        block_type = step_definition.get("uses")
-        block: Block = create_block(block_type, step_definition.get("with"))
-        step: Step = Step(step_definition.get("id", block_type), block)
-        steps.append(step)
-
-    # parse the input
-    input = None
-    if source.get("input") is not None:
-        input_definition = source.get("input")
-        input = create_block(input_definition.get("uses"), input_definition.get("with"))
-
-    return Job(steps, input, source.get("error_handling"))
+        return Job(steps, input, source.get("error_handling"))

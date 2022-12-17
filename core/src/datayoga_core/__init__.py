@@ -2,7 +2,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from datayoga_core.context import Context
-from datayoga_core.job import Job, compile_job, validate_job
+from datayoga_core.job import Job
 
 logger = logging.getLogger("dy")
 
@@ -11,7 +11,7 @@ def compile(
         job_settings: Dict[str, Any],
         whitelisted_blocks: Optional[List[str]] = None) -> Job:
     """
-    Compiles a job in YAML 
+    Compiles a job in YAML
 
     Args:
         job_settings (Dict[str, Any]): Job settings
@@ -21,12 +21,12 @@ def compile(
         Job: Compiled job
     """
     logger.debug("Compiling job")
-    return compile_job(job_settings, whitelisted_blocks)
+    return Job.compile(job_settings, whitelisted_blocks)
 
 
 def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
     """
-    Validates a job in YAML 
+    Validates a job in YAML
 
     Args:
         job_settings (Dict[str, Any]): Job settings
@@ -37,7 +37,7 @@ def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str
     """
     logger.debug("Validating job")
     try:
-        validate_job(
+        Job.validate(
             source=job_settings,
             whitelisted_blocks=whitelisted_blocks
         )

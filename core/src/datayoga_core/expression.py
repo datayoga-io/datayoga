@@ -3,7 +3,7 @@ import logging
 import sqlite3
 from collections.abc import MutableMapping
 from enum import Enum, unique
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import jmespath
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
@@ -143,10 +143,10 @@ class JMESPathExpression(Expression):
         self.expression = jmespath.compile(expression)
         self.filter_expression = jmespath.compile(f"[?{expression}]")
 
-    def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def filter(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
         return self.filter_expression.search(data, options=self.options)
 
-    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def search(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
         return self.expression.search(data, options=self.options)
 
 

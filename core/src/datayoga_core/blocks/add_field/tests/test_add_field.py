@@ -1,5 +1,5 @@
 import pytest
-from datayoga_core.block import Result
+from datayoga_core import result
 from datayoga_core.blocks.add_field.block import Block
 
 
@@ -10,7 +10,7 @@ async def test_add_field():
                    "expression": "[fname,lname] | join(' ', @)"})
     block.init()
     assert await block.run([{"fname": "john", "lname": "doe"}]) == ([
-        {"fname": "john", "lname": "doe", "full_name": "john doe"}], [Result.SUCCESS]
+        {"fname": "john", "lname": "doe", "full_name": "john doe"}], [result.SUCCESS]
     )
 
 
@@ -21,7 +21,7 @@ async def test_add_nested_field():
                   "expression": "[name.fname,name.lname] | join(' ', @)"})
     block.init()
     assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == ([
-        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}], [Result.SUCCESS])
+        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -30,7 +30,7 @@ async def test_add_multiple_fields():
                   "field": "name.fname_upper", "language": "jmespath", "expression": "upper(name.fname)"}]})
     block.init()
     assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == ([
-        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}], [Result.SUCCESS])
+        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}], [result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -40,4 +40,4 @@ async def test_add_field_with_dot():
                    "expression": "[fname,lname] | join(' ', @)"})
     block.init()
     assert await block.run([{"fname": "john", "lname": "doe"}]) == ([
-        {"fname": "john", "lname": "doe", "name.full_name": "john doe"}], [Result.SUCCESS])
+        {"fname": "john", "lname": "doe", "name.full_name": "john doe"}], [result.SUCCESS])

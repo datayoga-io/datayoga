@@ -11,7 +11,7 @@ logger = logging.getLogger("dy")
 REDIS_PORT = 12554
 
 
-def test_redis_read_pending_messages(tmpdir: str):
+def test_redis_read_pending_messages(tmpdir):
     redis_container = redis.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
 
