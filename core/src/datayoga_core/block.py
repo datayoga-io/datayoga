@@ -39,14 +39,23 @@ class Block():
         """
         Validates block against its JSON Schema
         """
+        logger.debug(f"validating {self.properties}")
+        validate(instance=self.properties, schema=self.get_json_schema())
+
+    def get_json_schema(self) -> Dict[str, Any]:
+        """
+        Return json schema for this block
+
+        Returns:
+            Dict
+        """
         json_schema_file = path.join(
             utils.get_bundled_dir(), "blocks", self.get_block_name(),
             "block.schema.json") if utils.is_bundled() else path.join(
             os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
             "block.schema.json")
-
-        logger.debug(f"validating {self.properties} against {json_schema_file}")
-        validate(instance=self.properties, schema=utils.read_json(json_schema_file))
+        logger.debug(f"loading schema from {json_schema_file}")
+        return utils.read_json(json_schema_file)
 
     def init(self, context: Optional[Context] = None):
         """
