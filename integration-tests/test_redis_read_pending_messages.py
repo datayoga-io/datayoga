@@ -2,8 +2,8 @@ import json
 import logging
 import os
 
-import common.redis as redis
 import pytest
+from common import redis_utils
 from common.utils import run_job
 
 logger = logging.getLogger("dy")
@@ -12,10 +12,10 @@ REDIS_PORT = 12554
 
 
 def test_redis_read_pending_messages(tmpdir):
-    redis_container = redis.get_redis_oss_container(REDIS_PORT)
+    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
 
-    redis_client = redis.get_redis_client("localhost", REDIS_PORT)
+    redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
     redis_client.xadd("emp", {"message": json.dumps({"id": 1, "fname": "john", "lname": "doe"})})
     # malformed record (missing fname and lname properties)
     redis_client.xadd("emp", {"message": json.dumps({"id": 3})})

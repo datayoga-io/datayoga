@@ -1,7 +1,6 @@
 import logging
 
-import common.cassandra as cassandra
-import common.redis as redis
+from common import cassandra_utils, redis_utils
 from common.utils import run_job
 
 logger = logging.getLogger("dy")
@@ -12,19 +11,19 @@ TABLE = f"{KEYSPACE}.emp"
 
 
 def test_redis_to_cassandra():
-    redis_container = redis.get_redis_oss_container(REDIS_PORT)
+    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
 
-    redis_client = redis.get_redis_client("localhost", REDIS_PORT)
-    redis.add_to_emp_stream(redis_client)
+    redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
+    redis_utils.add_to_emp_stream(redis_client)
 
-    cassandra_container = cassandra.get_cassandra_container()
+    cassandra_container = cassandra_utils.get_cassandra_container()
     cassandra_container.start()
-    session = cassandra.get_cassandra_session(["localhost"])
+    session = cassandra_utils.get_cassandra_session(["localhost"])
 
-    cassandra.create_keyspace(session, KEYSPACE)
-    cassandra.create_emp_table(session, KEYSPACE)
-    cassandra.insert_to_emp_table(session, KEYSPACE)
+    cassandra_utils.create_keyspace(session, KEYSPACE)
+    cassandra_utils.create_emp_table(session, KEYSPACE)
+    cassandra_utils.insert_to_emp_table(session, KEYSPACE)
 
     run_job("tests.redis_to_cassandra")
 
