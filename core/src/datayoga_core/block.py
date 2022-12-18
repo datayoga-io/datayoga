@@ -46,10 +46,10 @@ class Block(metaclass=ABCMeta):
 
     def get_json_schema(self) -> Dict[str, Any]:
         """
-        Return json schema for this block
+        Returns the JSON Schema for this block
 
         Returns:
-            Dict
+            Dict[str, Any]: JSON Schema
         """
         json_schema_file = path.join(
             utils.get_bundled_dir(),

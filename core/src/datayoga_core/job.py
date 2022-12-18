@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -154,40 +153,38 @@ class Job():
         block_schemas = []
         # we traverse the json schemas directly instead of 'walk_packages'
         # to avoid importing all of the block classes
-        schema_paths = Path(
-            os.path.dirname(os.path.realpath(blocks.__file__))).rglob(
-            "**/block.schema.json")
+        schema_paths = Path(os.path.dirname(os.path.realpath(blocks.__file__))).rglob("**/block.schema.json")
         for schema_path in schema_paths:
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
                 os.path.dirname(os.path.realpath(blocks.__file__))
             )
-            block_type = block_type.replace(os.path.sep,".")
+            block_type = block_type.replace(os.path.sep, ".")
 
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
-
                 # load schema file
-                with open(schema_path,'r') as f:
-                    schema = json.load(f)
-                    # append to the array of oneOf for the full schema
-                    block_schemas.append({
-                        "type":"object",
-                        "properties": {
+                schema = utils.read_json(f"{schema_path}")
+                # append to the array of oneOf for the full schema
+                block_schemas.append({
+                    "type": "object",
+                    "properties": {
                         "uses": {
                             "description": "Block type",
                             "type": "string",
-                            "const":block_type
+                            "const": block_type
                         },
                         "with": schema,
-                        },
-                        "additionalProperties": False,
-                        "required": ["uses"],
-                    })
+                    },
+                    "additionalProperties": False,
+                    "required": ["uses"],
+                })
 
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),"resources","schemas","job.schema.json"),'r') as f:
-            job_schema = json.load(f)
-            job_schema['definitions']['block'] = {
-                "type": "object",
-                "oneOf":block_schemas
-            }
+        job_schema = utils.read_json(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                         "resources", "schemas", "job.schema.json"))
+        job_schema["definitions"]["block"] = {
+            "type": "object",
+            "oneOf": block_schemas
+        }
+
         return job_schema
