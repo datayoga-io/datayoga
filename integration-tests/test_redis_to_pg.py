@@ -38,9 +38,10 @@ def test_redis_to_pg():
 
     engine = pg.get_engine(postgres_container)
     pg.create_emp_table(engine, "hr")
-    engine.execute("INSERT INTO hr.emp VALUES (1, 'John Doe', '972 - ISRAEL', 'M')")
-    engine.execute("INSERT INTO hr.emp VALUES (10, 'john doe', '972 - ISRAEL', 'M')")
-    engine.execute("INSERT INTO hr.emp VALUES (12, 'steve steve', '972 - ISRAEL', 'M')")
+    engine.execute("INSERT INTO hr.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')")
+    engine.execute("INSERT INTO hr.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')")
+    engine.execute(
+        "INSERT INTO hr.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')")
 
     run_job("tests.redis_to_pg")
 
@@ -61,6 +62,8 @@ def test_redis_to_pg():
     assert second_employee["full_name"] == "John Doe"
     assert second_employee["country"] == "972 - ISRAEL"
     assert second_employee["gender"] == "M"
+    assert second_employee["address"] == "main street"
+
 
     redis_container.stop()
     postgres_container.stop()

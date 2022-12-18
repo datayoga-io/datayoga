@@ -32,6 +32,7 @@ def create_emp_table(engine: Engine, schema_name: str):
         Column("id", Integer, primary_key=True, nullable=False),
         Column("full_name", String(50)),
         Column("country", String(50)),
+        Column("address", String(50)),
         Column("gender", String(1))
     ]
     Table("emp", base.metadata, *columns, schema=schema_name)
