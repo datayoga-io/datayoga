@@ -38,9 +38,23 @@ redis = { version = "^4.3.5", optional = true}
 SQLAlchemy = { version = "^1.4.44", optional = true}
 
 [tool.poetry.extras]
-redis = ["redis"]
+cassandra = ["cassandra-driver"]
 pg = ["psycopg2-binary","SQLAlchemy"]
-test = ["mock", "pytest", "pytest-asyncio", "pytest-describe", "pytest-mock", "pytest-timeout", "requests-mock", "redis", "psycopg2-binary", "SQLAlchemy", "testcontainers"]
+redis = ["redis"]
+test = [
+        "cassandra",
+        "mock",
+        "psycopg2-binary",
+        "pytest",
+        "pytest-asyncio",
+        "pytest-describe",
+        "pytest-mock",
+        "pytest-timeout",
+        "redis",
+        "requests-mock",
+        "SQLAlchemy",
+        "testcontainers"
+]
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
