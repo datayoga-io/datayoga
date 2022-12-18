@@ -1,9 +1,0 @@
-input:
-  uses: std.read
-steps:
-  - uses: add_field
-    with:
-      field: greeting
-      expression: "'hello ' || name"
-      language: sql
-  - uses: std.write
