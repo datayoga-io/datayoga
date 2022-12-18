@@ -153,7 +153,9 @@ class Job():
         block_schemas = []
         # we traverse the json schemas directly instead of 'walk_packages'
         # to avoid importing all of the block classes
-        schema_paths = Path(os.path.dirname(os.path.realpath(blocks.__file__))).rglob("**/block.schema.json")
+        schema_paths = Path(os.path.join(utils.get_bundled_dir(), "blocks") if utils.is_bundled() else os.path.dirname(
+            os.path.realpath(blocks.__file__))).rglob("**/block.schema.json")
+
         for schema_path in schema_paths:
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
@@ -180,8 +182,9 @@ class Job():
                 })
 
         job_schema = utils.read_json(
-            os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                         "resources", "schemas", "job.schema.json"))
+            os.path.join(
+                utils.get_bundled_dir() if utils.is_bundled() else os.path.dirname(os.path.realpath(__file__)),
+                "resources", "schemas", "job.schema.json"))
         job_schema["definitions"]["block"] = {
             "type": "object",
             "oneOf": block_schemas
