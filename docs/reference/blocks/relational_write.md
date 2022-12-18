@@ -13,8 +13,8 @@ Write into a SQL-compatible data store
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.yaml<br/>|yes|
-|**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |**schema**<br/>(The table schema of the target table)|`string`|If left blank, the default schema of this connection will be used as defined in the connections.yaml<br/>|yes|
+|**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |[**keys**](#keys)<br/>(Business keys to use in case of \`load\_strategy\` is UPSERT or working with \`opcode\_field\`)|`array`||no|
 |[**mapping**](#mapping)<br/>(Fields to write)|`array`||no|
 |**opcode\_field**|`string`|Name of the field in the payload that holds the operation (c - create, d - delete, u - update) for this record in the DB<br/>|no|
