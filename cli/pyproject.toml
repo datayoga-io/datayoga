@@ -17,6 +17,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
+certifi = "^2022.12.7"
 click = "^8.0.3"
 datayoga-core = "1.*"
 jsonschema = "^4.4.0"
