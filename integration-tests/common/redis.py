@@ -1,9 +1,9 @@
+import json
 from typing import Optional
-
-from testcontainers.redis import RedisContainer
 
 import redis
 from redis import Redis
+from testcontainers.redis import RedisContainer
 
 
 def get_redis_client(host: str, port: int, password: Optional[str] = None) -> Redis:
@@ -24,3 +24,23 @@ def get_redis_client(host: str, port: int, password: Optional[str] = None) -> Re
 
 def get_redis_oss_container(redis_port: int, redis_password: Optional[str] = None) -> RedisContainer:
     return RedisContainer(password=redis_password).with_bind_ports(6379, redis_port)
+
+
+def add_to_emp_stream(redis_client: Redis):
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"_id": 1, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M", "__$$opcode": "d"})})
+
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"_id": 2, "fname": "jane", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1000-2000-3000-4000", "gender": "F", "__$$opcode": "u"})})
+
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"_id": 12, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M", "__$$opcode": "u"})})

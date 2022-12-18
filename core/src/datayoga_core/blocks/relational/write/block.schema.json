@@ -22,17 +22,17 @@
       "description": "Logical connection name as defined in the connections.yaml",
       "examples": ["europe_db", "target", "eu_dwh"]
     },
-    "table": {
-      "type": "string",
-      "title": "The target table name",
-      "description": "Target table name",
-      "examples": ["employees"]
-    },
     "schema": {
       "type": "string",
       "title": "The table schema of the target table",
       "description": "If left blank, the default schema of this connection will be used as defined in the connections.yaml",
       "examples": ["dbo"]
+    },
+    "table": {
+      "type": "string",
+      "title": "The target table name",
+      "description": "Target table name",
+      "examples": ["employees"]
     },
     "keys": {
       "type": "array",

@@ -9,3 +9,7 @@ cache:
   type: redis
   host: localhost
   port: 12554
+cassandra:
+  type: cassandra
+  hosts: ["localhost"]
+  port: 9042
