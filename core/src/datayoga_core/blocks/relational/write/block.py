@@ -5,7 +5,6 @@ import sqlalchemy as sa
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.opcode import OpCode
 from datayoga_core.result import Result
 from sqlalchemy import Table
 from sqlalchemy.dialects.postgresql import insert
@@ -71,17 +70,11 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
 
         if self.opcode_field:
-            records_by_opcode_groups = write_utils.group_records_by_opcode(data, self.opcode_field, self.keys)
+            records_to_insert, records_to_update, records_to_delete = write_utils.group_records_by_opcode(
+                data, self.opcode_field, self.keys)
 
-            for records_by_opcode in records_by_opcode_groups:
-                opcode = records_by_opcode["opcode"]
-                records: List[Dict[str, Any]] = records_by_opcode["records"]
-
-                logger.debug(f"Total {len(records)} record(s) with {opcode} opcode")
-                if opcode == OpCode.UPDATE.value:
-                    self.execute_upsert(records)
-                elif opcode == OpCode.DELETE.value:
-                    self.execute_delete(records)
+            self.execute_upsert(records_to_insert + records_to_update)
+            self.execute_delete(records_to_delete)
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.conn.execute(self.tbl.insert(), data)
@@ -89,21 +82,21 @@ class Block(DyBlock):
         return utils.produce_data_and_results(data)
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
-        logger.debug(f"Upserting {len(records)} record(s) to {self.table} table")
-        records_to_upsert = []
-        for record in records:
-            if not utils.is_rejected(record):
+        if records:
+            logger.debug(f"Upserting {len(records)} record(s) to {self.table} table")
+            records_to_upsert = []
+            for record in records:
                 records_to_upsert.append(write_utils.map_record(record, self.keys, self.mapping))
 
-        if records_to_upsert:
-            self.conn.execute(self.upsert_stmt, records_to_upsert)
+            if records_to_upsert:
+                self.conn.execute(self.upsert_stmt, records_to_upsert)
 
     def execute_delete(self, records: List[Dict[str, Any]]):
-        logger.debug(f"Deleting {len(records)} record(s) from {self.table} table")
-        records_to_delete = []
-        for record in records:
-            if not utils.is_rejected(record):
+        if records:
+            logger.debug(f"Deleting {len(records)} record(s) from {self.table} table")
+            records_to_delete = []
+            for record in records:
                 records_to_delete.append(write_utils.map_record(record, self.keys))
 
-        if records_to_delete:
-            self.conn.execute(self.delete_stmt, records_to_delete)
+            if records_to_delete:
+                self.conn.execute(self.delete_stmt, records_to_delete)

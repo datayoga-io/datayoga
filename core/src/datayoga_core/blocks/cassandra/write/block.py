@@ -7,7 +7,6 @@ from cassandra.cluster import PreparedStatement
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.opcode import OpCode
 from datayoga_core.result import Result
 
 logger = logging.getLogger("dy")
@@ -53,17 +52,9 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
 
-        records_by_opcode_groups = write_utils.group_records_by_opcode(data, self.opcode_field, self.keys)
-
-        for records_by_opcode in records_by_opcode_groups:
-            opcode = records_by_opcode["opcode"]
-            records: List[Dict[str, Any]] = records_by_opcode["records"]
-
-            logger.debug(f"Total {len(records)} record(s) with {opcode} opcode")
-            if opcode == OpCode.UPDATE.value:
-                self.execute_upsert(records)
-            elif opcode == OpCode.DELETE.value:
-                self.execute_delete(records)
+        records_to_insert, records_to_update, records_to_delete = write_utils.group_records_by_opcode(data, self.opcode_field, self.keys)
+        self.execute_upsert(records_to_insert + records_to_update)
+        self.execute_delete(records_to_delete)
 
         return utils.produce_data_and_results(data)
 
@@ -73,25 +64,25 @@ class Block(DyBlock):
         return future
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
-        logger.debug(f"Upserting {len(records)} record(s) to {self.table} table")
-        stmt = self.session.prepare(self.upsert_stmt)
-        futures = []
-        for record in records:
-            if not utils.is_rejected(record):
+        if records:
+            logger.debug(f"Upserting {len(records)} record(s) to {self.table} table")
+            stmt = self.session.prepare(self.upsert_stmt)
+            futures = []
+            for record in records:
                 record_to_upsert = write_utils.map_record(record, self.keys, self.mapping)
                 futures.append(self.get_future(stmt, record_to_upsert))
 
-        for future in futures:
-            future.result()
+            for future in futures:
+                future.result()
 
     def execute_delete(self, records: List[Dict[str, Any]]):
-        logger.debug(f"Deleting {len(records)} record(s) from {self.table} table")
-        stmt = self.session.prepare(self.delete_stmt)
-        futures = []
-        for record in records:
-            if not utils.is_rejected(record):
+        if records:
+            logger.debug(f"Deleting {len(records)} record(s) from {self.table} table")
+            stmt = self.session.prepare(self.delete_stmt)
+            futures = []
+            for record in records:
                 record_to_delete = write_utils.map_record(record, self.keys)
                 futures.append(self.get_future(stmt, record_to_delete))
 
-        for future in futures:
-            future.result()
+            for future in futures:
+                future.result()
