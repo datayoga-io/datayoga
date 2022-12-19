@@ -9,7 +9,7 @@ import yaml
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import Result, Status
 
 
 def read_json(filename: str) -> Any:
@@ -105,3 +105,11 @@ def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str,
 
 def all_success(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
     return data, [result.SUCCESS] * len(data)
+
+
+def is_rejected(record: Dict[str, Any]):
+    return record.get(Block.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
+
+
+def reject_record(reason: str, record: Dict[str, Any]):
+    record[Block.RESULT_FIELD] = Result(Status.REJECTED, reason)

@@ -44,3 +44,10 @@ def add_to_emp_stream(redis_client: Redis):
         {"message":
          json.dumps({"_id": 12, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
                      "credit_card": "1234-1234-1234-1234", "gender": "M", "__$$opcode": "u"})})
+
+    # unsupported opcode
+    redis_client.xadd(
+        "emp",
+        {"message":
+         json.dumps({"_id": 99, "fname": "john", "lname": "doe", "country_code": 972, "country_name": "israel",
+                     "credit_card": "1234-1234-1234-1234", "gender": "M", "__$$opcode": "x"})})
