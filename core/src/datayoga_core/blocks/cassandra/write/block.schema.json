@@ -1,0 +1,68 @@
+{
+  "title": "cassandra.write",
+  "description": "Write into a Cassandra data store",
+  "type": "object",
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "load_snowflake",
+      "type": "relational.write",
+      "properties": {
+        "connection": "eu_datalake",
+        "table": "employees",
+        "schema": "dbo",
+        "load_strategy": "APPEND"
+      }
+    }
+  ],
+  "properties": {
+    "connection": {
+      "type": "string",
+      "title": "The connection to use for loading",
+      "description": "Logical connection name as defined in the connections.yaml",
+      "examples": ["europe_db", "target", "eu_dwh"]
+    },
+    "keyspace": {
+      "type": "string",
+      "title": "Keyspace",
+      "description": "Keyspace",
+      "examples": ["employees"]
+    },
+    "table": {
+      "type": "string",
+      "title": "The target table name",
+      "description": "Target table name",
+      "examples": ["employees"]
+    },
+    "keys": {
+      "type": "array",
+      "title": "Business keys",
+      "items": {
+        "type": ["string", "object"],
+        "title": "name of column"
+      },
+      "examples": [["fname", { "lname": "last_name" }]]
+    },
+    "mapping": {
+      "type": "array",
+      "title": "Fields to write",
+      "items": {
+        "type": ["string", "object"],
+        "title": "name of column"
+      },
+      "examples": [["fname", { "lname": "last_name" }, "address", "gender"]]
+    },
+    "opcode_field": {
+      "type": "string",
+      "description": "Name of the field in the payload that holds the operation (c - create, d - delete, u - update) for this record in the DB"
+    }
+  },
+  "required": [
+    "connection",
+    "keyspace",
+    "table",
+    "keys",
+    "mapping",
+    "opcode_field"
+  ]
+}

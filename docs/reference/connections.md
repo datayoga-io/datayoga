@@ -27,7 +27,7 @@ SQL database
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|DB type<br/>Pattern: ^\(?\!redis$\)<br/>|yes|
+|**type**|`string`|DB type<br/>Pattern: ^\(?\!redis\|cassandra$\)<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
 |**database**|`string`|DB name<br/>|yes|
@@ -75,4 +75,45 @@ cache:
 ```
 
 
+   
+**Option 3 (optional):** 
+Cassandra
+
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**type**|`string`|DB type<br/>Enum: `"cassandra"`<br/>|yes|
+|[**hosts**](#option3hosts)|`string[]`|Cassandra hosts<br/>|yes|
+|**port**|`integer`|Cassandra DB port<br/>Default: `9042`<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
+|**database**|`string`|DB name<br/>|no|
+|**user**|`string`|DB user<br/>|no|
+|**password**|`string`|DB password<br/>|no|
+
+**Additional Properties:** not allowed  
+**Example**
+
+```yaml
+cache:
+  type: cassandra
+  hosts:
+    - localhost
+  port: 9042
+  database: myDB
+  user: myUser
+  password: myPassword
+
+```
+
+
+<a name="option3hosts"></a>
+## Option 3\]: hosts\[\]: array
+
+Cassandra hosts
+
+
+**Items: Address of Cassandra node**
+
+**Item Type:** `string`  
 
