@@ -49,7 +49,8 @@ def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str
 
 def transform(job_settings: Dict[str, Any],
               data: List[Dict[str, Any]],
-              context: Optional[Context] = None, whitelisted_blocks: Optional[List[str]] = None) -> Tuple[List[Dict[str, Any]], List[Result]]:
+              context: Optional[Context] = None,
+              whitelisted_blocks: Optional[List[str]] = None) -> Tuple[List[Dict[str, Any]], List[Result]]:
     """
     Transforms data against a certain job
 
