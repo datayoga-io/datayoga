@@ -11,9 +11,9 @@ DataYoga supports both SQL and [JMESPath](https://jmespath.org/) expressions. JM
 - Dot notation in expression represents nesting fields in the object, for example `name.first_name` refers to `{ "name": { "first_name": "John" } }`.
 - In SQL, use backticks to reference a nested column:
 
-```yaml
-expression: UPPER(`nested.field`)
-```
+  ```yaml
+  expression: UPPER(`nested.field`)
+  ```
 
 - In order to refer to a field that contains a dot in its name, escape it, for example `name\.first_name` refers to `{ "name.first_name": "John" }`.
 
