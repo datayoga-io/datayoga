@@ -93,23 +93,29 @@ def get_connection_details(connection_name: str, context: Context) -> Dict[str, 
     raise ValueError(f"{connection_name} connection not found")
 
 
-def produce_data_and_results(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+def produce_data_and_results(records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
     results: List[Result] = []
-    for record in data:
+    for record in records:
         results.append(record.get(Block.RESULT_FIELD, result.SUCCESS))
         if Block.RESULT_FIELD in record:
             del record[Block.RESULT_FIELD]
 
-    return data, results
+    return records, results
 
 
-def all_success(data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-    return data, [result.SUCCESS] * len(data)
+def all_success(records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    return records, [result.SUCCESS] * len(records)
 
 
-def is_rejected(record: Dict[str, Any]):
+def is_rejected(record: Dict[str, Any]) -> bool:
     return record.get(Block.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
 
 
 def reject_record(reason: str, record: Dict[str, Any]):
     record[Block.RESULT_FIELD] = Result(Status.REJECTED, reason)
+
+
+def reject_records(records: List[Dict[str, Any]], reason: str):
+    for record in records:
+        if not is_rejected(record):
+            reject_record(reason, record)
