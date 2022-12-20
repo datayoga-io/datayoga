@@ -69,7 +69,6 @@ class Job():
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-
         """
         Transforms data
 
@@ -114,19 +113,7 @@ class Job():
 
     @staticmethod
     def validate(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
-        # validate against the schema
-        jsonschema.validate(instance=source, schema=utils.read_json(
-            utils.get_resource_path(os.path.join("schemas", "job.schema.json"))))
-
-        # validate that steps do not use any non whitelisted blocks
-        if whitelisted_blocks is not None:
-            for step in source.get("steps"):
-                if step.get("uses") not in whitelisted_blocks:
-                    raise ValueError(f"use of invalid block type: {step.get('uses')}")
-
-        # validate each block against its schema
-        for step_definition in source.get("steps"):
-            Block.create(step_definition.get("uses"), step_definition.get("with"))
+        jsonschema.validate(instance=source, schema=Job.get_json_schema(whitelisted_blocks))
 
     @staticmethod
     def compile(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None) -> Job:
@@ -148,7 +135,7 @@ class Job():
         return Job(steps, input, source.get("error_handling"))
 
     @staticmethod
-    def get_json_schema(whitelisted_blocks: Optional[List[str]] = None) -> Dict[str,Any]:
+    def get_json_schema(whitelisted_blocks: Optional[List[str]] = None) -> Dict[str, Any]:
         # compiles a complete json schema of the job and all possible blocks
         block_schemas = []
         # we traverse the json schemas directly instead of 'walk_packages'
