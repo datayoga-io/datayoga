@@ -5,6 +5,7 @@ from os import path
 import datayoga_core as dy
 import pytest
 import yaml
+from jsonschema import ValidationError
 
 logger = logging.getLogger("dy")
 
@@ -63,5 +64,5 @@ def test_validate_invalid_job():
 
 
 def test_block_not_in_whitelisted_blocks(job_settings):
-    with pytest.raises(ValueError, match="map"):
+    with pytest.raises(ValidationError):
         dy.compile(job_settings, whitelisted_blocks=["add_field", "rename_field", "remove_field"])
