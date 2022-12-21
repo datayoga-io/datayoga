@@ -6,6 +6,10 @@ steps:
       field: full_name
       language: jmespath
       expression: concat([capitalize(fname), ' ' , capitalize(lname)])
+  - uses: filter
+    with:
+      expression: fname like 'j%'
+      language: sql
   - uses: map
     with:
       expression:

@@ -215,3 +215,8 @@ def test_jmespath_in():
 
     assert expression.search({"el": 1})
     assert not expression.search({"el": 0})
+
+def test_jmespath_nested_expression():
+    expression.compile(f"a.b")
+    assert expression.search({"a": {"b": "c"}}) == "c"
+
