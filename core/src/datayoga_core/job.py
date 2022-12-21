@@ -85,8 +85,13 @@ class Job():
         transformed_data = copy.deepcopy(data)
         results = []
         for step in self.steps:
-            transformed_data, results = asyncio.run(step.block.run(transformed_data))
-            logger.debug(transformed_data)
+            try:
+                transformed_data, results = asyncio.run(step.block.run(transformed_data))
+            except Exception as e:
+                logger.error(f"Error while transforming data: {e}")
+                utils.reject_records(data, f"{e}")
+                transformed_data, results = utils.produce_data_and_results(data)
+                break
 
         return transformed_data, results
 
