@@ -14,7 +14,7 @@ logger = logging.getLogger("dy")
 
 def generate_upsert_stmt(table: Table, business_key_columns: List[str], columns: List[str], db_type: str) -> Any:
     if db_type.lower() == "postgresql":
-        insert_stmt = insert(table).values(columns)
+        insert_stmt = insert(table).values({col: "?" for col in columns})
         return insert_stmt.on_conflict_do_update(
             index_elements=[table.columns[column] for column in business_key_columns],
             set_={col: getattr(insert_stmt.excluded, col) for col in columns})

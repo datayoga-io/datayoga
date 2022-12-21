@@ -36,7 +36,10 @@ def test_redis_to_pg():
     assert second_employee["full_name"] == "Jane Doe"
     assert second_employee["country"] == "972 - ISRAEL"
     assert second_employee["gender"] == "F"
+    # address was not in the inserted record. verify that additional columns are set to null
+    assert second_employee["address"] == None
 
+    # address is not in the record. verify an upsert operation doesn't remove it
     second_employee = pg_utils.select_one_row(engine, f"select * from {SCHEMA}.emp where id = 12")
     assert second_employee["id"] == 12
     assert second_employee["full_name"] == "John Doe"
