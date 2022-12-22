@@ -12,7 +12,7 @@ Maps a record into a new output based on expressions
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|[**expression**](#expression)|`object`|Expression<br/>|yes|
+|[**expression**](#expression)|`object`, `string`|Expression<br/>|yes|
 |**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 
 **Additional Properties:** not allowed  
@@ -32,7 +32,7 @@ language: sql
 ```
 
 <a name="expression"></a>
-## expression: object
+## expression: object,string
 
 Expression
 
