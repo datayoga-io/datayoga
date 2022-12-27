@@ -33,6 +33,7 @@ SQL database
 |**database**|`string`|DB name<br/>|yes|
 |**user**|`string`|DB user<br/>|yes|
 |**password**|`string`|DB password<br/>|no|
+|[**connect\_args**](#option1connect_args)|`object`|Additional arguments to use when connecting to the DB<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
@@ -45,6 +46,8 @@ hr:
   database: postgres
   user: postgres
   password: postgres
+  connect_args:
+    connect_timeout: 10
 
 ```
 
@@ -106,6 +109,14 @@ cache:
 
 ```
 
+
+<a name="option1connect_args"></a>
+## Option 1\]: connect\_args: object
+
+Additional arguments to use when connecting to the DB
+
+
+**No properties.**
 
 <a name="option3hosts"></a>
 ## Option 3\]: hosts\[\]: array
