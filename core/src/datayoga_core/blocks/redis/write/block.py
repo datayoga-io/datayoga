@@ -37,9 +37,11 @@ class Block(DyBlock):
             pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
 
         try:
-            pipeline.execute()
+            results = pipeline.execute(raise_on_error=False)
+            for record, result in zip(data, results):
+                if isinstance(result, Exception):
+                    utils.reject_record(f"{result}", record)
         except redis.exceptions.ConnectionError as e:
             raise ConnectionError(e)
 
-        # TODO: check the return value from the pipeline
-        return utils.all_success(data)
+        return utils.produce_data_and_results(data)
