@@ -3,6 +3,7 @@ from functools import reduce
 from typing import Any, Dict, List, Optional, Tuple
 
 import datayoga_core.blocks.redis.utils as redis_utils
+import redis
 from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.block import Result
@@ -35,7 +36,10 @@ class Block(DyBlock):
             dict_as_list = list(reduce(lambda x, y: x + y, record.items()))
             pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
 
-        pipeline.execute()
+        try:
+            pipeline.execute()
+        except redis.exceptions.ConnectionError as e:
+            raise ConnectionError(e)
 
         # TODO: check the return value from the pipeline
         return utils.all_success(data)
