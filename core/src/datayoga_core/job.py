@@ -87,7 +87,11 @@ class Job():
         for step in self.steps:
             try:
                 transformed_data, results = asyncio.run(step.block.run(transformed_data))
+            except ConnectionError as e:
+                # connection errors are thrown back to the caller to handle
+                raise e
             except Exception as e:
+                # other exceptions are rejected
                 logger.error(f"Error while transforming data: {e}")
                 utils.reject_records(data, f"{e}")
                 transformed_data, results = utils.produce_data_and_results(data)
