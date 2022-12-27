@@ -38,7 +38,7 @@ class Block(DyBlock):
                 username=connection.get("user"),
                 password=connection.get("password"),
                 database=connection.get("database")),
-            echo=False)
+            echo=False, connect_args=connection.get("connect_args", {}))
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         logger.debug(f"Connecting to {db_type}")
