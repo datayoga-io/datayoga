@@ -54,7 +54,9 @@ def map_record(record: Dict[str, Any],
     mapped_record = {}
     for item in keys + mapping:
         source = next(iter(item.values())) if isinstance(item, dict) else item
-        target = next(iter(item.keys())) if isinstance(item, dict) else item
+
+        # columns with spaces will be later used with underscores in the bind variables
+        target = (next(iter(item.keys())) if isinstance(item, dict) else item).replace(" ", "_")
         mapped_record[target] = None if source not in record else record[source]
 
     return mapped_record

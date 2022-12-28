@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Dict, List, Optional, Tuple
 
-import datayoga_core.blocks.relational.connectors as connectors
 import sqlalchemy as sa
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
@@ -42,10 +41,7 @@ class Block(DyBlock):
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         logger.debug(f"Connecting to {db_type}")
-        if db_type == DbType.PSQL.value:
-            self.connector = connectors.PostgresConnector(self.engine)
-        elif db_type == DbType.MYSQL.value:
-            self.connector = connectors.MySQLConnector(self.engine)
+        self.connector = Connector.get_connector(db_type, self.engine)
 
         if self.opcode_field:
             business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]

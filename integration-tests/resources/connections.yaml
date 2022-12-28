@@ -12,6 +12,13 @@ mysql-hr:
   database: hr
   user: my_user
   password: my_pass
+mssql-hr:
+  type: mssql
+  host: localhost
+  port: 11433
+  database: tempdb
+  user: sa
+  password: 1Secure*Password1
 cache:
   type: redis
   host: localhost

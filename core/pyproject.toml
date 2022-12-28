@@ -36,19 +36,22 @@ testcontainers = { version = "^3.7.0", optional = true }
 
 cassandra-driver = { version = "^3.25.0", optional = true }
 psycopg2-binary = { version="^2.9.5", optional = true}
-PyMySQL = { version="^1.0.2", optional = true}
-redis = { version = "^4.3.5", optional = true}
-SQLAlchemy = { version = "^1.4.44", optional = true}
+pymssql = { version="^2.2.7", optional = true }
+PyMySQL = { version="^1.0.2", optional = true }
+redis = { version = "^4.3.5", optional = true }
+SQLAlchemy = { version = "^1.4.44", optional = true }
 
 [tool.poetry.extras]
 cassandra = ["cassandra-driver"]
-mysql = ["PyMySQL"]
+mssql = ["pymssql", "SQLAlchemy"]
+mysql = ["PyMySQL", "SQLAlchemy"]
 pg = ["psycopg2-binary","SQLAlchemy"]
 redis = ["redis"]
 test = [
         "cassandra-driver",
         "mock",
         "psycopg2-binary",
+        "pymssql",
         "PyMySQL",
         "pytest",
         "pytest-asyncio",
