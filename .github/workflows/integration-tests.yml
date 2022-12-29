@@ -28,7 +28,9 @@ jobs:
       - name: Install dependencies
         run: |
           cd core
-          pip install . 
+          pip install wheel
+          CASS_DRIVER_NO_CYTHON=1 pip install cassandra-driver
+          pip install .
           pip install .[test]
 
       - name: Run tests
