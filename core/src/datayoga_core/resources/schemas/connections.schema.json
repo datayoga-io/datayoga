@@ -23,7 +23,11 @@
             },
             "database": { "description": "DB name", "type": "string" },
             "user": { "description": "DB user", "type": "string" },
-            "password": { "description": "DB password", "type": "string" }
+            "password": { "description": "DB password", "type": "string" },
+            "connect_args": {
+              "description": "Additional arguments to use when connecting to the DB",
+              "type": "object"
+            }
           },
           "additionalProperties": false,
           "required": ["type", "host", "database", "user"],
@@ -35,7 +39,8 @@
                 "port": 5432,
                 "database": "postgres",
                 "user": "postgres",
-                "password": "postgres"
+                "password": "postgres",
+                "connect_args": { "connect_timeout": 10 }
               }
             }
           ]
