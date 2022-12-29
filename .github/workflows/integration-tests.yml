@@ -28,7 +28,8 @@ jobs:
       - name: Install dependencies
         run: |
           cd core
-          pip install . 
+          pip install .
+          pip install wheel
           pip install .[test]
 
       - name: Run tests

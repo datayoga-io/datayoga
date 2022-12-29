@@ -43,7 +43,6 @@ cassandra = ["cassandra-driver"]
 pg = ["psycopg2-binary","SQLAlchemy"]
 redis = ["redis"]
 test = [
-        "wheel",
         "cassandra-driver",
         "mock",
         "psycopg2-binary",
