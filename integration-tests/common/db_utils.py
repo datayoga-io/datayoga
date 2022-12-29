@@ -6,8 +6,13 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import DbContainer
+from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
 from testcontainers.postgres import PostgresContainer
+
+
+def get_mssql_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
+    return SqlServerContainer(dbname=db_name, user=db_user, password=db_password).with_bind_ports(1433, 11433)
 
 
 def get_mysql_container(mysql_root_password: str, db_name: str, db_user: str, db_password: str) -> MySqlContainer:
@@ -47,7 +52,7 @@ def create_emp_table(engine: Engine, schema_name: str):
     base = declarative_base()
 
     columns = [
-        Column("id", Integer, primary_key=True, nullable=False),
+        Column("id", Integer, primary_key=True, nullable=False, autoincrement=False),
         Column("full_name", String(50)),
         Column("country", String(50)),
         Column("address", String(50)),
