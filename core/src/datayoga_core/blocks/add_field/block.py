@@ -22,18 +22,20 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
-        for row in data:
-            for field in self.fields:
-                obj = row
-                field_path = utils.split_field(field)
+        for field in self.fields:
+            expression_results = self.fields[field].search(data)
+            field_path = utils.split_field(field)
 
+            for i,row in enumerate(data):
+                obj = row
+                # handle nested fields. in that case, the obj points at the nested entity
                 for key in field_path[:-1]:
                     key = utils.unescape_field(key)
                     if key in obj:
                         obj = obj[key]
                     else:
                         obj[key] = {}
-
-                obj[utils.unescape_field(field_path[-1:][0])] = self.fields[field].search(row)
+                # assign the new values
+                obj[utils.unescape_field(field_path[-1:][0])] = expression_results[i]
 
         return utils.all_success(data)
