@@ -4,7 +4,7 @@ from datayoga_core.blocks.map.block import Block
 
 
 @pytest.mark.asyncio
-async def test_map_expression_jmspath():
+async def test_map_expression_jmespath():
     block = Block(properties={"language": "jmespath",
                               "expression": """{
                         "new_field": `hello`
@@ -16,7 +16,7 @@ async def test_map_expression_jmspath():
 
 
 @pytest.mark.asyncio
-async def test_map_field_multiple_expressions_jmspath():
+async def test_map_field_multiple_expressions_jmespath():
     block = Block(properties={"language": "jmespath",
                               "expression": """{
                             "new_field": `hello`, "name" : fname
@@ -28,7 +28,7 @@ async def test_map_field_multiple_expressions_jmspath():
 
 
 @pytest.mark.asyncio
-async def test_map_field_nested_expression_jmspath():
+async def test_map_field_nested_expression_jmespath():
     block = Block(properties={"language": "jmespath",
                               "expression": """{
                             "new_field": `hello`, "name" : details.fname
@@ -40,7 +40,7 @@ async def test_map_field_nested_expression_jmspath():
 
 
 @pytest.mark.asyncio
-async def test_map_field_double_nested_expression_jmspath():
+async def test_map_field_double_nested_expression_jmespath():
     block = Block(properties={"language": "jmespath",
                               "expression": """{
                             "new_field": `hello`, "name" : details.name.fname
@@ -52,7 +52,7 @@ async def test_map_field_double_nested_expression_jmspath():
 
 
 @pytest.mark.asyncio
-async def test_map_expression_non_quoted_jmspath():
+async def test_map_expression_non_quoted_jmespath():
     block = Block(properties={"language": "jmespath",
                               "expression": {
                                   "name": "fname"
@@ -64,7 +64,7 @@ async def test_map_expression_non_quoted_jmspath():
 
 
 @pytest.mark.asyncio
-async def test_map_multiple_expressions_non_quoted_jmspath():
+async def test_map_multiple_expressions_non_quoted_jmespath():
     block = Block(properties={"language": "jmespath",
                               "expression": {
                                   "name": "fname", "last name": "lname"
