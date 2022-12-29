@@ -76,3 +76,14 @@ async def test_rename_field_with_dot():
     )
     block.init()
     assert await block.run([{"name.fname": "john", "lname": "doe"}]) == ([{"name.first_name": "john", "lname": "doe"}], [result.SUCCESS])
+
+@pytest.mark.asyncio
+async def test_rename_existing_field():
+    block = Block(
+        {
+            "from_field": "fname",
+            "to_field": "lname"
+        }
+    )
+    block.init()
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([{"lname": "john"}], [result.SUCCESS])
