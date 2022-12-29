@@ -1,10 +1,17 @@
-hr:
+psql-hr:
   type: postgresql
   host: localhost
   port: 5433
   database: postgres
   user: postgres
   password: postgres
+mysql-hr:
+  type: mysql
+  host: localhost
+  port: 13306
+  database: hr
+  user: my_user
+  password: my_pass
 cache:
   type: redis
   host: localhost

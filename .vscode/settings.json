@@ -27,6 +27,7 @@
     "isort",
     "jdbc",
     "jsonschema",
+    "keyspace",
     "loglevel",
     "Pylance",
     "pylintrc",
