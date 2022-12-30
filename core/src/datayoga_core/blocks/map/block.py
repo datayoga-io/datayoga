@@ -13,7 +13,11 @@ logger = logging.getLogger("dy")
 class Block(DyBlock):
     def init(self, context: Context = None):
         logger.debug(f"Initializing {self.get_block_name()}")
-        self.expression = expression.compile(self.properties["language"], json.dumps(self.properties["expression"]))
+        expression_prop = json.dumps(
+            self.properties["expression"]) if isinstance(
+            self.properties["expression"],
+            dict) else self.properties["expression"]
+        self.expression = expression.compile(self.properties["language"], expression_prop)
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")

@@ -4,22 +4,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import sqlalchemy as sa
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
+from datayoga_core.blocks.relational.connectors import Connector, DbType
 from datayoga_core.context import Context
 from datayoga_core.result import Result
-from sqlalchemy import Table
-from sqlalchemy.dialects.postgresql import insert
 
 logger = logging.getLogger("dy")
-
-
-def generate_upsert_stmt(table: Table, business_key_columns: List[str], columns: List[str], db_type: str) -> Any:
-    if db_type.lower() == "postgresql":
-        insert_stmt = insert(table).values({col: "?" for col in columns})
-        return insert_stmt.on_conflict_do_update(
-            index_elements=[table.columns[column] for column in business_key_columns],
-            set_={col: getattr(insert_stmt.excluded, col) for col in columns})
-
-    raise ValueError(f"upsert for {db_type} is not supported yet")
 
 
 class Block(DyBlock):
@@ -28,15 +17,10 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         connection = utils.get_connection_details(self.properties.get("connection"), context)
-        db_type = connection.get("type")
-        engine_url = sa.engine.URL.create(
-            drivername=db_type,
-            host=connection.get("host"),
-            port=connection.get("port"),
-            username=connection.get("user"),
-            password=connection.get("password"),
-            database=connection.get("database")
-        )
+
+        db_type = connection.get("type").lower()
+        if not DbType.has_value(db_type):
+            raise ValueError(f"{db_type} is not supported yet")
 
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
@@ -45,8 +29,19 @@ class Block(DyBlock):
         self.keys = self.properties.get("keys")
         self.mapping = self.properties.get("mapping")
 
-        self.engine = sa.create_engine(engine_url, echo=False)
+        self.engine = sa.create_engine(
+            sa.engine.URL.create(
+                drivername=Connector.get_driver_name(db_type),
+                host=connection.get("host"),
+                port=connection.get("port"),
+                username=connection.get("user"),
+                password=connection.get("password"),
+                database=connection.get("database")),
+            echo=False, connect_args=connection.get("connect_args", {}))
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
+
+        logger.debug(f"Connecting to {db_type}")
+        self.connector = Connector.get_connector(db_type, self.engine)
 
         if self.opcode_field:
             business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
@@ -61,10 +56,7 @@ class Block(DyBlock):
             self.delete_stmt = self.tbl.delete().where(
                 sa.and_(*[(self.tbl.columns[column] == sa.bindparam(column)) for column in business_key_columns]))
 
-            self.upsert_stmt = generate_upsert_stmt(self.tbl, business_key_columns, columns, db_type)
-
-        logger.debug(f"Connecting to {db_type}")
-        self.conn = self.engine.connect()
+            self.upsert_stmt = self.connector.generate_upsert_stmt(self.tbl, business_key_columns, columns)
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
@@ -77,7 +69,7 @@ class Block(DyBlock):
             self.execute_delete(records_to_delete)
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
-            self.conn.execute(self.tbl.insert(), data)
+            self.connector.execute(self.tbl.insert(), data)
 
         return utils.produce_data_and_results(data)
 
@@ -89,7 +81,7 @@ class Block(DyBlock):
                 records_to_upsert.append(write_utils.map_record(record, self.keys, self.mapping))
 
             if records_to_upsert:
-                self.conn.execute(self.upsert_stmt, records_to_upsert)
+                self.connector.execute(self.upsert_stmt, records_to_upsert)
 
     def execute_delete(self, records: List[Dict[str, Any]]):
         if records:
@@ -99,4 +91,4 @@ class Block(DyBlock):
                 records_to_delete.append(write_utils.map_record(record, self.keys))
 
             if records_to_delete:
-                self.conn.execute(self.delete_stmt, records_to_delete)
+                self.connector.execute(self.delete_stmt, records_to_delete)

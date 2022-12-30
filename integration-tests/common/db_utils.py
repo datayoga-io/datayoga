@@ -1,5 +1,3 @@
-
-
 from typing import Optional
 
 import sqlalchemy
@@ -7,15 +5,42 @@ from sqlalchemy import Column, Integer, String, Table
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import declarative_base
+from testcontainers.core.generic import DbContainer
+from testcontainers.mssql import SqlServerContainer
+from testcontainers.mysql import MySqlContainer
 from testcontainers.postgres import PostgresContainer
 
 
-def get_postgres_container() -> PostgresContainer:
-    return PostgresContainer(dbname="postgres", user="postgres", password="postgres").with_bind_ports(5432, 5433)
+def get_mssql_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
+    return SqlServerContainer(dbname=db_name, user=db_user, password=db_password).with_bind_ports(1433, 11433)
 
 
-def get_engine(postgres_container: PostgresContainer) -> Engine:
-    return sqlalchemy.create_engine(postgres_container.get_connection_url())
+def get_mysql_container(mysql_root_password: str, db_name: str, db_user: str, db_password: str) -> MySqlContainer:
+    """Runs MySQL as docker container.
+
+    Args:
+        mysql_root_password (str): The password of the root user.
+        db_name (str): The name of the database.
+        db_user (str): The user of the database.
+        db_password (str): The password of the user.
+
+    Returns:
+        MySqlContainer: MySQL container
+    """
+    return MySqlContainer(
+        MYSQL_ROOT_PASSWORD=mysql_root_password,
+        MYSQL_DATABASE=db_name,
+        MYSQL_USER=db_user,
+        MYSQL_PASSWORD=db_password
+    ).with_bind_ports(3306, 13306)
+
+
+def get_postgres_container(db_name: str, db_user: str, db_password: str) -> PostgresContainer:
+    return PostgresContainer(dbname=db_name, user=db_user, password=db_password).with_bind_ports(5432, 5433)
+
+
+def get_engine(db_container: DbContainer) -> Engine:
+    return sqlalchemy.create_engine(db_container.get_connection_url())
 
 
 def create_schema(engine: Engine, schema_name: str):
@@ -24,12 +49,10 @@ def create_schema(engine: Engine, schema_name: str):
 
 
 def create_emp_table(engine: Engine, schema_name: str):
-    create_schema(engine, schema_name)
-
     base = declarative_base()
 
     columns = [
-        Column("id", Integer, primary_key=True, nullable=False),
+        Column("id", Integer, primary_key=True, nullable=False, autoincrement=False),
         Column("full_name", String(50)),
         Column("country", String(50)),
         Column("address", String(50)),

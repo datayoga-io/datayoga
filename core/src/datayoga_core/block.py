@@ -79,7 +79,7 @@ class Block(metaclass=ABCMeta):
             data (List[Dict[str, Any]]): Data
 
         Returns:
-            List[Dict[str, Any]]: Transformed data
+            Tuple[List[Dict[str, Any]], List[Result]]: Transformed data and results
         """
         pass
 

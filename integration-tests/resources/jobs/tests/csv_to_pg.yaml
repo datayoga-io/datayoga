@@ -21,6 +21,6 @@ steps:
       language: sql
   - uses: relational.write
     with:
-      connection: hr
+      connection: psql-hr
       schema: hr
       table: emp

@@ -66,9 +66,5 @@ def transform(job_settings: Dict[str, Any],
     job = compile(job_settings, whitelisted_blocks)
     job.init(context)
     logger.debug("Transforming data")
-    try:
-        return job.transform(data)
-    except Exception as e:
-        logger.error(f"Error while transforming data: {e}")
-        utils.reject_records(data, f"{e}")
-        return utils.produce_data_and_results(data)
+    return job.transform(data)
+

@@ -22,8 +22,8 @@ steps:
       language: sql
   - uses: relational.write
     with:
-      connection: psql-hr
-      schema: hr
+      connection: mssql-hr
+      schema: dbo
       table: emp
       opcode_field: __$$opcode
       keys:

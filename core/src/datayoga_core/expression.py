@@ -6,6 +6,7 @@ from enum import Enum, unique
 from typing import Any, Dict, List, Union
 
 import jmespath
+
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -98,18 +99,25 @@ class SQLExpression(Expression):
         # use a CTE to create the in memory data structure
         return f"with data({columns_clause}) as (values {values_clause})"
 
-    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def search(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
         try:
             fields = json.loads(self.expression)
-            new_data = {}
-            for field in fields:
-                new_data[field] = self.exec_sql(data, fields[field])
-            return new_data
+            if isinstance(data,list):
+                return self.exec_sql(data, fields)
+            else:
+                return self.exec_sql([data],fields)[0]
+
         except json.JSONDecodeError:
             # this is not a json, treat as a simple expression
-            return self.exec_sql(data, self.expression)
+            fields = {"expr":self.expression}
 
-    def exec_sql(self, data: List[Dict[str, Any]], expression: str) -> List[Dict[str, Any]]:
+            if isinstance(data,list):
+                return [x.get("expr") for x in self.exec_sql(data, fields)]
+            else:
+                return self.exec_sql([data],fields)[0].get("expr")
+
+
+    def exec_sql(self, data: List[Dict[str, Any]], expressions: Dict[str,str]) -> List[Dict[str, Any]]:
         """Executes an SQL statement
 
         Args:
@@ -126,13 +134,14 @@ class SQLExpression(Expression):
 
         # fetch the CTE and bind the variables
         data_values = [row.get(colname) for row in data_inner for colname in column_names]
-        self.conn.row_factory = sqlite3.Row
-        logger.debug(f"{cte_clause} select {expression} from data)")
-        cursor = self.conn.execute(
-            f"{cte_clause} select {expression} from data", data_values
-        )
 
-        return cursor.fetchone()[0]
+        # expressions clause
+        expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name,expression in expressions.items()])
+        self.conn.row_factory = sqlite3.Row
+        statement = f"{cte_clause} select {expressions_clause} from data"
+        logger.debug(statement)
+        cursor = self.conn.execute(statement, data_values)
+        return [dict(x) for x in cursor.fetchall()]
 
 
 class JMESPathExpression(Expression):
@@ -147,6 +156,8 @@ class JMESPathExpression(Expression):
         return self.filter_expression.search(data, options=self.options)
 
     def search(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
+        if isinstance(data,list):
+            return [self.expression.search(row, options=self.options) for row in data]
         return self.expression.search(data, options=self.options)
 
 
@@ -164,6 +175,8 @@ def compile(language: Language, expression: str) -> Expression:
         expression_class = JMESPathExpression()
     elif language == Language.SQL.value:
         expression_class = SQLExpression()
+    else:
+        raise ValueError(f"unknown expression language {language}")
 
     expression_class.compile(expression)
     return expression_class
