@@ -1,5 +1,7 @@
 import logging
 
+import pytest
+
 from common import cassandra_utils, redis_utils
 from common.utils import run_job
 
@@ -10,7 +12,9 @@ KEYSPACE = "hr"
 TABLE = f"{KEYSPACE}.emp"
 
 
-def test_redis_to_cassandra():
+@pytest.fixture(scope="module")
+def prepare_db(request):
+    # pseudo code
     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
 
@@ -27,12 +31,24 @@ def test_redis_to_cassandra():
 
     run_job("tests.redis_to_cassandra")
 
+    yield
+
+    # cleanup
+    redis_container.stop()
+    cassandra_container.stop()
+
+def test_total_records(prepare_db):
+    session = cassandra_utils.get_cassandra_session(["localhost"])
     total_employees = session.execute(f"select count(*) as total from {TABLE}").one()
     assert total_employees.total == 3
 
+def test_filtered_record(prepare_db):
+    session = cassandra_utils.get_cassandra_session(["localhost"])
     first_employee = session.execute(f"select * from {TABLE} where id = 1").one()
     assert first_employee is None
 
+def test_records(prepare_db):
+    session = cassandra_utils.get_cassandra_session(["localhost"])
     second_employee = session.execute(f"select * from {TABLE} where id = 2").one()
     assert second_employee.id == 2
     assert second_employee.full_name == "Jane Doe"
@@ -46,5 +62,3 @@ def test_redis_to_cassandra():
     assert second_employee.gender == "M"
     assert second_employee.address == "main street"
 
-    redis_container.stop()
-    cassandra_container.stop()

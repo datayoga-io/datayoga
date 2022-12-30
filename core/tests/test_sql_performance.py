@@ -25,7 +25,7 @@ def test_sql_benchmark(batchsize:int,expected_ops_per_sec:int,fields:int):
     # dummy record with 20 fields
     record = {f"field{i}":"01234567890" for i in range(fields)}
     for _ in range(cycles//batch):
-        results = expr.search([record]*batch)
+        results = expr.search_bulk([record]*batch)
 
     end = time.time()
 

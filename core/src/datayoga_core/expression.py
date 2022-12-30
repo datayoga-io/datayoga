@@ -1,6 +1,7 @@
 import json
 import logging
 import sqlite3
+from abc import abstractclassmethod, abstractmethod
 from collections.abc import MutableMapping
 from enum import Enum, unique
 from typing import Any, Dict, List, Union
@@ -37,6 +38,7 @@ def flatten(d, parent_key="", sep="_"):
 
 
 class Expression():
+    @abstractmethod
     def compile(self, expression: str):
         """Compiles an expression
 
@@ -45,8 +47,9 @@ class Expression():
         """
         pass
 
-    def search(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Executes the expression on a given data
+    @abstractmethod
+    def search(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Executes the expression on a single data entry
 
         Args:
             data (List[Dict[str, Any]]): Data
@@ -56,35 +59,48 @@ class Expression():
         """
         pass
 
-
-class SQLExpression(Expression):
-    def compile(self, expression: str):
-        # we turn off check_same_thread to gain performance benefit by reusing the same connection object. safe to use since we are only creating in memory structures
-        self.conn = sqlite3.connect(":memory:", check_same_thread=False)
-        self.expression = expression
-
-    def filter(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Tests a where clause for an SQL statement
+    @abstractmethod
+    def search_bulk(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Executes the expression in bulk on a list of data entries
 
         Args:
             data (List[Dict[str, Any]]): Data
 
         Returns:
+            List[Dict[str, Any]]: Transformed data
+        """
+        pass
+
+    def filter(self, data: List[Dict[str, Any]],tombstone:bool = False) -> List[Union[Dict[str, Any],None]]:
+        """Tests a where clause for an SQL statement
+
+        Args:
+            data (List[Dict[str, Any]]): Data
+            tombestone: if True, returns None for filtered values
+
+        Returns:
             List[Dict[str, Any]]: Filtered data
         """
-        data_inner = flatten_data(data)
-        cte_clause = self._get_cte(data_inner)
+        # filter is essentially using a single field returning 0 or 1 for the condition
+        if tombstone:
+            return [row[0] if row[1] else None for row in zip(data,self.search_bulk(data))]
+        else:
+            return [row[0] for row in zip(data,self.search_bulk(data)) if row[1]]
 
-        column_names = data_inner[0].keys()
+class SQLExpression(Expression):
+    def compile(self, expression: str):
+        # we turn off check_same_thread to gain performance benefit by reusing the same connection object. safe to use since we are only creating in memory structures
+        self.conn = sqlite3.connect(":memory:", check_same_thread=False)
+        # we support both single field expressions and multiple fields
+        self._is_single_field = True
+        try:
+            self._fields = json.loads(expression)
+            self._is_single_field = False
+        except json.JSONDecodeError:
+            # this is not a json, treat as a simple expression
+            self._fields = {"expr":expression}
 
-        # fetch the CTE and bind the variables
-        data_values = [row.get(column_name) for row in data_inner for column_name in column_names]
-        self.conn.row_factory = sqlite3.Row
 
-        cursor = self.conn.execute(
-            f"{cte_clause} select * from data where {self.expression}", data_values
-        )
-        return [dict(row) for row in cursor.fetchall()]
 
     def _get_cte(self, data: List[Any]) -> str:
         # builds a CTE expression for fetching in memory data
@@ -99,22 +115,16 @@ class SQLExpression(Expression):
         # use a CTE to create the in memory data structure
         return f"with data({columns_clause}) as (values {values_clause})"
 
-    def search(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
-        try:
-            fields = json.loads(self.expression)
-            if isinstance(data,list):
-                return self.exec_sql(data, fields)
-            else:
-                return self.exec_sql([data],fields)[0]
+    def search_bulk(self, data: List[Dict[str, Any]]) -> Any:
+        results = self.exec_sql(data, self._fields)
+        if self._is_single_field:
+            # treat as a simple expression
+            return [x.get("expr") for x in results]
+        else:
+            return results
 
-        except json.JSONDecodeError:
-            # this is not a json, treat as a simple expression
-            fields = {"expr":self.expression}
-
-            if isinstance(data,list):
-                return [x.get("expr") for x in self.exec_sql(data, fields)]
-            else:
-                return self.exec_sql([data],fields)[0].get("expr")
+    def search(self, data: Dict[str, Any]) -> Any:
+        return self.search_bulk([data])[0]
 
 
     def exec_sql(self, data: List[Dict[str, Any]], expressions: Dict[str,str]) -> List[Dict[str, Any]]:
@@ -150,15 +160,12 @@ class JMESPathExpression(Expression):
 
     def compile(self, expression: str):
         self.expression = jmespath.compile(expression)
-        self.filter_expression = jmespath.compile(f"[?{expression}]")
 
-    def filter(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
-        return self.filter_expression.search(data, options=self.options)
-
-    def search(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> Any:
-        if isinstance(data,list):
-            return [self.expression.search(row, options=self.options) for row in data]
+    def search(self, data: Dict[str, Any]) -> Any:
         return self.expression.search(data, options=self.options)
+
+    def search_bulk(self, data: List[Dict[str, Any]]) -> Any:
+        return [self.search(row) for row in data]
 
 
 def compile(language: Language, expression: str) -> Expression:

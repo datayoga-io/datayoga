@@ -33,8 +33,27 @@ async def test_filter_sql_multiple():
     ) == ([
         {"fname": "john", "lname": "doe", "age": 25},
         {"fname": "john3", "lname": "doe3", "age": 22}
-    ], [result.SUCCESS, result.SUCCESS])
+    ], [result.SUCCESS, result.FILTERED, result.SUCCESS])
 
+@pytest.mark.asyncio
+async def test_filter_jmespath_multiple():
+    block = Block(
+        {
+            "language": "jmespath",
+            "expression": "age>`20`"
+        }
+    )
+    block.init()
+    assert await block.run(
+        [
+            {"fname": "john", "lname": "doe", "age": 25},
+            {"fname": "john2", "lname": "doe2", "age": 15},
+            {"fname": "john3", "lname": "doe3", "age": 22}
+        ]
+    ) == ([
+        {"fname": "john", "lname": "doe", "age": 25},
+        {"fname": "john3", "lname": "doe3", "age": 22}
+    ], [result.SUCCESS, result.FILTERED, result.SUCCESS])
 
 @pytest.mark.asyncio
 async def test_filter_sql_not():
@@ -45,7 +64,7 @@ async def test_filter_sql_not():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe", "age": 15}]) == ([], [])
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 15}]) == ([], [result.FILTERED])
 
 
 @pytest.mark.asyncio
@@ -78,7 +97,7 @@ async def test_filter_jmespath_multiple_nested():
     ) == ([
         {"fname": "john", "lname": "doe", "age": {"years": 25, "months": 5}},
         {"fname": "john3", "lname": "doe3", "age": {"years": 22, "months": 2}}
-    ], [result.SUCCESS, result.SUCCESS])
+    ], [result.SUCCESS, result.FILTERED,result.SUCCESS])
 
 
 @pytest.mark.asyncio
@@ -90,4 +109,4 @@ async def test_filter_jmespath_not():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe", "age": 15}]) == ([], [])
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 15}]) == ([], [result.FILTERED])

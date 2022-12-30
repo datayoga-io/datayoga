@@ -16,11 +16,6 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
-        # all rows are filtered until proven otherwise
-        is_filtered = {row[Block.MSG_ID_FIELD]:True for row in data}
-        return_data = self.expression.filter(data)
+        return_data = self.expression.filter(data,tombstone=True)
         # mark filtered rows
-        is_filtered.update({row[Block.MSG_ID_FIELD]:False for row in return_data})
-        logger.warn([Result(Status.FILTERED) if filtered else Result(Status.SUCCESS) for filtered in is_filtered.values()])
-
-        return return_data,[Result(Status.FILTERED) if filtered else Result(Status.SUCCESS) for filtered in is_filtered.values()]
+        return [x for x in return_data if x is not None],[Result(Status.FILTERED) if x is None else Result(Status.SUCCESS) for x in return_data]

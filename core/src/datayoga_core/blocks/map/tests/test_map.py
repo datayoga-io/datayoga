@@ -121,3 +121,28 @@ async def test_map_nested_expression_sql():
     assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == ([
         {"name": "john"}], [result.SUCCESS]
     )
+
+@pytest.mark.asyncio
+async def test_map_malformed():
+    block = Block(properties={"language": "sql",
+                              "expression": "{name: (`details.fname`) "})
+    with pytest.raises(ValueError):
+        block.init()
+
+@pytest.mark.asyncio
+async def test_jmespath_does_not_filter_in_map():
+    block = Block(properties={"language": "jmespath",
+                              "expression": "{name: a} "})
+    block.init()
+    assert await block.run([{"a":"one"},{"b":"two"}])== ([
+        {"name":"one"},
+        {"name":None}
+    ], [result.SUCCESS,result.SUCCESS])
+
+@pytest.mark.asyncio
+async def test_map_malformed_sql():
+    block = Block(properties={"language": "sql",
+                              "expression": "{name: (`details.fname`) "})
+    with pytest.raises(ValueError):
+        block.init()
+        await block.run([{"details": {"fname": "john", "lname": "doe"}}])

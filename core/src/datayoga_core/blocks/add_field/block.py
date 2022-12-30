@@ -23,7 +23,7 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
         for field in self.fields:
-            expression_results = self.fields[field].search(data)
+            expression_results = self.fields[field].search_bulk(data)
             field_path = utils.split_field(field)
 
             for i,row in enumerate(data):
