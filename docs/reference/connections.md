@@ -35,7 +35,7 @@ SQL database
 |**user**|`string`|DB user<br/>|yes|
 |**password**|`string`|DB password<br/>|no|
 |[**connect\_args**](#option1connect_args)|`object`|Additional arguments to use when connecting to the DB<br/>|no|
-|**debug**|`boolean`|Debug mode<br/>Default: `false`<br/>|no|
+|**debug**<br/>(Debug mode)|`boolean`|Echo all SQL commands to stdout<br/>Default: `false`<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
