@@ -106,14 +106,9 @@ class Block(DyBlock):
         if self.db_type == DbType.MYSQL.value:
             from sqlalchemy.dialects.mysql import insert
 
-            insert_stmt = insert(self.table).values({col: "?" for col in self.columns})
-            return insert_stmt.on_duplicate_key_update(
-                ColumnCollection(
-                    columns=[(x.name, x)
-                             for x
-                             in
-                             [insert_stmt.inserted[column]
-                              for column in self.columns]]))
+            insert_stmt = insert(self.tbl).values({col: "?" for col in self.columns})
+            return insert_stmt.on_duplicate_key_update(ColumnCollection(
+                columns=[(x.name, x) for x in [insert_stmt.inserted[column] for column in self.columns]]))
 
         if self.db_type == DbType.MSSQL.value:
             return sa.sql.text("""
