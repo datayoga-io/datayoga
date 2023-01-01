@@ -30,7 +30,8 @@
               "type": "object"
             },
             "debug": {
-              "description": "Debug mode",
+              "title": "Debug mode",
+              "description": "Echo all SQL commands to stdout",
               "type": "boolean",
               "default": false
             }

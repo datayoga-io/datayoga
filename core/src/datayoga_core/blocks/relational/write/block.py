@@ -26,9 +26,10 @@ class DbType(Enum):
         return value in cls._value2member_map_
 
 
-DRIVERS = {
+DEFAULT_DRIVERS = {
     DbType.MYSQL.value: "mysql+pymysql",
-    DbType.MSSQL.value: "mssql+pymssql"
+    DbType.MSSQL.value: "mssql+pymssql",
+    DbType.PSQL.value: "postgresql"
 }
 
 class Block(DyBlock):
@@ -51,7 +52,7 @@ class Block(DyBlock):
 
         engine = sa.create_engine(
             sa.engine.URL.create(
-                drivername=connection.get("driver", DRIVERS.get(self.db_type, self.db_type)),
+                drivername=connection.get("driver", DEFAULT_DRIVERS.get(self.db_type)),
                 host=connection.get("host"),
                 port=connection.get("port"),
                 username=connection.get("user"),
@@ -95,6 +96,7 @@ class Block(DyBlock):
         return utils.produce_data_and_results(data)
 
     def generate_upsert_stmt(self) -> Any:
+        """Generates an UPSERT statement based on the DB type"""
         if self.db_type == DbType.PSQL.value:
             from sqlalchemy.dialects.postgresql import insert
 
