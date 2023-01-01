@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
@@ -11,7 +11,7 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyBlock):
-    def init(self, context: Context = None):
+    def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         expression_prop = json.dumps(
             self.properties["expression"]) if isinstance(
