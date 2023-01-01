@@ -12,3 +12,4 @@ class Result():
 
 
 SUCCESS = Result(Status.SUCCESS)
+FILTERED = Result(Status.FILTERED)

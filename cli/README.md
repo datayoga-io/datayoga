@@ -31,3 +31,14 @@ python -m pip install -e .
 ```bash
 python ./cli/src/datayoga/__main__.py
 ```
+
+## Running tests
+
+### Core
+
+```
+cd core
+pip install .
+pip install .[test]
+PYTHONPATH=src python -m pytest -s --log-cli-level=DEBUG
+```

@@ -8,10 +8,11 @@ from abc import ABCMeta, abstractmethod
 from os import path
 from typing import Any, Dict, List, Optional, Tuple
 
+from jsonschema import validate
+
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.result import Result
-from jsonschema import validate
 
 logger = logging.getLogger("dy")
 
@@ -20,6 +21,7 @@ class Block(metaclass=ABCMeta):
     INTERNAL_FIELD_PREFIX = "__$$"
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
     RESULT_FIELD = f"{INTERNAL_FIELD_PREFIX}result"
+    OPCODE_FIELD = f"{INTERNAL_FIELD_PREFIX}opcode"
     """
     Block
 

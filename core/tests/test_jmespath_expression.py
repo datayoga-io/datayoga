@@ -220,3 +220,21 @@ def test_jmespath_nested_expression():
     expression.compile("a.b")
     assert expression.search({"a": {"b": "c"}}) == "c"
 
+def test_jmespath_filter():
+    expression.compile("fname==`a`")
+    assert expression.filter(
+        [{"fname": "a", "id": 1},
+         {"fname": "b", "id": 2},
+         {"fname": "a", "id": 3}]) == [
+        {"fname": "a", "id": 1},
+        {"fname": "a", "id": 3}]
+
+def test_jmespath_filter_tombstone():
+    expression.compile("fname==`a`")
+    assert expression.filter(
+        [{"fname": "a", "id": 1},
+         {"fname": "b", "id": 2},
+         {"fname": "a", "id": 3}],tombstone=True) == [
+        {"fname": "a", "id": 1},
+        None,
+        {"fname": "a", "id": 3}]
