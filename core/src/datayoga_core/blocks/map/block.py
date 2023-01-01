@@ -17,19 +17,22 @@ class Block(DyBlock):
             self.properties["expression"]) if isinstance(
             self.properties["expression"],
             dict) else self.properties["expression"]
+        # the expression is now a string (jmespath expressions are not valid JSON)
+        expression_prop = expression_prop.strip()
+        if not (expression_prop.startswith("{") and expression_prop.endswith("}")):
+            raise ValueError("map expression must be in a json-like format enclosed in { }")
         self.expression = expression.compile(self.properties["language"], expression_prop)
 
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         logger.debug(f"Running {self.get_block_name()}")
-        return_data = []
-        for row in data:
-            mapped_row = self.expression.search(row)
+        mapped_rows = self.expression.search_bulk(data)
+        # we always add the internal fields back, in case they were dropped in the map operation
+        for mapped_row,original_row in zip(mapped_rows,data):
+            original_msg_id= original_row.get(Block.MSG_ID_FIELD)
+            original_opcode= original_row.get(Block.OPCODE_FIELD)
+            if original_msg_id is not None:
+                mapped_row[Block.MSG_ID_FIELD] = original_msg_id
+            if original_opcode is not None:
+                mapped_row[Block.OPCODE_FIELD] = original_opcode
 
-            # we always add the internal fields back
-            internal_fields = [(k, v) for (k, v) in row.items() if k.startswith(Block.INTERNAL_FIELD_PREFIX)]
-            for (key, value) in internal_fields:
-                mapped_row[key] = value
-
-            return_data.append(mapped_row)
-
-        return utils.all_success(return_data)
+        return utils.all_success(mapped_rows)

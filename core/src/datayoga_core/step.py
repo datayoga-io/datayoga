@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from concurrent.futures import process
 from typing import Any, Callable, Dict, List, Optional
 
 from datayoga_core.block import Block
@@ -52,7 +53,6 @@ class Step():
         if not self.initialized:
             await self.start_pool()
             self.initialized = True
-
         self.active_entries.update([x[Block.MSG_ID_FIELD] for x in messages])
         await self.queue.put(messages)
 
@@ -63,15 +63,21 @@ class Step():
             try:
                 processed_entries, results = await self.block.run(entry)
 
-                # TODO: handle filtered. anything not processed or rejected
-                # check if we have a next step
-                if self.next_step:
-                    # process downstream
-                    await self.next_step.process(processed_entries)
-                else:
-                    # we are a last channel, propagate the ack upstream
-                    # TODO: verify that all entries have a msg id otherwise raise consistency error
-                    self.done([x[Block.MSG_ID_FIELD] for x in processed_entries], results)
+                # handle filtered. anything not processed or rejected
+                filtered_entries = [payload_with_result[0][Block.MSG_ID_FIELD] for payload_with_result in zip(entry,results) if payload_with_result[1].status == Status.FILTERED]
+                logger.debug(f"filtered entries: {filtered_entries}, processed entries: {processed_entries}")
+                if len(filtered_entries) > 0:
+                    # ack the filtered entries
+                    self.done(filtered_entries, [Result(Status.FILTERED)] * len(filtered_entries))
+                if len(processed_entries) > 0:
+                    # check if we have a next step
+                    if self.next_step:
+                        # process downstream
+                        await self.next_step.process(processed_entries)
+                    else:
+                        # we are a last channel, propagate the ack upstream
+                        # TODO: verify that all entries have a msg id otherwise raise consistency error
+                        self.done([x[Block.MSG_ID_FIELD] for x in processed_entries], results)
 
             except Exception as e:
                 # we caught an exception. the entire batch is considered rejected
@@ -93,6 +99,7 @@ class Step():
     async def join(self):
         # wait for all active entries to be processed
         while len(self.active_entries) > 0:
+            logger.debug(f"{self.id} waiting for dangling messages: {self.active_entries}")
             await asyncio.sleep(0.2)
 
     async def stop(self):
