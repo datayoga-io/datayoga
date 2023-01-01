@@ -18,4 +18,4 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
         return_data = self.expression.filter(data,tombstone=True)
         # mark filtered rows
-        return [x for x in return_data if x is not None],[Result(Status.FILTERED) if x is None else Result(Status.SUCCESS) for x in return_data]
+        return [x for x in return_data if x is not None], [Result(Status.FILTERED) if x is None else Result(Status.SUCCESS) for x in return_data]

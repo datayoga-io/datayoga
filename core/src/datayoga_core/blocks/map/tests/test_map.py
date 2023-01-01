@@ -121,7 +121,7 @@ async def test_map_nested_expression_sql():
     assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == ([
         {"name": "john"}], [result.SUCCESS]
     )
-
+cd ..
 @pytest.mark.asyncio
 async def test_map_malformed():
     block = Block(properties={"language": "sql",

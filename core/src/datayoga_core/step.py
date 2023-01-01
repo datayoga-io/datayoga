@@ -53,7 +53,6 @@ class Step():
         if not self.initialized:
             await self.start_pool()
             self.initialized = True
-        logger.warning(f"got {messages}")
         self.active_entries.update([x[Block.MSG_ID_FIELD] for x in messages])
         await self.queue.put(messages)
 
@@ -66,11 +65,11 @@ class Step():
 
                 # handle filtered. anything not processed or rejected
                 filtered_entries = [payload_with_result[0][Block.MSG_ID_FIELD] for payload_with_result in zip(entry,results) if payload_with_result[1].status == Status.FILTERED]
-                logger.debug(f"filtered entries : {filtered_entries} processed entries: {processed_entries}")
-                if len(filtered_entries)>0:
+                logger.debug(f"filtered entries: {filtered_entries}, processed entries: {processed_entries}")
+                if len(filtered_entries) > 0:
                     # ack the filtered entries
                     self.done(filtered_entries, [Result(Status.FILTERED)] * len(filtered_entries))
-                if len(processed_entries)>0:
+                if len(processed_entries) > 0:
                     # check if we have a next step
                     if self.next_step:
                         # process downstream

@@ -1,7 +1,6 @@
 import logging
 import time
 
-import datayoga_core as dy
 import pytest
 from datayoga_core import expression
 

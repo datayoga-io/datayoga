@@ -26,7 +26,7 @@ class Block(DyBlock):
             expression_results = self.fields[field].search_bulk(data)
             field_path = utils.split_field(field)
 
-            for i,row in enumerate(data):
+            for i, row in enumerate(data):
                 obj = row
                 # handle nested fields. in that case, the obj points at the nested entity
                 for key in field_path[:-1]:

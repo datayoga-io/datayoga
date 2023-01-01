@@ -127,7 +127,7 @@ class SQLExpression(Expression):
         return self.search_bulk([data])[0]
 
 
-    def exec_sql(self, data: List[Dict[str, Any]], expressions: Dict[str,str]) -> List[Dict[str, Any]]:
+    def exec_sql(self, data: List[Dict[str, Any]], expressions: Dict[str, str]) -> List[Dict[str, Any]]:
         """Executes an SQL statement
 
         Args:

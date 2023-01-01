@@ -13,7 +13,7 @@ TABLE = f"{KEYSPACE}.emp"
 
 
 @pytest.fixture(scope="module")
-def prepare_db(request):
+def prepare_db():
     # pseudo code
     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
