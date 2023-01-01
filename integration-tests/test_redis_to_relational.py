@@ -22,7 +22,6 @@ def test_redis_to_mysql():
     mysql_container.start()
 
     engine = db_utils.get_engine(mysql_container)
-    logger.warning(f"engine: {engine}")
     db_utils.create_emp_table(engine, schema)
     db_utils.insert_to_emp_table(engine, schema)
 
