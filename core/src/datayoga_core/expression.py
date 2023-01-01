@@ -1,13 +1,12 @@
 import json
 import logging
 import sqlite3
-from abc import abstractclassmethod, abstractmethod
+from abc import abstractmethod
 from collections.abc import MutableMapping
 from enum import Enum, unique
 from typing import Any, Dict, List, Union
 
 import jmespath
-
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -45,7 +44,7 @@ class Expression():
         Args:
             expression (str): expression
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def search(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -57,7 +56,7 @@ class Expression():
         Returns:
             List[Dict[str, Any]]: Transformed data
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def search_bulk(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -69,9 +68,9 @@ class Expression():
         Returns:
             List[Dict[str, Any]]: Transformed data
         """
-        pass
+        raise NotImplementedError
 
-    def filter(self, data: List[Dict[str, Any]],tombstone:bool = False) -> List[Union[Dict[str, Any],None]]:
+    def filter(self, data: List[Dict[str, Any]], tombstone: bool = False) -> List[Union[Dict[str, Any], None]]:
         """Tests a where clause for an SQL statement
 
         Args:
@@ -89,7 +88,8 @@ class Expression():
 
 class SQLExpression(Expression):
     def compile(self, expression: str):
-        # we turn off check_same_thread to gain performance benefit by reusing the same connection object. safe to use since we are only creating in memory structures
+        # we turn off `check_same_thread` to gain performance benefit by reusing the same connection object
+        # safe to use since we are only creating in memory structures
         self.conn = sqlite3.connect(":memory:", check_same_thread=False)
         # we support both single field expressions and multiple fields
         self._is_single_field = True
@@ -98,13 +98,10 @@ class SQLExpression(Expression):
             self._is_single_field = False
         except json.JSONDecodeError:
             # this is not a json, treat as a simple expression
-            self._fields = {"expr":expression}
-
-
+            self._fields = {"expr": expression}
 
     def _get_cte(self, data: List[Any]) -> str:
         # builds a CTE expression for fetching in memory data
-
         column_names = data[0].keys()
         columns_clause = ','.join(f"`{col}`" for col in column_names)
 
@@ -126,12 +123,12 @@ class SQLExpression(Expression):
     def search(self, data: Dict[str, Any]) -> Any:
         return self.search_bulk([data])[0]
 
-
     def exec_sql(self, data: List[Dict[str, Any]], expressions: Dict[str, str]) -> List[Dict[str, Any]]:
         """Executes an SQL statement
 
         Args:
             data (List[Dict[str, Any]]): Data
+            expressions: Dict[str, str]: Expressions
 
         Returns:
             List[Dict[str, Any]]: Query result
