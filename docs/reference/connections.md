@@ -30,10 +30,12 @@ SQL database
 |**type**|`string`|DB type<br/>Enum: `"mssql"`, `"mysql"`, `"postgresql"`<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
+|**driver**|`string`|Driver<br/>|no|
 |**database**|`string`|DB name<br/>|yes|
 |**user**|`string`|DB user<br/>|yes|
 |**password**|`string`|DB password<br/>|no|
 |[**connect\_args**](#option1connect_args)|`object`|Additional arguments to use when connecting to the DB<br/>|no|
+|**debug**|`boolean`|Debug mode<br/>Default: `false`<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
