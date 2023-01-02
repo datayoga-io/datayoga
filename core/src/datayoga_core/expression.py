@@ -1,12 +1,13 @@
 import json
 import logging
-import sqlite3
 from abc import abstractmethod
 from collections.abc import MutableMapping
 from enum import Enum, unique
 from typing import Any, Dict, List, Union
 
 import jmespath
+import pysqlite3
+
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -90,7 +91,7 @@ class SQLExpression(Expression):
     def compile(self, expression: str):
         # we turn off `check_same_thread` to gain performance benefit by reusing the same connection object
         # safe to use since we are only creating in memory structures
-        self.conn = sqlite3.connect(":memory:", check_same_thread=False)
+        self.conn = pysqlite3.connect(":memory:", check_same_thread=False)
         # we support both single field expressions and multiple fields
         self._is_single_field = True
         try:
@@ -144,7 +145,7 @@ class SQLExpression(Expression):
 
         # expressions clause
         expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name,expression in expressions.items()])
-        self.conn.row_factory = sqlite3.Row
+        self.conn.row_factory = pysqlite3.Row
         statement = f"{cte_clause} select {expressions_clause} from data"
         logger.debug(statement)
         cursor = self.conn.execute(statement, data_values)
