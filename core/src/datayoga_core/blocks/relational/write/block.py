@@ -64,6 +64,10 @@ class Block(DyBlock):
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = engine.connect()
 
+        if self.db_type == DbType.MSSQL.value:
+            # MERGE statement requires this
+            self.connection = self.connection.execution_options(autocommit=True)
+
         if self.opcode_field:
             self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
             self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
