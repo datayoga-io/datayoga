@@ -1,10 +1,10 @@
 import logging
-from enum import Enum, unique
 from typing import Any, Dict, List, Optional, Tuple
 
 import sqlalchemy as sa
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
+from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
 from datayoga_core.result import Result
 from sqlalchemy import Table
@@ -15,23 +15,6 @@ from sqlalchemy.sql.expression import ColumnCollection
 logger = logging.getLogger("dy")
 
 
-@unique
-class DbType(Enum):
-    MSSQL = "mssql"
-    MYSQL = "mysql"
-    PSQL = "postgresql"
-
-    @classmethod
-    def has_value(cls, value: str) -> bool:
-        return value in cls._value2member_map_
-
-
-DEFAULT_DRIVERS = {
-    DbType.MYSQL.value: "mysql+pymysql",
-    DbType.MSSQL.value: "mssql+pymssql",
-    DbType.PSQL.value: "postgresql"
-}
-
 class Block(DyBlock):
 
     def init(self, context: Optional[Context] = None):
@@ -40,7 +23,7 @@ class Block(DyBlock):
         connection = utils.get_connection_details(self.properties.get("connection"), context)
 
         self.db_type = connection.get("type").lower()
-        if not DbType.has_value(self.db_type):
+        if not relational_utils.DbType.has_value(self.db_type):
             raise ValueError(f"{self.db_type} is not supported yet")
 
         self.schema = self.properties.get("schema")
@@ -52,7 +35,7 @@ class Block(DyBlock):
 
         engine = sa.create_engine(
             sa.engine.URL.create(
-                drivername=connection.get("driver", DEFAULT_DRIVERS.get(self.db_type)),
+                drivername=connection.get("driver", relational_utils.DEFAULT_DRIVERS.get(self.db_type)),
                 host=connection.get("host"),
                 port=connection.get("port"),
                 username=connection.get("user"),
@@ -64,7 +47,7 @@ class Block(DyBlock):
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = engine.connect()
 
-        if self.db_type == DbType.MSSQL.value:
+        if self.db_type == relational_utils.DbType.MSSQL.value:
             # MERGE statement requires this
             self.connection = self.connection.execution_options(autocommit=True)
 
@@ -101,7 +84,7 @@ class Block(DyBlock):
 
     def generate_upsert_stmt(self) -> Any:
         """Generates an UPSERT statement based on the DB type"""
-        if self.db_type == DbType.PSQL.value:
+        if self.db_type == relational_utils.DbType.PSQL.value:
             from sqlalchemy.dialects.postgresql import insert
 
             insert_stmt = insert(self.tbl).values({col: "?" for col in self.columns})
@@ -109,14 +92,14 @@ class Block(DyBlock):
                 index_elements=self.business_key_columns,
                 set_={col: getattr(insert_stmt.excluded, col) for col in self.columns})
 
-        if self.db_type == DbType.MYSQL.value:
+        if self.db_type == relational_utils.DbType.MYSQL.value:
             from sqlalchemy.dialects.mysql import insert
 
             insert_stmt = insert(self.tbl).values({col: "?" for col in self.columns})
             return insert_stmt.on_duplicate_key_update(ColumnCollection(
                 columns=[(x.name, x) for x in [insert_stmt.inserted[column] for column in self.columns]]))
 
-        if self.db_type == DbType.MSSQL.value:
+        if self.db_type == relational_utils.DbType.MSSQL.value:
             return sa.sql.text("""
                     MERGE %s AS target
                     USING (VALUES (%s)) AS source (%s) ON (%s)

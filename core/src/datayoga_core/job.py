@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import copy
-import json
 import logging
 import os
 import sys
@@ -11,11 +10,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import jsonschema
+
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
 from datayoga_core.result import Result, Status
 from datayoga_core.step import Step
+from datayoga_core.step_buffer import StepBuffer
 
 logger = logging.getLogger("dy")
 
@@ -47,11 +48,12 @@ class Job():
         self.steps = steps
         self.error_handling = error_handling if error_handling else ErrorHandling.IGNORE
         self.initialized = False
+        self.root = None
 
     def init(self, context: Optional[Context] = None):
         # open any connections or setup needed
         self.context = context
-        self.root = None
+
         for step in self.steps:
             step.init(context)
 

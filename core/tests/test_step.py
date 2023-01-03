@@ -7,6 +7,7 @@ from datayoga_core import result, utils
 from datayoga_core.block import Block
 from datayoga_core.result import Result, Status
 from datayoga_core.step import Step
+from datayoga_core.step_buffer import StepBuffer
 
 logger = logging.getLogger("dy")
 
@@ -135,3 +136,49 @@ async def test_acks_exception():
     await root.stop()
     assert producer_mock.ack.call_args_list == [mock.call.ack(
         [i[Block.MSG_ID_FIELD]], [Result(Status.REJECTED, "Error in step A: ValueError()")]) for i in messages]
+
+@pytest.mark.asyncio
+async def test_step_buffer_by_size():
+    results_block = mock.Mock(wraps=EchoBlock())
+    root = StepBuffer("BUFFER",min_buffer_size=4,flush_ms=100000)
+    root | Step("A", results_block, concurrency=1)
+    messages = [
+        {Block.MSG_ID_FIELD: "message1", "value": True},
+        {Block.MSG_ID_FIELD: "message2", "value": True},
+        {Block.MSG_ID_FIELD: "message3", "value": True},
+        {Block.MSG_ID_FIELD: "message4", "value": True},
+    ]
+    producer_mock = mock.MagicMock()
+    root.add_done_callback(producer_mock.ack)
+    for message in messages:
+        await root.process([message])
+    await root.stop()
+    producer_mock.assert_has_calls([
+        mock.call.ack(
+            [i[Block.MSG_ID_FIELD]  for i in messages],
+            [result.SUCCESS for i in messages]
+        )
+    ])
+
+@pytest.mark.asyncio
+async def test_step_buffer_by_timeout():
+    results_block = mock.Mock(wraps=EchoBlock())
+    root = StepBuffer("BUFFER",min_buffer_size=4,flush_ms=500)
+    root | Step("A", results_block, concurrency=1)
+    messages = [
+        {Block.MSG_ID_FIELD: "message1", "value": True},
+        {Block.MSG_ID_FIELD: "message2", "value": True},
+        {Block.MSG_ID_FIELD: "message3", "value": True},
+    ]
+    producer_mock = mock.MagicMock()
+    root.add_done_callback(producer_mock.ack)
+    for message in messages:
+        await root.process([message])
+    await asyncio.sleep(0.5)
+    await root.stop()
+    producer_mock.assert_has_calls([
+        mock.call.ack(
+            [i[Block.MSG_ID_FIELD]  for i in messages],
+            [result.SUCCESS for i in messages]
+        )
+    ])

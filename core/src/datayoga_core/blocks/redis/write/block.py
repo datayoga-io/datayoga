@@ -33,7 +33,8 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         pipeline = self.redis_client.pipeline()
         for record in data:
-            dict_as_list = list(reduce(lambda x, y: x + y, record.items()))
+            # transform to a list, filtering it out None, which Redis does not support
+            dict_as_list = sum(filter(lambda i: i[1] is not None and i[0] != Block.MSG_ID_FIELD,record.items()),())
             pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
 
         try:

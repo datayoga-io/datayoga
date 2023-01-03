@@ -15,6 +15,16 @@
       "program": "${workspaceFolder}/cli/src/datayoga/__main__.py",
       "args": ["run", "sample.hello", "--dir", "/path/to/datayoga-dir"],
       "justMyCode": false
+    },
+    {
+      "name": "Python Debug: current",
+      "type": "python",
+      "request": "launch",
+      "env": {
+        "PYTHONDEVMODE": "1"
+      },
+      "program": "${workspaceFolder}/core/tests/tmp_test.py",
+      "justMyCode": false
     }
   ]
 }
