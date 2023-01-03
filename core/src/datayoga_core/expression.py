@@ -1,12 +1,12 @@
 import json
 import logging
+import sqlite3
 from abc import abstractmethod
 from collections.abc import MutableMapping
 from enum import Enum, unique
 from typing import Any, Dict, List, Union
 
 import jmespath
-import pysqlite3
 
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
@@ -91,7 +91,7 @@ class SQLExpression(Expression):
     def compile(self, expression: str):
         # we turn off `check_same_thread` to gain performance benefit by reusing the same connection object
         # safe to use since we are only creating in memory structures
-        self.conn = pysqlite3.connect(":memory:", check_same_thread=False)
+        self.conn = sqlite3.connect(":memory:", check_same_thread=False)
         # we support both single field expressions and multiple fields
         self._is_single_field = True
         try:
@@ -101,17 +101,6 @@ class SQLExpression(Expression):
             # this is not a json, treat as a simple expression
             self._fields = {"expr": expression}
 
-    def _get_cte(self, data: List[Any]) -> str:
-        # builds a CTE expression for fetching in memory data
-        column_names = data[0].keys()
-        columns_clause = ','.join(f"`{col}`" for col in column_names)
-
-        # values in the form of (?,?), (?,?)
-        values_clause_row = f"({','.join('?'*len(column_names))})"
-        values_clause = ','.join([values_clause_row]*len(data))
-
-        # use a CTE to create the in memory data structure
-        return f"with data({columns_clause}) as (values {values_clause})"
 
     def search_bulk(self, data: List[Dict[str, Any]]) -> Any:
         results = self.exec_sql(data, self._fields)
@@ -136,17 +125,25 @@ class SQLExpression(Expression):
         """
         # use a CTE to create the in memory data structure
         data_inner = flatten_data(data)
-        cte_clause = self._get_cte(data_inner)
-
+        # builds a CTE expression for fetching in memory data
         column_names = data_inner[0].keys()
+        columns_clause = ','.join(f"[column{i+1}] as `{col}`" for i,col in enumerate(column_names))
 
-        # fetch the CTE and bind the variables
+        # values in the form of (?,?), (?,?)
+        values_clause_row = f"({','.join('?'*len(column_names))})"
+        values_clause = ','.join([values_clause_row]*len(data_inner))
+
+        subselect = f"select {columns_clause} from (values {values_clause})"
+
+        # bind the variables
         data_values = [row.get(colname) for row in data_inner for colname in column_names]
 
         # expressions clause
         expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name,expression in expressions.items()])
-        self.conn.row_factory = pysqlite3.Row
-        statement = f"{cte_clause} select {expressions_clause} from data"
+        self.conn.row_factory = sqlite3.Row
+        # we revert to not using a real CTE because of compatibility with older SQLlite versions on Centos7
+        statement = f"select {expressions_clause} from ({subselect})"
+
         logger.debug(statement)
         cursor = self.conn.execute(statement, data_values)
         return [dict(x) for x in cursor.fetchall()]

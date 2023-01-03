@@ -9,8 +9,10 @@ import sys
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from xmlrpc.client import boolean
 
 import jsonschema
+
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -68,12 +70,13 @@ class Job():
         self.root.add_done_callback(self.handle_results)
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    def transform(self, data: List[Dict[str, Any]],deepcopy:boolean=True) -> Tuple[List[Dict[str, Any]], List[Result]]:
         """
         Transforms data
 
         Args:
             data (List[Dict[str, Any]]): Data
+            deepcopy: if True, performs a deepcopy before modifying records. otherwise, modifies in place. can affect performance.
 
         Returns:
             Tuple[List[Dict[str, Any]], List[Result]]: Transformed data and results
@@ -82,7 +85,11 @@ class Job():
             logger.debug("job has not been initialized yet, initializing...")
             self.init()
 
-        transformed_data = copy.deepcopy(data)
+        if deepcopy:
+            transformed_data = copy.deepcopy(data)
+        else:
+            transformed_data = data
+
         results = []
         for step in self.steps:
             try:
