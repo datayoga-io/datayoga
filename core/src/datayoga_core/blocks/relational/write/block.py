@@ -7,7 +7,6 @@ from datayoga_core.block import Block as DyBlock
 from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
 from datayoga_core.result import Result
-from sqlalchemy import Table
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import ColumnCollection
@@ -20,12 +19,9 @@ class Block(DyBlock):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection = utils.get_connection_details(self.properties.get("connection"), context)
+        engine, db_type = relational_utils.get_engine(self.properties.get("connection"), context)
 
-        self.db_type = connection.get("type").lower()
-        if not relational_utils.DbType.has_value(self.db_type):
-            raise ValueError(f"{self.db_type} is not supported yet")
-
+        self.db_type = db_type
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
         self.opcode_field = self.properties.get("opcode_field")
@@ -33,21 +29,12 @@ class Block(DyBlock):
         self.keys = self.properties.get("keys")
         self.mapping = self.properties.get("mapping")
 
-        engine = sa.create_engine(
-            sa.engine.URL.create(
-                drivername=connection.get("driver", relational_utils.DEFAULT_DRIVERS.get(self.db_type)),
-                host=connection.get("host"),
-                port=connection.get("port"),
-                username=connection.get("user"),
-                password=connection.get("password"),
-                database=connection.get("database")),
-            echo=connection.get("debug", False), connect_args=connection.get("connect_args", {}))
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
 
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = engine.connect()
 
-        if self.db_type == relational_utils.DbType.MSSQL.value:
+        if self.db_type == relational_utils.DbType.MSSQL:
             # MERGE statement requires this
             self.connection = self.connection.execution_options(autocommit=True)
 
@@ -92,14 +79,14 @@ class Block(DyBlock):
                 index_elements=self.business_key_columns,
                 set_={col: getattr(insert_stmt.excluded, col) for col in self.columns})
 
-        if self.db_type == relational_utils.DbType.MYSQL.value:
+        if self.db_type == relational_utils.DbType.MYSQL:
             from sqlalchemy.dialects.mysql import insert
 
             insert_stmt = insert(self.tbl).values({col: "?" for col in self.columns})
             return insert_stmt.on_duplicate_key_update(ColumnCollection(
                 columns=[(x.name, x) for x in [insert_stmt.inserted[column] for column in self.columns]]))
 
-        if self.db_type == relational_utils.DbType.MSSQL.value:
+        if self.db_type == relational_utils.DbType.MSSQL:
             return sa.sql.text("""
                     MERGE %s AS target
                     USING (VALUES (%s)) AS source (%s) ON (%s)
