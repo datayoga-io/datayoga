@@ -29,15 +29,15 @@ def group_records_by_opcode(records: List[Dict[str, Any]],
                 source = next(iter(item.values())) if isinstance(item, dict) else item
                 if source not in record:
                     raise ValueError(f"{source} key does not exist", record)
-
+        except ValueError as e:
+            utils.reject_record(f"{e}", record)
+        else:
             if opcode == OpCode.CREATE:
                 records_to_insert.append(record)
             elif opcode == OpCode.UPDATE:
                 records_to_update.append(record)
             elif opcode == OpCode.DELETE:
                 records_to_delete.append(record)
-        except ValueError as e:
-             utils.reject_record(f"{e}", record)
 
     return records_to_insert, records_to_update, records_to_delete
 
