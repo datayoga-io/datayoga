@@ -2,7 +2,7 @@ import logging
 from typing import Any, Dict, List, Tuple, Union
 
 from datayoga_core import utils
-from datayoga_core.opcode import OPCODES, OpCode
+from datayoga_core.opcode import OpCode
 
 logger = logging.getLogger("dy")
 
