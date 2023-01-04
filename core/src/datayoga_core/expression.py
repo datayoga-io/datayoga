@@ -124,13 +124,13 @@ class SQLExpression(Expression):
         """
         # create the in memory data structure
         data_inner = flatten_data(data)
-        # builds a CTE expression for fetching in memory data
+        # builds an expression for fetching in memory data
         column_names = data_inner[0].keys()
         columns_clause = ','.join(f"[column{i+1}] as `{col}`" for i, col in enumerate(column_names))
 
         # values in the form of (?,?), (?,?)
         values_clause_row = f"({','.join('?' * len(column_names))})"
-        values_clause = ','.join([values_clause_row]*len(data_inner))
+        values_clause = ','.join([values_clause_row] * len(data_inner))
 
         subselect = f"select {columns_clause} from (values {values_clause})"
 

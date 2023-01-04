@@ -85,10 +85,7 @@ class Job():
             logger.debug("job has not been initialized yet, initializing...")
             self.init()
 
-        if deepcopy:
-            transformed_data = copy.deepcopy(data)
-        else:
-            transformed_data = data
+        transformed_data = copy.deepcopy(data) if deepcopy else data
 
         results = []
         for step in self.steps:
