@@ -20,7 +20,7 @@ def test_sql_benchmark(batch_size: int, expected_ops_per_sec: int, fields: int):
     # suppress logging
     logging.getLogger("dy").disabled = True
     expression_text = "replace(replace(replace(replace(field1, 'a', 'A'), 'b', 'BB'), 'c', 'C'), 'dd', 'D')"
-    expr = expression.compile(expression.Language.SQL.value, expression_text)
+    expr = expression.compile(expression.Language.SQL, expression_text)
     cycles = 200000
     start = time.time()
 
@@ -51,7 +51,7 @@ def test_sql_benchmark_nested(batch_size: int, expected_ops_per_sec: int):
     # suppress logging
     logging.getLogger("dy").disabled = True
     expression_text = "upper(`a.b.c.d`)"
-    expr = expression.compile(expression.Language.SQL.value, expression_text)
+    expr = expression.compile(expression.Language.SQL, expression_text)
     cycles = 200000
     start = time.time()
 

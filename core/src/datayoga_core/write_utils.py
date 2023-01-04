@@ -18,25 +18,26 @@ def group_records_by_opcode(records: List[Dict[str, Any]],
     records_to_insert: List[Dict[str, Any]] = []
 
     for record in records:
-        opcode = record.get(opcode_field)
-        if opcode is None:
-            utils.reject_record(f"{opcode_field} opcode field does not exist", record)
-        elif opcode in OPCODES:
+        opcode_value = record.get(opcode_field)
+
+        try:
+            if opcode_value is None:
+                raise ValueError(f"{opcode_field} opcode field does not exist", record)
+
+            opcode = OpCode(opcode_value)
             for item in keys:
                 source = next(iter(item.values())) if isinstance(item, dict) else item
                 if source not in record:
-                    utils.reject_record(f"{source} key does not exist", record)
-                    break
-        else:
-            utils.reject_record(f"{opcode} - unsupported opcode", record)
+                    raise ValueError(f"{source} key does not exist", record)
 
-        if not utils.is_rejected(record):
-            if opcode == OpCode.CREATE.value:
+            if opcode == OpCode.CREATE:
                 records_to_insert.append(record)
-            elif opcode == OpCode.UPDATE.value:
+            elif opcode == OpCode.UPDATE:
                 records_to_update.append(record)
-            elif opcode == OpCode.DELETE.value:
+            elif opcode == OpCode.DELETE:
                 records_to_delete.append(record)
+        except ValueError as e:
+             utils.reject_record(f"{e}", record)
 
     return records_to_insert, records_to_update, records_to_delete
 

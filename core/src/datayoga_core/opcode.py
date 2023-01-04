@@ -2,10 +2,7 @@ from enum import Enum, unique
 
 
 @unique
-class OpCode(Enum):
+class OpCode(str, Enum):
     CREATE = "c"
     DELETE = "d"
     UPDATE = "u"
-
-
-OPCODES = [opcode.value for opcode in OpCode]
