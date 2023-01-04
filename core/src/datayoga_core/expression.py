@@ -7,7 +7,6 @@ from enum import Enum, unique
 from typing import Any, Dict, List, Union
 
 import jmespath
-
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -127,7 +126,7 @@ class SQLExpression(Expression):
         data_inner = flatten_data(data)
         # builds a CTE expression for fetching in memory data
         column_names = data_inner[0].keys()
-        columns_clause = ','.join(f"[column{i+1}] as `{col}`" for i,col in enumerate(column_names))
+        columns_clause = ','.join(f"[column{i+1}] as `{col}`" for i, col in enumerate(column_names))
 
         # values in the form of (?,?), (?,?)
         values_clause_row = f"({','.join('?' * len(column_names))})"

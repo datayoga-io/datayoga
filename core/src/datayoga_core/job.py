@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import copy
-import json
 import logging
 import os
 import sys
@@ -12,7 +11,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from xmlrpc.client import boolean
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -70,7 +68,9 @@ class Job():
         self.root.add_done_callback(self.handle_results)
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]],deepcopy:boolean=True) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    def transform(self, data: List[Dict[str, Any]],
+                  deepcopy: boolean = True) -> Tuple[List[Dict[str, Any]],
+                                                     List[Result]]:
         """
         Transforms data
 
