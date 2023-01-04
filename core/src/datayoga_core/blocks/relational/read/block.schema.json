@@ -1,0 +1,47 @@
+{
+  "title": "relational.read",
+  "description": "Read a table from an SQL-compatible data store",
+  "type": "object",
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "read_snowflake",
+      "type": "relational.read",
+      "properties": {
+        "connection": "eu_datalake",
+        "table": "employees",
+        "schema": "dbo"
+      }
+    }
+  ],
+  "properties": {
+    "connection": {
+      "type": "string",
+      "title": "The connection to use for loading",
+      "description": "Logical connection name as defined in the connections.yaml",
+      "examples": ["europe_db", "target", "eu_dwh"]
+    },
+    "schema": {
+      "type": "string",
+      "title": "The table schema of the table",
+      "description": "If left blank, the default schema of this connection will be used as defined in the connections.yaml",
+      "examples": ["dbo"]
+    },
+    "table": {
+      "type": "string",
+      "title": "The table name",
+      "description": "Table name",
+      "examples": ["employees"]
+    },
+    "columns": {
+      "type": "array",
+      "title": "Optional subset of columns to load",
+      "items": {
+        "type": ["string", "object"],
+        "title": "name of column"
+      },
+      "examples": [["fname", { "lname": "last_name" }]]
+    }
+  },
+  "required": ["connection", "table"]
+}

@@ -1,5 +1,4 @@
 import logging
-from functools import reduce
 from typing import Any, Dict, List, Optional, Tuple
 
 import datayoga_core.blocks.redis.utils as redis_utils
@@ -33,7 +32,11 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
         pipeline = self.redis_client.pipeline()
         for record in data:
-            dict_as_list = list(reduce(lambda x, y: x + y, record.items()))
+            # transform to a list, filtering it out None, which Redis does not support
+            dict_as_list = sum(filter(
+                lambda i: i[1] is not None and not i[0].startswith(Block.INTERNAL_FIELD_PREFIX),
+                record.items()
+            ),())
             pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
 
         try:

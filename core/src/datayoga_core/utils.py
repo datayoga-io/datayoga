@@ -2,6 +2,7 @@ import json
 import os
 import re
 import sys
+import uuid
 from os import path
 from typing import Any, Dict, List, Tuple
 
@@ -119,3 +120,6 @@ def reject_records(records: List[Dict[str, Any]], reason: str):
     for record in records:
         if not is_rejected(record):
             reject_record(reason, record)
+
+def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
+    return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}

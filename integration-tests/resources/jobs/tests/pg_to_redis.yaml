@@ -1,0 +1,14 @@
+input:
+  uses: relational.read
+  with:
+    connection: psql-hr
+    schema: hr
+    table: emp
+steps:
+  - uses: redis.write
+    with:
+      connection: cache
+      command: HSET
+      key:
+        expression: id
+        language: jmespath

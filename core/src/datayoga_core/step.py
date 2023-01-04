@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from concurrent.futures import process
 from typing import Any, Callable, Dict, List, Optional
 
 from datayoga_core.block import Block
@@ -26,9 +25,9 @@ class Step():
     def init(self, context: Optional[Context] = None):
         # initialize the block
         self.block.init(context)
-        # start pool of workers for parallelization
 
     async def start_pool(self):
+        # start pool of workers for parallelization
         logger.debug("starting pool")
         self.queue = asyncio.Queue(maxsize=1)
         for id in range(self.concurrency):
@@ -88,7 +87,7 @@ class Step():
                           Result(Status.REJECTED, f"Error in step {self.id}: {repr(e)}")] * len(entry))
             finally:
                 self.queue.task_done()
-            logger.debug(f"{self.id}-{worker_id} done processing {entry[0][Block.MSG_ID_FIELD]}")
+            logger.debug(f"{self.id}-{worker_id} done processing {entry}")
 
     def done(self, msg_ids: List[str], results: List[Result]):
         logger.debug(f"{self.id} acking {msg_ids}")
@@ -105,6 +104,7 @@ class Step():
     async def stop(self):
         # wait for all tasks to finish
         await self.join()
+        logger.debug("joined")
 
         # stop any downstream workers
         if self.next_step:
