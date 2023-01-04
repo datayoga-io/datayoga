@@ -71,7 +71,7 @@ class Block(DyBlock):
 
     def generate_upsert_stmt(self) -> Any:
         """Generates an UPSERT statement based on the DB type"""
-        if self.db_type == relational_utils.DbType.PSQL.value:
+        if self.db_type == relational_utils.DbType.PSQL:
             from sqlalchemy.dialects.postgresql import insert
 
             insert_stmt = insert(self.tbl).values({col: "?" for col in self.columns})

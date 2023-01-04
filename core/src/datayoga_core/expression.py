@@ -20,7 +20,7 @@ logger = logging.getLogger("dy")
 
 
 @unique
-class Language(Enum):
+class Language(str, Enum):
     JMESPATH = "jmespath"
     SQL = "sql"
 
@@ -183,9 +183,9 @@ def compile(language: Language, expression: str) -> Expression:
     Returns:
         Expression: Expression class
     """
-    if language == Language.JMESPATH.value:
+    if language == Language.JMESPATH:
         expression_class = JMESPathExpression()
-    elif language == Language.SQL.value:
+    elif language == Language.SQL:
         expression_class = SQLExpression()
     else:
         raise ValueError(f"unknown expression language {language}")

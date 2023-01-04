@@ -5,7 +5,7 @@ import copy
 import logging
 import os
 import sys
-from enum import Enum
+from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from xmlrpc.client import boolean
@@ -19,8 +19,8 @@ from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
 
-
-class ErrorHandling(Enum):
+@unique
+class ErrorHandling(str, Enum):
     ABORT = "abort"
     IGNORE = "ignore"
 
@@ -119,7 +119,7 @@ class Job():
         await self.root.stop()
 
     def handle_results(self, msg_ids: List[str], results: List[Result]):
-        if any(x.status == Status.REJECTED for x in results) and self.error_handling == ErrorHandling.ABORT.value:
+        if any(x.status == Status.REJECTED for x in results) and self.error_handling == ErrorHandling.ABORT:
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 
