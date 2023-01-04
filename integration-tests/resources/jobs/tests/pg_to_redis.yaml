@@ -5,7 +5,6 @@ input:
     schema: hr
     table: emp
 steps:
-  # - uses: std.write
   - uses: redis.write
     with:
       connection: cache

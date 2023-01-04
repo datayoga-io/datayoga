@@ -1,6 +1,6 @@
 import logging
 from enum import Enum, unique
-from typing import Any, Dict, List, Tuple, Union
+from typing import Tuple
 
 import sqlalchemy as sa
 from datayoga_core import utils
@@ -10,14 +10,10 @@ logger = logging.getLogger("dy")
 
 
 @unique
-class DbType(str,Enum):
+class DbType(str, Enum):
     MSSQL = "mssql"
     MYSQL = "mysql"
     PSQL = "postgresql"
-
-    @classmethod
-    def has_value(cls, value: str) -> bool:
-        return value in cls._value2member_map_
 
 
 DEFAULT_DRIVERS = {
@@ -26,12 +22,11 @@ DEFAULT_DRIVERS = {
     DbType.PSQL: "postgresql"
 }
 
+
 def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine, DbType]:
     connection = utils.get_connection_details(connection_name, context)
 
-    db_type = connection.get("type","").lower()
-    if not DbType.has_value(db_type):
-        raise ValueError(f"{db_type} is not supported yet")
+    db_type = DbType(connection.get("type", "").lower())
 
     engine = sa.create_engine(
         sa.engine.URL.create(

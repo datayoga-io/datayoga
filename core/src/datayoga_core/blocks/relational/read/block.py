@@ -13,7 +13,7 @@ logger = logging.getLogger("dy")
 
 class Block(DyProducer):
 
-    def init(self, context: Context):
+    def init(self, context: Optional[Context] = None):
         engine, db_type = relational_utils.get_engine(self.properties.get("connection"), context)
         self.db_type = db_type
 

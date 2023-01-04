@@ -46,7 +46,5 @@ def test_pg_to_redis():
                             "gender": "M",
                             "address": "main street"}
 
-
     redis_container.stop()
-
     postgres_container.stop()

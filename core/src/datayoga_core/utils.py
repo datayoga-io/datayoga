@@ -7,11 +7,9 @@ from os import path
 from typing import Any, Dict, List, Tuple
 
 import yaml
-
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
-from datayoga_core.producer import Message
 from datayoga_core.result import Result, Status
 
 
@@ -124,4 +122,4 @@ def reject_records(records: List[Dict[str, Any]], reason: str):
             reject_record(reason, record)
 
 def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
-    return {Block.MSG_ID_FIELD: str(uuid.uuid4()), **record}
+    return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}

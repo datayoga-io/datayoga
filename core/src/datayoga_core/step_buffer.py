@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 import logging
 
 from datayoga_core.step import Step
@@ -7,7 +6,7 @@ from datayoga_core.step import Step
 logger = logging.getLogger("dy")
 
 class StepBuffer(Step):
-    def __init__(self, id, min_buffer_size=4, max_buffer_size=4, flush_ms=None):
+    def __init__(self, id, min_buffer_size=4, max_buffer_size=4, flush_ms=1000):
         super().__init__(id, None)
         self.min_buffer_size = min_buffer_size
         self.max_buffer_size = max(max_buffer_size,min_buffer_size)
@@ -18,7 +17,7 @@ class StepBuffer(Step):
 
     async def flush_timer(self):
         await asyncio.sleep(self.flush_ms/1000)
-        logger.debug(f"flushing on timeout")
+        logger.debug("flushing on timeout")
         await self.flush()
 
     async def run(self, worker_id: int):

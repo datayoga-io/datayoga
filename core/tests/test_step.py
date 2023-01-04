@@ -140,7 +140,7 @@ async def test_acks_exception():
 @pytest.mark.asyncio
 async def test_step_buffer_by_size():
     results_block = mock.Mock(wraps=EchoBlock())
-    root = StepBuffer("BUFFER",min_buffer_size=4,flush_ms=100000)
+    root = StepBuffer("BUFFER", min_buffer_size=4, flush_ms=100000)
     root | Step("A", results_block, concurrency=1)
     messages = [
         {Block.MSG_ID_FIELD: "message1", "value": True},
@@ -163,7 +163,7 @@ async def test_step_buffer_by_size():
 @pytest.mark.asyncio
 async def test_step_buffer_by_timeout():
     results_block = mock.Mock(wraps=EchoBlock())
-    root = StepBuffer("BUFFER",min_buffer_size=4,flush_ms=500)
+    root = StepBuffer("BUFFER", min_buffer_size=4, flush_ms=500)
     root | Step("A", results_block, concurrency=1)
     messages = [
         {Block.MSG_ID_FIELD: "message1", "value": True},
@@ -178,7 +178,7 @@ async def test_step_buffer_by_timeout():
     await root.stop()
     producer_mock.assert_has_calls([
         mock.call.ack(
-            [i[Block.MSG_ID_FIELD]  for i in messages],
+            [i[Block.MSG_ID_FIELD] for i in messages],
             [result.SUCCESS for i in messages]
         )
     ])

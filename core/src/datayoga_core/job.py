@@ -10,13 +10,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
 from datayoga_core.result import Result, Status
 from datayoga_core.step import Step
-from datayoga_core.step_buffer import StepBuffer
 
 logger = logging.getLogger("dy")
 
