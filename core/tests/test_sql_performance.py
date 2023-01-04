@@ -5,8 +5,8 @@ import pytest
 from datayoga_core import expression
 
 
-@pytest.mark.parametrize("batchsize,expected_ops_per_sec,fields", [(100,40000,20), (1000, 40000,20), (10000, 40000,20)])
-def test_sql_benchmark(batchsize:int,expected_ops_per_sec:int,fields:int):
+@pytest.mark.parametrize("batch_size,expected_ops_per_sec,fields", [(100,40000,20), (1000, 40000,20), (10000, 40000,20)])
+def test_sql_benchmark(batch_size:int,expected_ops_per_sec:int,fields:int):
     """ A rough sanity benchmark to test the ballpark figures of the expression language
 
     Args:
@@ -19,12 +19,14 @@ def test_sql_benchmark(batchsize:int,expected_ops_per_sec:int,fields:int):
     expr = expression.compile(expression.Language.SQL.value,expression_text)
     cycles = 200000
     start = time.time()
-    batch = 1000
 
     # dummy record with 20 fields
     record = {f"field{i}":"01234567890" for i in range(fields)}
-    for _ in range(cycles//batch):
-        results = expr.search_bulk([record]*batch)
+    for _ in range(cycles//batch_size):
+        results = expr.search_bulk([record]*batch_size)
+
+    if (cycles%batch_size>0):
+        results = expr.search_bulk([record]*(cycles%batch_size))
 
     end = time.time()
 
@@ -33,8 +35,8 @@ def test_sql_benchmark(batchsize:int,expected_ops_per_sec:int,fields:int):
     logging.debug(f"ops per sec: {actual_ops_per_sec}")
     assert actual_ops_per_sec>expected_ops_per_sec
 
-@pytest.mark.parametrize("batchsize,expected_ops_per_sec,fields", [(100,40000,20), (1000, 40000,20), (10000, 40000,20)])
-def test_sql_benchmark_nested(batchsize:int,expected_ops_per_sec:int,fields:int):
+@pytest.mark.parametrize("batch_size,expected_ops_per_sec,fields", [(100,40000,20), (1000, 40000,20), (10000, 40000,20)])
+def test_sql_benchmark_nested(batch_size:int, expected_ops_per_sec:int, fields:int):
     """ A rough sanity benchmark to test the ballpark figures of the expression language
 
     Args:
@@ -47,9 +49,8 @@ def test_sql_benchmark_nested(batchsize:int,expected_ops_per_sec:int,fields:int)
     expr = expression.compile(expression.Language.SQL.value,expression_text)
     cycles = 200000
     start = time.time()
-    batch = 1000
 
-    # dummy record with 20 fields
+    # dummy record with nested fields
     record = {
         "a":{
             "x": "x"*10,
@@ -62,9 +63,12 @@ def test_sql_benchmark_nested(batchsize:int,expected_ops_per_sec:int,fields:int)
             }
         }
     }
-    for _ in range(cycles//batch):
-        results = expr.search_bulk([record]*batch)
+    for _ in range(cycles//batch_size):
+        results = expr.search_bulk([record]*batch_size)
 
+    # perform the remainder. e.g. 10 cycles on 4 batch size, add 2 more
+    if (cycles%batch_size>0):
+        results = expr.search_bulk([record]*(cycles%batch_size))
     end = time.time()
 
     logging.getLogger("dy").disabled = False

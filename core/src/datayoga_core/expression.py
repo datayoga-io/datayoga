@@ -123,14 +123,14 @@ class SQLExpression(Expression):
         Returns:
             List[Dict[str, Any]]: Query result
         """
-        # use a CTE to create the in memory data structure
+        # create the in memory data structure
         data_inner = flatten_data(data)
         # builds a CTE expression for fetching in memory data
         column_names = data_inner[0].keys()
         columns_clause = ','.join(f"[column{i+1}] as `{col}`" for i,col in enumerate(column_names))
 
         # values in the form of (?,?), (?,?)
-        values_clause_row = f"({','.join('?'*len(column_names))})"
+        values_clause_row = f"({','.join('?' * len(column_names))})"
         values_clause = ','.join([values_clause_row]*len(data_inner))
 
         subselect = f"select {columns_clause} from (values {values_clause})"
@@ -139,9 +139,9 @@ class SQLExpression(Expression):
         data_values = [row.get(colname) for row in data_inner for colname in column_names]
 
         # expressions clause
-        expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name,expression in expressions.items()])
+        expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
         self.conn.row_factory = sqlite3.Row
-        # we revert to not using a real CTE because of compatibility with older SQLlite versions on Centos7
+        # we don't use CTE because of compatibility with older SQLlite versions on Centos7
         statement = f"select {expressions_clause} from ({subselect})"
 
         logger.debug(statement)
