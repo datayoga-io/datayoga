@@ -1,12 +1,19 @@
 import json
 import logging
-import sqlite3
+
+try:
+    # older linux doesn't have adequate version
+    import pysqlite3 as sqlite3
+except ImportError:
+    import sqlite3
+
 from abc import abstractmethod
 from collections.abc import MutableMapping
 from enum import Enum, unique
 from typing import Any, Dict, List, Union
 
 import jmespath
+
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -88,6 +95,10 @@ class Expression():
 
 class SQLExpression(Expression):
     def compile(self, expression: str):
+        # check min sqlite3 version to at least support values clause
+        if sqlite3.sqlite_version_info < (3,8,8):
+            raise ValueError(f"must have SQLite v3.8.8 and above to use SQL expressions. Found {sqlite3.sqlite_version_info}")
+
         # we turn off `check_same_thread` to gain performance benefit by reusing the same connection object
         # safe to use since we are only creating in memory structures
         self.conn = sqlite3.connect(":memory:", check_same_thread=False)
