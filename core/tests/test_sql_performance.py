@@ -76,6 +76,10 @@ def test_sql_benchmark_nested(batch_size: int, expected_ops_per_sec: int):
         results = expr.search_bulk([record]*(cycles % batch_size))
     end = time.time()
 
+    # sanity test. check one result
+    results = expr.search_bulk([record])
+    assert results == ["D"*10]
+
     logging.getLogger("dy").disabled = False
     actual_ops_per_sec = cycles/(end-start)
     logging.debug(f"ops per sec: {actual_ops_per_sec}")
