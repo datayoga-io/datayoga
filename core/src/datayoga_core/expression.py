@@ -106,7 +106,14 @@ class SQLExpression(Expression):
         self._is_single_field = True
         try:
             self._fields = json.loads(expression)
-            self._is_single_field = False
+
+            # verify this is a dict, and not a list or document ('x' is a valid json)
+            if isinstance(self._fields,dict):
+                self._is_single_field = False
+            else:
+                # this is not a dict, treat as a simple expression
+                self._fields = {"expr": expression}
+
         except json.JSONDecodeError:
             # this is not a json, treat as a simple expression
             self._fields = {"expr": expression}

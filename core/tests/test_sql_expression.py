@@ -6,6 +6,16 @@ def test_sql_expression():
     sql_expression.compile("fname || ' ' || mname || ' ' || lname")
     assert sql_expression.search({"fname": "john",  "mname": "george", "lname": "smith"}) == "john george smith"
 
+def test_sql_expression_number_literal():
+    sql_expression = SQLExpression()
+    sql_expression.compile("10")
+    assert sql_expression.search({"fname": "john",  "mname": "george", "lname": "smith"}) == 10
+
+def test_sql_expression_string_literal():
+    sql_expression = SQLExpression()
+    sql_expression.compile("'10'")
+    assert sql_expression.search({"fname": "john",  "mname": "george", "lname": "smith"}) == "10"
+
 def test_sql_expression_list():
     sql_expression = SQLExpression()
     sql_expression.compile("fname || ' ' || mname || ' ' || lname")
