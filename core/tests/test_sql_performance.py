@@ -6,9 +6,9 @@ from datayoga_core import expression
 
 
 @pytest.mark.parametrize("batch_size, expected_ops_per_sec, fields",
-                         [(100, 40000, 20),
-                          (1000, 40000, 20),
-                          (10000, 40000, 20)])
+                         [(100, 100000, 20),
+                          (1000, 100000, 20),
+                          (10000, 100000, 20)])
 def test_sql_benchmark(batch_size: int, expected_ops_per_sec: int, fields: int):
     """ A rough sanity benchmark to test the ballpark figures of the expression language
 
@@ -40,7 +40,7 @@ def test_sql_benchmark(batch_size: int, expected_ops_per_sec: int, fields: int):
     assert actual_ops_per_sec > expected_ops_per_sec
 
 
-@pytest.mark.parametrize("batch_size, expected_ops_per_sec", [(100, 40000), (1000, 40000), (10000, 40000)])
+@pytest.mark.parametrize("batch_size, expected_ops_per_sec", [(100, 100000), (1000, 100000), (10000, 100000)])
 def test_sql_benchmark_nested(batch_size: int, expected_ops_per_sec: int):
     """ A rough sanity benchmark to test the ballpark figures of the expression language
 
@@ -60,7 +60,7 @@ def test_sql_benchmark_nested(batch_size: int, expected_ops_per_sec: int):
         "a": {
             "x": "x"*10,
             "b": {
-                "x": "x"*10,
+                "x": {f"field{i}":"x"*10 for i in range(20)},
                 "c": {
                     "x": "x"*10,
                     "d": "d"*10

@@ -5,7 +5,7 @@ import pytest
 from datayoga_core import expression
 
 
-@pytest.mark.parametrize("batch_size, expected_ops_per_sec, fields", [(100,40000,20), (1000, 40000,20), (10000, 40000,20)])
+@pytest.mark.parametrize("batch_size, expected_ops_per_sec, fields", [(100,100000,20), (1000, 100000,20), (10000, 100000,20)])
 def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int):
     """ A rough sanity benchmark to test the ballpark figures of the expression language
 
