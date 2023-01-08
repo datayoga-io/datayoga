@@ -1,6 +1,8 @@
 import json
 import logging
 
+import sqlglot
+
 try:
     # older linux doesn't have adequate version
     import pysqlite3 as sqlite3
@@ -8,12 +10,10 @@ except ImportError:
     import sqlite3
 
 from abc import abstractmethod
-from collections.abc import MutableMapping
 from enum import Enum, unique
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import jmespath
-
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -25,22 +25,11 @@ class Language(str, Enum):
     SQL = "sql"
 
 
-def flatten_data(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    # flattened structure
-    data_inner = data if isinstance(data, list) else [data]
-    data_inner = [flatten(row, sep=".") for row in data_inner]
-    return data_inner
-
-
-def flatten(d, parent_key="", sep="_"):
-    items = []
-    for k, v in d.items():
-        new_key = parent_key + sep + k if parent_key else k
-        if isinstance(v, MutableMapping):
-            items.extend(flatten(v, new_key, sep=sep).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
+def get_nested_value(data: Dict[str, Any], key: Tuple[str]) -> Any:
+    # get nested key
+    for level in key:
+        data = data[level]
+    return data
 
 
 class Expression():
@@ -118,6 +107,13 @@ class SQLExpression(Expression):
             # this is not a json, treat as a simple expression
             self._fields = {"expr": expression}
 
+        # for each of the expressions, we determine the column names used.
+        # they will get parsed and binded for performance instead of traversing the entire payload
+        self._column_names = set()
+        for _exp in self._fields.values():
+            self._column_names.update(
+                [tuple(column.sql().replace('"', "").split("."))
+                 for column in sqlglot.parse_one("SELECT " + _exp.replace('`', '"')).find_all(sqlglot.exp.Column)])
 
     def search_bulk(self, data: List[Dict[str, Any]]) -> Any:
         results = self.exec_sql(data, self._fields)
@@ -140,30 +136,35 @@ class SQLExpression(Expression):
         Returns:
             List[Dict[str, Any]]: Query result
         """
-        # create the in memory data structure
-        data_inner = flatten_data(data)
         # builds an expression for fetching in memory data
-        column_names = data_inner[0].keys()
-        columns_clause = ','.join(f"[column{i+1}] as `{col}`" for i, col in enumerate(column_names))
-
-        # values in the form of (?,?), (?,?)
-        values_clause_row = f"({','.join('?' * len(column_names))})"
-        values_clause = ','.join([values_clause_row] * len(data_inner))
-
-        subselect = f"select {columns_clause} from (values {values_clause})"
-
-        # bind the variables
-        data_values = [row.get(colname) for row in data_inner for colname in column_names]
-
-        # expressions clause
-        expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
         self.conn.row_factory = sqlite3.Row
-        # we don't use CTE because of compatibility with older SQLlite versions on Centos7
-        statement = f"select {expressions_clause} from ({subselect})"
 
-        logger.debug(statement)
-        cursor = self.conn.execute(statement, data_values)
-        return [dict(x) for x in cursor.fetchall()]
+        if len(self._column_names) > 0:
+            columns_clause = ','.join(f"[column{i+1}] as `{'.'.join(col)}`" for i, col in enumerate(self._column_names))
+
+            # values in the form of (?,?), (?,?)
+            values_clause_row = f"({','.join('?' * len(self._column_names))})"
+            values_clause = ','.join([values_clause_row] * len(data))
+
+            subselect = f"select {columns_clause} from (values {values_clause})"
+
+            # bind the variables
+            data_values = [get_nested_value(row,col) for row in data for col in self._column_names]
+
+            # expressions clause
+            expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
+            # we don't use CTE because of compatibility with older SQLlite versions on Centos7
+            statement = f"select {expressions_clause} from ({subselect})"
+
+            logger.debug(statement)
+            cursor = self.conn.execute(statement, data_values)
+            return [dict(x) for x in cursor.fetchall()]
+        else:
+            # a sepcial case where we are only selecting literals. e.g. select current_timstamp or 'x'
+            # no need to bind anything. just run it once and copy to all records
+            expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
+            cursor = self.conn.execute(f"select {expressions_clause}")
+            return [dict(cursor.fetchone())] * len(data)
 
 
 class JMESPathExpression(Expression):
