@@ -60,7 +60,7 @@ def test_sql_benchmark_nested(batch_size: int, expected_ops_per_sec: int):
         "a": {
             "x": "x"*10,
             "b": {
-                "x": {f"field{i}":"x"*10 for i in range(20)},
+                "x": {f"field{i}": "x" * 10 for i in range(20)},
                 "c": {
                     "x": "x"*10,
                     "d": "d"*10

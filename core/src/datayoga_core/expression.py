@@ -10,12 +10,10 @@ except ImportError:
     import sqlite3
 
 from abc import abstractmethod
-from collections.abc import MutableMapping
 from enum import Enum, unique
 from typing import Any, Dict, List, Tuple, Union
 
 import jmespath
-
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -27,7 +25,7 @@ class Language(str, Enum):
     SQL = "sql"
 
 
-def get_nested_value(data: Dict[str, Any],key:Tuple[str]) -> Any:
+def get_nested_value(data: Dict[str, Any], key: Tuple[str]) -> Any:
     # get nested key
     for level in key:
         data = data[level]
@@ -113,7 +111,9 @@ class SQLExpression(Expression):
         # they will get parsed and binded for performance instead of traversing the entire payload
         self._column_names = set()
         for _exp in self._fields.values():
-            self._column_names.update([tuple(column.sql().replace('"',"").split(".")) for column in sqlglot.parse_one("SELECT "+_exp.replace('`','"')).find_all(sqlglot.exp.Column)])
+            self._column_names.update(
+                [tuple(column.sql().replace('"', "").split("."))
+                 for column in sqlglot.parse_one("SELECT " + _exp.replace('`', '"')).find_all(sqlglot.exp.Column)])
 
     def search_bulk(self, data: List[Dict[str, Any]]) -> Any:
         results = self.exec_sql(data, self._fields)
@@ -139,7 +139,7 @@ class SQLExpression(Expression):
         # builds an expression for fetching in memory data
         self.conn.row_factory = sqlite3.Row
 
-        if len(self._column_names)>0:
+        if len(self._column_names) > 0:
             columns_clause = ','.join(f"[column{i+1}] as `{'.'.join(col)}`" for i, col in enumerate(self._column_names))
 
             # values in the form of (?,?), (?,?)
@@ -164,7 +164,7 @@ class SQLExpression(Expression):
             # no need to bind anything. just run it once and copy to all records
             expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
             cursor = self.conn.execute(f"select {expressions_clause}")
-            return [dict(cursor.fetchone())]*len(data)
+            return [dict(cursor.fetchone())] * len(data)
 
 
 class JMESPathExpression(Expression):
