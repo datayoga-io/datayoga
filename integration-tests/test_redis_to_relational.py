@@ -57,6 +57,30 @@ def test_redis_to_pg():
     postgres_container.stop()
 
 
+def test_redis_to_oracle():
+    schema = "hr"
+
+    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+    redis_container.start()
+
+    redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+
+    oracle_container = db_utils.get_oracle_container() #("testdb", "system", "oracle")
+    oracle_container.start()
+
+    engine = db_utils.get_engine(oracle_container)
+    db_utils.create_schema(engine, schema)
+    db_utils.create_emp_table(engine, schema)
+    db_utils.insert_to_emp_table(engine, schema)
+
+    run_job("tests.redis_to_oracle")
+
+    check_results(engine, schema)
+
+    redis_container.stop()
+    oracle_container.stop()
+
+
 @pytest.mark.xfail
 # fails due https://github.com/testcontainers/testcontainers-python/issues/285
 # will be changed once this [1] PR is merged:

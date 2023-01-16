@@ -1,3 +1,13 @@
+try:
+    import sys
+    import oracledb
+
+    oracledb.init_oracle_client()
+    oracledb.version = "8.3.0"
+    sys.modules["cx_Oracle"] = oracledb
+except (oracledb.exceptions.DatabaseError, ModuleNotFoundError):
+    pass
+
 from typing import Optional
 
 import sqlalchemy
@@ -9,6 +19,7 @@ from testcontainers.core.generic import DbContainer
 from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
 from testcontainers.postgres import PostgresContainer
+from testcontainers.oracle import OracleDbContainer
 
 
 def get_mssql_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
@@ -37,6 +48,10 @@ def get_mysql_container(mysql_root_password: str, db_name: str, db_user: str, db
 
 def get_postgres_container(db_name: str, db_user: str, db_password: str) -> PostgresContainer:
     return PostgresContainer(dbname=db_name, user=db_user, password=db_password).with_bind_ports(5432, 5433)
+
+
+def get_oracle_container() -> OracleDbContainer:
+    return OracleDbContainer().with_bind_ports(1521, 11521)
 
 
 def get_engine(db_container: DbContainer) -> Engine:

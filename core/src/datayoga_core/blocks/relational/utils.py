@@ -14,12 +14,14 @@ class DbType(str, Enum):
     MSSQL = "mssql"
     MYSQL = "mysql"
     PSQL = "postgresql"
+    ORACLE = "oracle"
 
 
 DEFAULT_DRIVERS = {
     DbType.MYSQL: "mysql+pymysql",
     DbType.MSSQL: "mssql+pymssql",
-    DbType.PSQL: "postgresql"
+    DbType.PSQL: "postgresql",
+    DbType.ORACLE: "oracle+python-oracledb"
 }
 
 
