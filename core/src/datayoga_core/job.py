@@ -3,14 +3,16 @@ from __future__ import annotations
 import asyncio
 import copy
 import logging
+import marshal
 import os
 import sys
-from enum import Enum
+from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from xmlrpc.client import boolean
 
 import jsonschema
+
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -19,8 +21,8 @@ from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
 
-
-class ErrorHandling(Enum):
+@unique
+class ErrorHandling(str, Enum):
     ABORT = "abort"
     IGNORE = "ignore"
 
@@ -85,8 +87,8 @@ class Job():
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
             self.init()
-
-        transformed_data = copy.deepcopy(data) if deepcopy else data
+        # use marshal. faster than deepcopy
+        transformed_data = marshal.loads(marshal.dumps(data)) if deepcopy else data
 
         results = []
         for step in self.steps:
@@ -119,7 +121,7 @@ class Job():
         await self.root.stop()
 
     def handle_results(self, msg_ids: List[str], results: List[Result]):
-        if any(x.status == Status.REJECTED for x in results) and self.error_handling == ErrorHandling.ABORT.value:
+        if any(x.status == Status.REJECTED for x in results) and self.error_handling == ErrorHandling.ABORT:
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 

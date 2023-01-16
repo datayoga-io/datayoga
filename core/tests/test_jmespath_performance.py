@@ -5,7 +5,10 @@ import pytest
 from datayoga_core import expression
 
 
-@pytest.mark.parametrize("batch_size, expected_ops_per_sec, fields", [(100,40000,20), (1000, 40000,20), (10000, 40000,20)])
+@pytest.mark.parametrize("batch_size, expected_ops_per_sec, fields",
+                         [(100, 100000, 20),
+                          (1000, 100000, 20),
+                          (10000, 100000, 20)])
 def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int):
     """ A rough sanity benchmark to test the ballpark figures of the expression language
 
@@ -16,11 +19,12 @@ def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int
     # suppress logging
     logging.getLogger("dy").disabled = True
     expression_text = "upper(field1)"
-    expr = expression.compile(expression.Language.JMESPATH.value,expression_text)
+    expr = expression.compile(expression.Language.JMESPATH, expression_text)
     cycles = 200000
     start = time.time()
     field_value = "abcdefghij"
-    # dummy record with 20 fields
+
+    # dummy record with the given fields
     record = {f"field{i}": field_value for i in range(fields)}
     for _ in range(cycles//batch_size):
         results = expr.search_bulk([record]*batch_size)
