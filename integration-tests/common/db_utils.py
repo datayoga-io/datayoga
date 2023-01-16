@@ -2,10 +2,13 @@ try:
     import sys
     import oracledb
 
-    oracledb.init_oracle_client()
-    oracledb.version = "8.3.0"
-    sys.modules["cx_Oracle"] = oracledb
-except (oracledb.exceptions.DatabaseError, ModuleNotFoundError):
+    try:
+        oracledb.init_oracle_client()
+        oracledb.version = "8.3.0"
+        sys.modules["cx_Oracle"] = oracledb
+    except oracledb.exceptions.DatabaseError:
+        pass
+except ModuleNotFoundError:
     pass
 
 from typing import Optional
