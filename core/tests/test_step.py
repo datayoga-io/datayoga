@@ -54,7 +54,7 @@ async def test_step_continuous_in_order():
     await root.stop()
     assert results_block.run.call_args_list == [mock.call.run([i]) for i in messages]
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], [result.SUCCESS]) for i in messages]
+        [i[Block.MSG_ID_FIELD]], [Result(status=Status.SUCCESS,payload=i)]) for i in messages]
 
 
 @pytest.mark.asyncio
@@ -118,7 +118,7 @@ async def test_acks_successful():
         await root.process([message])
     logger.debug("waiting for in flight messages")
     await root.stop()
-    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [result.SUCCESS]) for i in messages])
+    producer.assert_has_calls([mock.call.ack([i[Block.MSG_ID_FIELD]], [Result(status=Status.SUCCESS,payload=i)]) for i in messages])
 
 
 @pytest.mark.asyncio
@@ -156,7 +156,7 @@ async def test_step_buffer_by_size():
     producer_mock.assert_has_calls([
         mock.call.ack(
             [i[Block.MSG_ID_FIELD]  for i in messages],
-            [result.SUCCESS for i in messages]
+            [Result(status=Status.SUCCESS,payload=i) for i in messages]
         )
     ])
 
@@ -179,6 +179,6 @@ async def test_step_buffer_by_timeout():
     producer_mock.assert_has_calls([
         mock.call.ack(
             [i[Block.MSG_ID_FIELD] for i in messages],
-            [result.SUCCESS for i in messages]
+            [Result(status=Status.SUCCESS,payload=i) for i in messages]
         )
     ])

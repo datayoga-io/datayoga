@@ -4,18 +4,17 @@ import importlib
 import logging
 import os
 import sys
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractclassmethod, abstractmethod
 from os import path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple
 
 from jsonschema import validate
 
 from datayoga_core import utils
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import BlockResult
 
 logger = logging.getLogger("dy")
-
 
 class Block(metaclass=ABCMeta):
     INTERNAL_FIELD_PREFIX = "__$$"
@@ -74,7 +73,7 @@ class Block(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         """ Transforms data
 
         Args:

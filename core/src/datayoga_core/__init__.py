@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.job import Job
-from datayoga_core.result import Result
+from datayoga_core.result import BlockResult, JobResult, Result
 
 logger = logging.getLogger("dy")
 
@@ -50,7 +50,7 @@ def validate(job_settings: Dict[str, Any], whitelisted_blocks: Optional[List[str
 def transform(job_settings: Dict[str, Any],
               data: List[Dict[str, Any]],
               context: Optional[Context] = None,
-              whitelisted_blocks: Optional[List[str]] = None) -> Tuple[List[Dict[str, Any]], List[Result]]:
+              whitelisted_blocks: Optional[List[str]] = None) -> JobResult:
     """
     Transforms data against a certain job
 

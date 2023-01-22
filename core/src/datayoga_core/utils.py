@@ -7,10 +7,11 @@ from os import path
 from typing import Any, Dict, List, Tuple
 
 import yaml
+
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
-from datayoga_core.result import Result, Status
+from datayoga_core.result import BlockResult, Result, Status
 
 
 def read_json(filename: str) -> Any:
@@ -94,32 +95,16 @@ def get_connection_details(connection_name: str, context: Context) -> Dict[str, 
     raise ValueError(f"{connection_name} connection not found")
 
 
-def produce_data_and_results(records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-    results: List[Result] = []
-    for record in records:
-        results.append(record.get(Block.RESULT_FIELD, result.SUCCESS))
-        if Block.RESULT_FIELD in record:
-            del record[Block.RESULT_FIELD]
-
-    return records, results
-
-
-def all_success(records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-    return records, [result.SUCCESS] * len(records)
+def all_success(records: List[Dict[str, Any]]) -> BlockResult:
+    return BlockResult(processed=[Result(Status.SUCCESS,payload=row) for row in records])
 
 
 def is_rejected(record: Dict[str, Any]) -> bool:
     return record.get(Block.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
 
-
-def reject_record(reason: str, record: Dict[str, Any]):
-    record[Block.RESULT_FIELD] = Result(Status.REJECTED, reason)
-
-
-def reject_records(records: List[Dict[str, Any]], reason: str):
-    for record in records:
-        if not is_rejected(record):
-            reject_record(reason, record)
-
 def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
     return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
+
+def block_result_success(records) -> result.BlockResult:
+    return result.BlockResult(processed=[result.Result(status=result.Status.SUCCESS,payload=row) for row in records])
+

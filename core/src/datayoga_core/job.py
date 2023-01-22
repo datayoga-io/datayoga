@@ -6,9 +6,10 @@ import logging
 import marshal
 import os
 import sys
+import typing
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple
 from xmlrpc.client import boolean
 
 import jsonschema
@@ -16,7 +17,7 @@ import jsonschema
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
-from datayoga_core.result import Result, Status
+from datayoga_core.result import JobResult, Result, Status
 from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
@@ -25,7 +26,6 @@ logger = logging.getLogger("dy")
 class ErrorHandling(str, Enum):
     ABORT = "abort"
     IGNORE = "ignore"
-
 
 class Job():
     """
@@ -72,8 +72,7 @@ class Job():
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]],
-                  deepcopy: boolean = True) -> Tuple[List[Dict[str, Any]],
-                                                     List[Result]]:
+                  deepcopy: boolean = True) -> JobResult:
         """
         Transforms data
 
@@ -90,21 +89,30 @@ class Job():
         # use marshal. faster than deepcopy
         transformed_data = marshal.loads(marshal.dumps(data)) if deepcopy else data
 
-        results = []
+        result = JobResult()
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+        # depending on context, you might debug or warning log that a running event loop wasn't found
+            loop = asyncio.get_event_loop()
+
         for step in self.steps:
             try:
-                transformed_data, results = asyncio.run(step.block.run(transformed_data))
+                processed, filtered, rejected = loop.run_until_complete(step.block.run(transformed_data))
+                result.filtered.extend(filtered)
+                result.rejected.extend(rejected)
+                transformed_data = [result.payload for result in processed]
             except ConnectionError as e:
                 # connection errors are thrown back to the caller to handle
                 raise e
             except Exception as e:
                 # other exceptions are rejected
                 logger.error(f"Error while transforming data: {e}")
-                utils.reject_records(data, f"{e}")
-                transformed_data, results = utils.produce_data_and_results(data)
-                break
+                result.rejected.extend([Result(Status.REJECTED,payload=row,message=f"{e}") for row in transformed_data])
+                return result
 
-        return transformed_data, results
+        result.processed.extend([Result(Status.SUCCESS,payload=row) for row in transformed_data])
+        return result
 
     async def run(self):
         for record in self.input.produce():

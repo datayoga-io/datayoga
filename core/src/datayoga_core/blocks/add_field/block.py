@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
-from datayoga_core.block import Result
 from datayoga_core.context import Context
+from datayoga_core.result import BlockResult, Result
 
 logger = logging.getLogger("dy")
 
@@ -20,7 +20,7 @@ class Block(DyBlock):
                 property["language"],
                 property["expression"])
 
-    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         for field in self.fields:
             expression_results = self.fields[field].search_bulk(data)
