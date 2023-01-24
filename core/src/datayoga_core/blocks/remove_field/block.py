@@ -1,10 +1,10 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
-from datayoga_core.block import Result
 from datayoga_core.context import Context
+from datayoga_core.result import BlockResult
 
 logger = logging.getLogger("dy")
 
@@ -14,7 +14,7 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.properties = utils.format_block_properties(self.properties)
 
-    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         for row in data:
             for property in self.properties["fields"]:

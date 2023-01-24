@@ -1,5 +1,5 @@
 import pytest
-from datayoga_core import result
+from datayoga_core import utils
 from datayoga_core.blocks.add_field.block import Block
 
 
@@ -9,8 +9,8 @@ async def test_add_field():
                    "language": "jmespath",
                    "expression": "[fname,lname] | join(' ', @)"})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([
-        {"fname": "john", "lname": "doe", "full_name": "john doe"}], [result.SUCCESS]
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+        {"fname": "john", "lname": "doe", "full_name": "john doe"}]
     )
 
 
@@ -20,8 +20,8 @@ async def test_add_nested_field():
                    "language": "jmespath",
                   "expression": "[name.fname,name.lname] | join(' ', @)"})
     block.init()
-    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == ([
-        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}], [result.SUCCESS])
+    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}])
 
 
 @pytest.mark.asyncio
@@ -29,8 +29,8 @@ async def test_add_multiple_fields():
     block = Block({"fields": [{"field": "name.full_name", "language": "jmespath", "expression": "concat([name.fname, ' ', name.lname])"}, {
                   "field": "name.fname_upper", "language": "jmespath", "expression": "upper(name.fname)"}]})
     block.init()
-    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == ([
-        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}], [result.SUCCESS])
+    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+        {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}])
 
 
 @pytest.mark.asyncio
@@ -39,5 +39,5 @@ async def test_add_field_with_dot():
                    "language": "jmespath",
                    "expression": "[fname,lname] | join(' ', @)"})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == ([
-        {"fname": "john", "lname": "doe", "name.full_name": "john doe"}], [result.SUCCESS])
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+        {"fname": "john", "lname": "doe", "name.full_name": "john doe"}])

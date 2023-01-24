@@ -60,23 +60,28 @@ class Step():
             entry = await self.queue.get()
             logger.debug(f"{self.id}-{worker_id} processing {[i[Block.MSG_ID_FIELD] for i in entry]}")
             try:
-                processed_entries, results = await self.block.run(entry)
+                processed_entries, filtered_entries, rejected_entries = await self.block.run(entry)
 
                 # handle filtered. anything not processed or rejected
-                filtered_entries = [payload_with_result[0][Block.MSG_ID_FIELD] for payload_with_result in zip(entry,results) if payload_with_result[1].status == Status.FILTERED]
                 logger.debug(f"filtered entries: {filtered_entries}, processed entries: {processed_entries}")
-                if len(filtered_entries) > 0:
+                if filtered_entries:
                     # ack the filtered entries
-                    self.done(filtered_entries, [Result(Status.FILTERED)] * len(filtered_entries))
-                if len(processed_entries) > 0:
+                    self.done([row.payload[Block.MSG_ID_FIELD] for row in filtered_entries], [Result(Status.FILTERED)] * len(filtered_entries))
+
+                # handle rejected
+                if rejected_entries:
+                    # ack the rejected entries
+                    self.done([row.payload[Block.MSG_ID_FIELD] for row in rejected_entries], rejected_entries)
+
+                if processed_entries:
                     # check if we have a next step
                     if self.next_step:
                         # process downstream
-                        await self.next_step.process(processed_entries)
+                        await self.next_step.process([result.payload for result in processed_entries])
                     else:
                         # we are a last channel, propagate the ack upstream
                         # TODO: verify that all entries have a msg id otherwise raise consistency error
-                        self.done([x[Block.MSG_ID_FIELD] for x in processed_entries], results)
+                        self.done([row.payload[Block.MSG_ID_FIELD] for row in processed_entries], processed_entries)
 
             except Exception as e:
                 # we caught an exception. the entire batch is considered rejected

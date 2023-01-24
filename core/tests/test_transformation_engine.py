@@ -1,5 +1,6 @@
 import logging
 import os
+import textwrap
 from os import path
 
 import datayoga_core as dy
@@ -35,7 +36,7 @@ def test_transform_oo(job_settings):
     job.init()
 
     for data in TEST_DATA:
-        assert job.transform(data["before"])[0] == data["after"]
+        assert job.transform(data["before"]).processed[0].payload == data["after"][0]
 
 
 def test_compile_and_transform_module(job_settings):
@@ -43,16 +44,36 @@ def test_compile_and_transform_module(job_settings):
     job.init()
 
     for data in TEST_DATA:
-        assert job.transform(data["before"])[0] == data["after"]
+        assert job.transform(data["before"]).processed[0].payload == data["after"][0]
 
 
 def test_transform_module(job_settings):
     for data in TEST_DATA:
-        assert dy.transform(job_settings, data["before"])[0] == data["after"]
+        assert dy.transform(job_settings, data["before"]).processed[0].payload == data["after"][0]
 
 
 def test_validate_valid_job(job_settings):
     dy.validate(job_settings)
+
+
+def test_block_after_filter():
+    job_yaml = """
+        steps:
+          - uses: filter
+            with:
+                expression: fname='firstfname'
+                language: sql
+          - uses: map
+            with:
+                expression:
+                    id: id
+                language: sql
+    """
+    data = [{"fname": "firstfname", "id": 1}, {"fname": "secondfname", "id": 2}]
+    processed, filtered, rejected = dy.transform(yaml.safe_load(textwrap.dedent(job_yaml)), data)
+    assert [result.payload for result in processed] == [{"id": 1}]
+    assert rejected == []
+    assert [result.payload for result in filtered] == [{"fname": "secondfname", "id": 2}]
 
 
 def test_validate_invalid_job():
