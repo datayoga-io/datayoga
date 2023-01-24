@@ -65,11 +65,13 @@ def test_redis_to_oracle():
 
     redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
 
-    oracle_container = db_utils.get_oracle_container() #("testdb", "system", "oracle")
+    oracle_container = db_utils.get_oracle_container()
     oracle_container.start()
 
     engine = db_utils.get_engine(oracle_container)
-    db_utils.create_schema(engine, schema)
+
+    #db_utils.create_schema(engine, schema)
+
     db_utils.create_emp_table(engine, schema)
     db_utils.insert_to_emp_table(engine, schema)
 

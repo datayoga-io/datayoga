@@ -23,7 +23,7 @@ oracle-hr:
   type: oracle
   host: localhost
   port: 11521
-  database: testdb
+  database: xe
   user: system
   password: oracle
 cache:

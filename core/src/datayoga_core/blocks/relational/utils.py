@@ -21,7 +21,7 @@ DEFAULT_DRIVERS = {
     DbType.MYSQL: "mysql+pymysql",
     DbType.MSSQL: "mssql+pymssql",
     DbType.PSQL: "postgresql",
-    DbType.ORACLE: "oracle+python-oracledb"
+    DbType.ORACLE: "oracle"
 }
 
 
