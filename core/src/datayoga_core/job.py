@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
+
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -86,29 +87,30 @@ class Job():
         transformed_data = marshal.loads(marshal.dumps(data)) if deepcopy else data
 
         result = JobResult()
+        # create an event loop for the duration of the transformation
+        loop = asyncio.new_event_loop()
+
         try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            # depending on context, you might debug or warning log that a running event loop wasn't found
-            loop = asyncio.get_event_loop()
+            for step in self.steps:
+                try:
+                    processed, filtered, rejected = loop.run_until_complete(step.block.run(transformed_data))
+                    result.filtered.extend(filtered)
+                    result.rejected.extend(rejected)
+                    transformed_data = [result.payload for result in processed]
+                except ConnectionError as e:
+                    # connection errors are thrown back to the caller to handle
+                    raise e
+                except Exception as e:
+                    # other exceptions are rejected
+                    logger.error(f"Error while transforming data: {e}")
+                    result.rejected.extend(
+                        [Result(Status.REJECTED, payload=row, message=f"{e}") for row in transformed_data])
+                    return result
 
-        for step in self.steps:
-            try:
-                processed, filtered, rejected = loop.run_until_complete(step.block.run(transformed_data))
-                result.filtered.extend(filtered)
-                result.rejected.extend(rejected)
-                transformed_data = [result.payload for result in processed]
-            except ConnectionError as e:
-                # connection errors are thrown back to the caller to handle
-                raise e
-            except Exception as e:
-                # other exceptions are rejected
-                logger.error(f"Error while transforming data: {e}")
-                result.rejected.extend(
-                    [Result(Status.REJECTED, payload=row, message=f"{e}") for row in transformed_data])
-                return result
-
-        result.processed.extend([Result(Status.SUCCESS, payload=row) for row in transformed_data])
+            result.processed.extend([Result(Status.SUCCESS, payload=row) for row in transformed_data])
+        finally:
+            # close the event loop
+            loop.close()
         return result
 
     async def run(self):
