@@ -36,6 +36,7 @@ testcontainers = { version = "^3.7.0", optional = true }
 
 cassandra-driver = { version = "^3.25.0", optional = true }
 psycopg2-binary = { version="^2.9.5", optional = true}
+cx-Oracle = { version="^8.3.0", optional = true}
 pymssql = { version="^2.2.7", optional = true }
 PyMySQL = { version="^1.0.2", optional = true }
 redis = { version = "^4.3.5", optional = true }
@@ -47,11 +48,13 @@ cassandra = ["cassandra-driver"]
 mssql = ["pymssql", "SQLAlchemy"]
 mysql = ["PyMySQL", "SQLAlchemy"]
 pg = ["psycopg2-binary","SQLAlchemy"]
+oracle = ["cx-Oracle", "SQLAlchemy"]
 redis = ["redis"]
 test = [
         "cassandra-driver",
         "mock",
         "psycopg2-binary",
+        "cx-Oracle",
         "pymssql",
         "PyMySQL",
         "pytest",

@@ -1,0 +1,34 @@
+input:
+  uses: redis.read_stream
+  with:
+    connection: cache
+    stream_name: emp
+    snapshot: true
+steps:
+  - uses: add_field
+    with:
+      field: full_name
+      language: jmespath
+      expression: concat([capitalize(fname), ' ' , capitalize(lname)])
+  - uses: map
+    with:
+      expression:
+        {
+          _id: _id,
+          full_name: full_name,
+          country: country_code || ' - ' || UPPER(country_name),
+          gender: gender
+        }
+      language: sql
+  - uses: relational.write
+    with:
+      connection: oracle-hr
+      schema: hr
+      table: emp
+      opcode_field: __$$opcode
+      keys:
+        - id: _id
+      mapping:
+        - full_name
+        - country
+        - gender

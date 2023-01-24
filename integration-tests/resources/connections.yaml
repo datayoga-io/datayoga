@@ -19,6 +19,13 @@ mssql-hr:
   database: tempdb
   user: sa
   password: 1Secure*Password1
+oracle-hr:
+  type: oracle
+  host: localhost
+  port: 11521
+  database: xe
+  user: system
+  password: oracle
 cache:
   type: redis
   host: localhost

@@ -13,12 +13,14 @@ logger = logging.getLogger("dy")
 class DbType(str, Enum):
     MSSQL = "mssql"
     MYSQL = "mysql"
+    ORACLE = "oracle"
     PSQL = "postgresql"
 
 
 DEFAULT_DRIVERS = {
     DbType.MYSQL: "mysql+pymysql",
     DbType.MSSQL: "mssql+pymssql",
+    DbType.ORACLE: "oracle",
     DbType.PSQL: "postgresql"
 }
 

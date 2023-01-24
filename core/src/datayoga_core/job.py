@@ -68,8 +68,7 @@ class Job():
         self.root.add_done_callback(self.handle_results)
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]],
-                  deepcopy: boolean = True) -> JobResult:
+    def transform(self, data: List[Dict[str, Any]], deepcopy: boolean = True) -> JobResult:
         """
         Transforms data
 

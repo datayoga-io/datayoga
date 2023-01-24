@@ -34,7 +34,7 @@ class Block(DyBlock):
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = engine.connect()
 
-        if self.db_type == relational_utils.DbType.MSSQL:
+        if self.db_type in (relational_utils.DbType.MSSQL, relational_utils.DbType.ORACLE):
             # MERGE statement requires this
             self.connection = self.connection.execution_options(autocommit=True)
 
@@ -100,6 +100,20 @@ class Block(DyBlock):
                 ", ".join([f"[{column}]" for column in self.columns]),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
                 ", ".join([f"target.[{column}] = {sa.bindparam(column)}" for column in self.mapping_columns])
+            ))
+
+        if self.db_type == relational_utils.DbType.ORACLE:
+            return sa.sql.text("""                    
+                    MERGE INTO %s target
+                    USING (SELECT 1 FROM DUAL) ON (%s)
+                    WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
+                    WHEN MATCHED THEN UPDATE SET %s
+                    """ % (
+                f"{self.tbl.schema}.{self.tbl.name}",
+                "AND ".join([f"target.{column} = :{column}" for column in self.business_key_columns]),
+                ", ".join([f"{column}" for column in self.columns]),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
+                ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
             ))
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
