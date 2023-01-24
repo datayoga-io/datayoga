@@ -29,7 +29,7 @@ jobs:
         run: |
           curl https://download.oracle.com/otn_software/linux/instantclient/218000/instantclient-basiclite-linux.x64-21.8.0.0.0dbru.zip -o /tmp/instantclient-basiclite-linux.x64-21.8.0.0.0dbru.zip
           unzip -q /tmp/instantclient-basiclite-linux.x64-21.8.0.0.0dbru.zip -d /opt/oracle/
-          sudo sh -c "echo /opt/oracle/instantclient_21_1 > /etc/ld.so.conf.d/oracle-instantclient.conf"
+          sudo sh -c "echo /opt/oracle/instantclient_21_8 > /etc/ld.so.conf.d/oracle-instantclient.conf"
           sudo ldconfig
           cd core
           pip install wheel
