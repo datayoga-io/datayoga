@@ -69,9 +69,6 @@ def test_redis_to_oracle():
     oracle_container.start()
 
     engine = db_utils.get_engine(oracle_container)
-
-    #db_utils.create_schema(engine, schema)
-
     db_utils.create_emp_table(engine, schema)
     db_utils.insert_to_emp_table(engine, schema)
 
