@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from datayoga_core import expression
 from datayoga_core.block import Block as DyBlock
@@ -20,9 +20,10 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
         return_data = self.expression.filter(data, tombstone=True)
         # mark filtered rows
-        for i,row in enumerate(return_data):
+        for i, row in enumerate(return_data):
             if row is None:
-                result.filtered.append(Result(Status.FILTERED,payload=data[i]))
+                result.filtered.append(Result(Status.FILTERED, payload=data[i]))
             else:
-                result.processed.append(Result(Status.SUCCESS,payload=row))
+                result.processed.append(Result(Status.SUCCESS, payload=row))
+
         return result

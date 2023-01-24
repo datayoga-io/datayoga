@@ -1,9 +1,9 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
 import redis
-from datayoga_core import expression, utils
+from datayoga_core import expression
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult, Result, Status
@@ -44,10 +44,9 @@ class Block(DyBlock):
             results = pipeline.execute(raise_on_error=False)
             for record, result in zip(data, results):
                 if isinstance(result, Exception):
-                    block_result.rejected.append(Result(Status.REJECTED, message=f"{result}",payload=record))
+                    block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
                 else:
                     block_result.rejected.append(Result(Status.SUCCESS, payload=record))
-
         except redis.exceptions.ConnectionError as e:
             raise ConnectionError(e)
 

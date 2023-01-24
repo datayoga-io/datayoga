@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from concurrent.futures import process
 from typing import Any, Callable, Dict, List, Optional
 
 from datayoga_core.block import Block
@@ -65,16 +64,16 @@ class Step():
 
                 # handle filtered. anything not processed or rejected
                 logger.debug(f"filtered entries: {filtered_entries}, processed entries: {processed_entries}")
-                if len(filtered_entries) > 0:
+                if filtered_entries:
                     # ack the filtered entries
                     self.done([row.payload[Block.MSG_ID_FIELD] for row in filtered_entries], [Result(Status.FILTERED)] * len(filtered_entries))
 
                 # handle rejected
-                if len(rejected_entries) > 0:
-                    # ack the filtered entries
+                if rejected_entries:
+                    # ack the rejected entries
                     self.done([row.payload[Block.MSG_ID_FIELD] for row in rejected_entries], rejected_entries)
 
-                if len(processed_entries) > 0:
+                if processed_entries:
                     # check if we have a next step
                     if self.next_step:
                         # process downstream

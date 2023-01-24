@@ -69,10 +69,10 @@ job_settings = read_yaml("example.yaml")
 job = dy.compile(job_settings)
 
 assert job.transform([{"fname": "jane", "lname": "smith", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999", "gender": "F"}]).processed == [
-  Result(status=Status.SUCCESS,payload={"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"})]
+  Result(status=Status.SUCCESS, payload={"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"})]
 ```
 
-The job can also be provided as a parsed json inline
+The job can also be provided as a parsed json inline:
 
 ```python
 import datayoga_core as dy
@@ -120,7 +120,7 @@ job_settings = textwrap.dedent("""
 job = dy.compile(yaml.safe_load(job_settings))
 
 assert job.transform([{"fname": "jane", "lname": "smith", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999", "gender": "F"}]).processed == [
-  Result(status=Status.SUCCESS,payload={"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"})]
+  Result(status=Status.SUCCESS, payload={"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"})]
 ```
 
 As can be seen, the record has been transformed based on the job:

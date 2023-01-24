@@ -1,5 +1,5 @@
 import pytest
-from datayoga_core import result, utils
+from datayoga_core import utils
 from datayoga_core.blocks.rename_field.block import Block
 
 

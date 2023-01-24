@@ -1,10 +1,10 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.result import BlockResult, Result
+from datayoga_core.result import BlockResult
 
 logger = logging.getLogger("dy")
 

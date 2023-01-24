@@ -4,15 +4,14 @@ import importlib
 import logging
 import os
 import sys
-from abc import ABCMeta, abstractclassmethod, abstractmethod
+from abc import ABCMeta, abstractmethod
 from os import path
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple
-
-from jsonschema import validate
+from typing import Any, Dict, List, Optional
 
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
+from jsonschema import validate
 
 logger = logging.getLogger("dy")
 
@@ -80,7 +79,7 @@ class Block(metaclass=ABCMeta):
             data (List[Dict[str, Any]]): Data
 
         Returns:
-            Tuple[List[Dict[str, Any]], List[Result]]: Transformed data and results
+            BlockResult: Block result
         """
         pass
 

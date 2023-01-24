@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, NamedTuple, Optional
+from typing import Any, Dict, List, Optional
 
 Status = Enum("Status", "SUCCESS REJECTED FILTERED")
 
@@ -11,6 +11,7 @@ class Result():
     payload: Optional[Dict[str, Any]] = None
     message: Optional[str] = None
 
+
 @dataclass
 class BlockResult():
     processed: List[Result] = field(default_factory=list)
@@ -20,10 +21,13 @@ class BlockResult():
     # allow unpacking
     def __iter__(self):
         return iter((self.processed, self.filtered, self.rejected))
-# FFU, separate type for JobResult
+
+
 @dataclass
 class JobResult(BlockResult):
+    # FFU, separate type for JobResult
     pass
+
 
 SUCCESS = Result(Status.SUCCESS)
 FILTERED = Result(Status.FILTERED)

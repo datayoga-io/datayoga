@@ -1,19 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-import copy
 import logging
 import marshal
 import os
 import sys
-import typing
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -81,7 +78,7 @@ class Job():
             deepcopy: if True, performs a deepcopy before modifying records. otherwise, modifies in place. can affect performance.
 
         Returns:
-            Tuple[List[Dict[str, Any]], List[Result]]: Transformed data and results
+            JobResult: Job result
         """
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
@@ -93,7 +90,7 @@ class Job():
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
-        # depending on context, you might debug or warning log that a running event loop wasn't found
+            # depending on context, you might debug or warning log that a running event loop wasn't found
             loop = asyncio.get_event_loop()
 
         for step in self.steps:
@@ -108,10 +105,11 @@ class Job():
             except Exception as e:
                 # other exceptions are rejected
                 logger.error(f"Error while transforming data: {e}")
-                result.rejected.extend([Result(Status.REJECTED,payload=row,message=f"{e}") for row in transformed_data])
+                result.rejected.extend(
+                    [Result(Status.REJECTED, payload=row, message=f"{e}") for row in transformed_data])
                 return result
 
-        result.processed.extend([Result(Status.SUCCESS,payload=row) for row in transformed_data])
+        result.processed.extend([Result(Status.SUCCESS, payload=row) for row in transformed_data])
         return result
 
     async def run(self):
