@@ -27,7 +27,7 @@ class Block(DyBlock):
         logger.debug(f"Running {self.get_block_name()}")
         mapped_rows = self.expression.search_bulk(data)
         # we always add the internal fields back, in case they were dropped in the map operation
-        for mapped_row,original_row in zip(mapped_rows,data):
+        for mapped_row, original_row in zip(mapped_rows, data):
             original_msg_id= original_row.get(Block.MSG_ID_FIELD)
             original_opcode= original_row.get(Block.OPCODE_FIELD)
             if original_msg_id is not None:
@@ -35,4 +35,4 @@ class Block(DyBlock):
             if original_opcode is not None:
                 mapped_row[Block.OPCODE_FIELD] = original_opcode
 
-        return BlockResult(processed=[Result(Status.SUCCESS,payload=row) for row in mapped_rows])
+        return BlockResult(processed=[Result(Status.SUCCESS, payload=row) for row in mapped_rows])
