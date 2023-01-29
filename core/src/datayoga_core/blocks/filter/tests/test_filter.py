@@ -12,7 +12,7 @@ async def test_filter_sql():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == utils.block_result_success([{"fname": "john", "lname": "doe", "age": 25}])
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == utils.all_success([{"fname": "john", "lname": "doe", "age": 25}])
 
 
 @pytest.mark.asyncio
@@ -88,7 +88,7 @@ async def test_filter_jmespath():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == utils.block_result_success([{"fname": "john", "lname": "doe", "age": 25}])
+    assert await block.run([{"fname": "john", "lname": "doe", "age": 25}]) == utils.all_success([{"fname": "john", "lname": "doe", "age": 25}])
 
 
 @pytest.mark.asyncio

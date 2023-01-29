@@ -1,12 +1,12 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import sqlalchemy as sa
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import BlockResult
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import ColumnCollection
@@ -54,7 +54,7 @@ class Block(DyBlock):
 
             self.upsert_stmt = self.generate_upsert_stmt()
 
-    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
 
         if self.opcode_field:
@@ -67,7 +67,7 @@ class Block(DyBlock):
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.execute(self.tbl.insert(), data)
 
-        return utils.produce_data_and_results(data)
+        return utils.all_success(data)
 
     def generate_upsert_stmt(self) -> Any:
         """Generates an UPSERT statement based on the DB type"""
@@ -103,7 +103,7 @@ class Block(DyBlock):
             ))
 
         if self.db_type == relational_utils.DbType.ORACLE:
-            return sa.sql.text("""                    
+            return sa.sql.text("""
                     MERGE INTO %s target
                     USING (SELECT 1 FROM DUAL) ON (%s)
                     WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
