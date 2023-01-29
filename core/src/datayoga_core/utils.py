@@ -7,6 +7,7 @@ from os import path
 from typing import Any, Dict, List
 
 import yaml
+
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -103,7 +104,4 @@ def is_rejected(record: Dict[str, Any]) -> bool:
 
 def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
     return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
-
-def block_result_success(records) -> result.BlockResult:
-    return result.BlockResult(processed=[result.Result(status=result.Status.SUCCESS,payload=row) for row in records])
 

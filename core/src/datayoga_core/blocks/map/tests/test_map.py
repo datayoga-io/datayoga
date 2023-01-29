@@ -10,7 +10,7 @@ async def test_map_expression_jmespath():
                         "new_field": `hello`
                    }"""})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"new_field": "hello"}]
     )
 
@@ -22,7 +22,7 @@ async def test_map_field_multiple_expressions_jmespath():
                             "new_field": `hello`, "name" : fname
                     }"""})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"new_field": "hello", "name": "john"}]
     )
 
@@ -34,7 +34,7 @@ async def test_map_field_nested_expression_jmespath():
                             "new_field": `hello`, "name" : details.fname
                     }"""})
     block.init()
-    assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+    assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"new_field": "hello", "name": "john"}]
     )
 
@@ -46,7 +46,7 @@ async def test_map_field_double_nested_expression_jmespath():
                             "new_field": `hello`, "name" : details.name.fname
                     }"""})
     block.init()
-    assert await block.run([{"details": {"name": {"fname": "john", "lname": "doe"}, "country": "israel"}}]) == utils.block_result_success([
+    assert await block.run([{"details": {"name": {"fname": "john", "lname": "doe"}, "country": "israel"}}]) == utils.all_success([
         {"new_field": "hello", "name": "john"}]
     )
 
@@ -58,7 +58,7 @@ async def test_map_expression_non_quoted_jmespath():
                                   "name": "fname"
                               }})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"name": "john"}]
     )
 
@@ -70,7 +70,7 @@ async def test_map_multiple_expressions_non_quoted_jmespath():
                                   "name": "fname", "last name": "lname"
                               }})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"name": "john", "last name": "doe"}]
     )
 
@@ -82,7 +82,7 @@ async def test_map_expression_sql():
                                   "new_field": "fname"
                               }})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"new_field": "john"}]
     )
 
@@ -94,7 +94,7 @@ async def test_map_multiple_expressions_sql():
                                   "name": "fname", "last name": "lname"
                               }})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"name": "john", "last name": "doe"}]
     )
 
@@ -106,7 +106,7 @@ async def test_map_double_nested_expression_sql():
                                   "name": "(`details.name.fname`)"
                               }})
     block.init()
-    assert await block.run([{"details": {"name": {"fname": "john", "lname": "doe"}, "country": "israel"}}]) == utils.block_result_success([
+    assert await block.run([{"details": {"name": {"fname": "john", "lname": "doe"}, "country": "israel"}}]) == utils.all_success([
         {"name": "john"}]
     )
 
@@ -118,7 +118,7 @@ async def test_map_nested_expression_sql():
                                   "name": "(`details.fname`)"
                               }})
     block.init()
-    assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+    assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"name": "john"}]
     )
 
@@ -136,7 +136,7 @@ async def test_jmespath_does_not_filter_in_map():
     block = Block(properties={"language": "jmespath",
                               "expression": "{name: a} "})
     block.init()
-    assert await block.run([{"a": "one"}, {"b": "two"}]) == utils.block_result_success([
+    assert await block.run([{"a": "one"}, {"b": "two"}]) == utils.all_success([
         {"name": "one"},
         {"name": None}
     ])

@@ -9,7 +9,7 @@ async def test_add_field():
                    "language": "jmespath",
                    "expression": "[fname,lname] | join(' ', @)"})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"fname": "john", "lname": "doe", "full_name": "john doe"}]
     )
 
@@ -20,7 +20,7 @@ async def test_add_nested_field():
                    "language": "jmespath",
                   "expression": "[name.fname,name.lname] | join(' ', @)"})
     block.init()
-    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}])
 
 
@@ -29,7 +29,7 @@ async def test_add_multiple_fields():
     block = Block({"fields": [{"field": "name.full_name", "language": "jmespath", "expression": "concat([name.fname, ' ', name.lname])"}, {
                   "field": "name.fname_upper", "language": "jmespath", "expression": "upper(name.fname)"}]})
     block.init()
-    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"name": {"fname": "john", "lname": "doe", "full_name": "john doe", "fname_upper": "JOHN"}}])
 
 
@@ -39,5 +39,5 @@ async def test_add_field_with_dot():
                    "language": "jmespath",
                    "expression": "[fname,lname] | join(' ', @)"})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"fname": "john", "lname": "doe", "name.full_name": "john doe"}])

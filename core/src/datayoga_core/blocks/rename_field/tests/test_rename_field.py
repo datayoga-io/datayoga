@@ -12,7 +12,7 @@ async def test_rename_existing_field():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([{"first_name": "john", "lname": "doe"}])
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([{"first_name": "john", "lname": "doe"}])
 
 
 @pytest.mark.asyncio
@@ -24,7 +24,7 @@ async def test_rename_missing_field():
         }
     )
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.block_result_success([
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
         {"fname": "john", "lname": "doe"}])
 
 
@@ -37,7 +37,7 @@ async def test_rename_deep_nested_field():
         }
     )
     block.init()
-    assert await block.run([{"employee": {"name": {"fname": "john", "lname": "doe"}}}]) == utils.block_result_success([
+    assert await block.run([{"employee": {"name": {"fname": "john", "lname": "doe"}}}]) == utils.all_success([
 
         {"employee": {"name": {"first_name": "john", "lname": "doe"}}}])
 
@@ -51,7 +51,7 @@ async def test_rename_nested_field():
         }
     )
     block.init()
-    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"name": {"first_name": "john", "lname": "doe"}}])
 
 
@@ -64,7 +64,7 @@ async def test_rename_nested_field_missing_to_field_parent():
         }
     )
     block.init()
-    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.block_result_success([
+    assert await block.run([{"name": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"name": {"lname": "doe"}, "new_name": {"first_name": "john"}}])
 
 
@@ -77,4 +77,4 @@ async def test_rename_field_with_dot():
         }
     )
     block.init()
-    assert await block.run([{"name.fname": "john", "lname": "doe"}]) == utils.block_result_success([{"name.first_name": "john", "lname": "doe"}])
+    assert await block.run([{"name.fname": "john", "lname": "doe"}]) == utils.all_success([{"name.first_name": "john", "lname": "doe"}])

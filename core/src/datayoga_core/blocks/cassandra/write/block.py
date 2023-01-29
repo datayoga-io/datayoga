@@ -1,12 +1,12 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import cassandra.auth
 from cassandra.cluster import NoHostAvailable, PreparedStatement
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.result import Result
+from datayoga_core.result import BlockResult
 
 logger = logging.getLogger("dy")
 
@@ -48,7 +48,7 @@ class Block(DyBlock):
 
         self.upsert_stmt = f"update {self.keyspace}.{self.table} set {', '.join([column + ' = ?' for column in mapping_columns])} where {pk_clause}"
 
-    async def run(self, data: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Result]]:
+    async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
 
         records_to_insert, records_to_update, records_to_delete = write_utils.group_records_by_opcode(
@@ -60,7 +60,8 @@ class Block(DyBlock):
         except NoHostAvailable as e:
             raise ConnectionError(e)
 
-        return utils.produce_data_and_results(data)
+        return utils.all_success(data)
+
 
     def get_future(self, stmt: PreparedStatement, record: Dict[str, Any]) -> Any:
         future = self.session.execute_async(stmt, record)
