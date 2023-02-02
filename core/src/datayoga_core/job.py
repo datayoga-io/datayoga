@@ -20,10 +20,12 @@ from datayoga_core.step import Step
 
 logger = logging.getLogger("dy")
 
+
 @unique
 class ErrorHandling(str, Enum):
     ABORT = "abort"
     IGNORE = "ignore"
+
 
 class Job():
     """
@@ -53,20 +55,22 @@ class Job():
         # open any connections or setup needed
         self.context = context
 
-        for step in self.steps:
-            step.init(context)
+        if self.steps is not None and len(self.steps) > 0:
+            # set the first step as root
+            self.root = self.steps[0]
+            self.root.init(context)
+            self.root.add_done_callback(self.handle_results)
+            last_step = self.root
 
             # create the step sequence
-            if self.root is None:
-                self.root = step
-                last_step = self.root
-            else:
+            for step in self.steps[1:]:
+                step.init(context)
+
                 last_step = last_step.append(step)
 
         if self.input:
             self.input.init(context)
 
-        self.root.add_done_callback(self.handle_results)
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]], deepcopy: boolean = True) -> JobResult:
@@ -119,7 +123,6 @@ class Job():
             except NotImplementedError as noe:
                 # for pyodide. doesn't implement loop.close, ignore
                 pass
-
 
         return result
 
