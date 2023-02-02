@@ -9,7 +9,7 @@ try:
 
     oracledb.version = "8.3.0"
     sys.modules["cx_Oracle"] = oracledb
-    import cx_Oracle
+    oracledb.init_oracle_client()
 except ImportError:
     pass
 
