@@ -7,6 +7,7 @@ try:
 
     import sys
     import oracledb
+    import oracledb.exceptions
 
     oracledb.version = "8.3.0"
     sys.modules["cx_Oracle"] = oracledb
