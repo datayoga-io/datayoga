@@ -76,6 +76,26 @@ def test_block_after_filter():
     assert [result.payload for result in filtered] == [{"fname": "secondfname", "id": 2}]
 
 
+def test_block_after_filter_empty_results():
+    job_yaml = """
+        steps:
+          - uses: filter
+            with:
+                expression: fname='x'
+                language: sql
+          - uses: add_field
+            with:
+                field: field0
+                expression: fname || 'x'
+                language: sql
+    """
+    data = [{"fname": "firstfname", "id": 1}]
+    processed, filtered, rejected = dy.transform(yaml.safe_load(textwrap.dedent(job_yaml)), data)
+    assert [result.payload for result in processed] == []
+    assert rejected == []
+    assert [result.payload for result in filtered] == [{"fname": "firstfname", "id": 1}]
+
+
 def test_validate_invalid_job():
     # unsupported property specified in this block
     job_settings = {"steps": [{"uses": "remove_field", "with": {"field": "my_field", "bla": "xxx"}}]}

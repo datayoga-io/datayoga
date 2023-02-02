@@ -93,6 +93,9 @@ class Job():
         try:
             for step in self.steps:
                 try:
+                    if len(transformed_data) == 0:
+                        # in case all records have been filtered, stop sending
+                        break
                     processed, filtered, rejected = loop.run_until_complete(step.block.run(transformed_data))
                     result.filtered.extend(filtered)
                     result.rejected.extend(rejected)
@@ -107,10 +110,17 @@ class Job():
                         [Result(Status.REJECTED, payload=row, message=f"{e}") for row in transformed_data])
                     return result
 
-            result.processed.extend([Result(Status.SUCCESS, payload=row) for row in transformed_data])
+            # the processed records are those that make it to the end
+            result.processed = [Result(Status.SUCCESS, payload=row) for row in transformed_data]
         finally:
             # close the event loop
-            loop.close()
+            try:
+                loop.close()
+            except NotImplementedError as noe:
+                # for pyodide. doesn't implement loop.close, ignore
+                pass
+
+
         return result
 
     async def run(self):
