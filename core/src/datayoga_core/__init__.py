@@ -10,7 +10,10 @@ try:
 
     oracledb.version = "8.3.0"
     sys.modules["cx_Oracle"] = oracledb
-    oracledb.init_oracle_client()
+    try:
+        oracledb.init_oracle_client()
+    except oracledb.exceptions.DatabaseError:
+        pass
 except ImportError:
     pass
 
