@@ -14,7 +14,6 @@ from enum import Enum, unique
 from typing import Any, Dict, List, Tuple, Union
 
 import jmespath
-
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
