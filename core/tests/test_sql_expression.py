@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from datayoga_core.expression import SQLExpression
 
 
@@ -36,6 +37,17 @@ def test_sql_expression_multiple_fields():
     assert sql_expression.search_bulk([{"fname": "john",  "mname": "george", "lname": "smith"}]) == [
         {"fullname": "john smith", "fname": "JOHN"}]
 
+
+def test_sql_expression_sql_parse_error():
+    sql_expression = SQLExpression()
+    with pytest.raises(ValueError):
+        sql_expression.compile("like 'A%'")
+
+
+def test_sql_expression_sql_parse_error_malformed():
+    sql_expression = SQLExpression()
+    with pytest.raises(ValueError):
+        sql_expression.compile("like 'A%")
 
 def test_sql_expression_nested_fields():
     sql_expression = SQLExpression()

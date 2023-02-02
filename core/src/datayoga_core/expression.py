@@ -78,15 +78,17 @@ class Expression():
         """
         # filter is essentially using a single field returning 0 or 1 for the condition
         if tombstone:
-            return [row[0] if row[1] else None for row in zip(data,self.search_bulk(data))]
+            return [row[0] if row[1] else None for row in zip(data, self.search_bulk(data))]
         else:
-            return [row[0] for row in zip(data,self.search_bulk(data)) if row[1]]
+            return [row[0] for row in zip(data, self.search_bulk(data)) if row[1]]
+
 
 class SQLExpression(Expression):
     def compile(self, expression: str):
         # check min sqlite3 version to at least support values clause
-        if sqlite3.sqlite_version_info < (3,8,8):
-            raise ValueError(f"must have SQLite v3.8.8 and above to use SQL expressions. Found {sqlite3.sqlite_version_info}")
+        if sqlite3.sqlite_version_info < (3, 8, 8):
+            raise ValueError(
+                f"must have SQLite v3.8.8 and above to use SQL expressions. Found {sqlite3.sqlite_version_info}")
 
         # we turn off `check_same_thread` to gain performance benefit by reusing the same connection object
         # safe to use since we are only creating in memory structures
@@ -97,7 +99,7 @@ class SQLExpression(Expression):
             self._fields = json.loads(expression)
 
             # verify this is a dict, and not a list or document ('x' is a valid json)
-            if isinstance(self._fields,dict):
+            if isinstance(self._fields, dict):
                 self._is_single_field = False
             else:
                 # this is not a dict, treat as a simple expression
@@ -111,9 +113,13 @@ class SQLExpression(Expression):
         # they will get parsed and binded for performance instead of traversing the entire payload
         self._column_names = set()
         for _exp in self._fields.values():
-            self._column_names.update(
-                [tuple(column.sql().replace('"', "").split("."))
-                 for column in sqlglot.parse_one("SELECT " + _exp.replace('`', '"')).find_all(sqlglot.exp.Column)])
+            try:
+                self._column_names.update(
+                    [tuple(column.sql().replace('"', "").split("."))
+                     for column in sqlglot.parse_one("SELECT " + _exp.replace('`', '"')).find_all(sqlglot.exp.Column)])
+            except Exception as pe:
+                # a parse error
+                raise ValueError(f"Cannot parse SQL expression: {_exp}")
 
     def search_bulk(self, data: List[Dict[str, Any]]) -> Any:
         results = self.exec_sql(data, self._fields)
@@ -149,10 +155,11 @@ class SQLExpression(Expression):
             subselect = f"select {columns_clause} from (values {values_clause})"
 
             # bind the variables
-            data_values = [get_nested_value(row,col) for row in data for col in self._column_names]
+            data_values = [get_nested_value(row, col) for row in data for col in self._column_names]
 
             # expressions clause
-            expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
+            expressions_clause = ", ".join(
+                [f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
             # we don't use CTE because of compatibility with older SQLlite versions on Centos7
             statement = f"select {expressions_clause} from ({subselect})"
 
@@ -162,7 +169,8 @@ class SQLExpression(Expression):
         else:
             # a sepcial case where we are only selecting literals. e.g. select current_timstamp or 'x'
             # no need to bind anything. just run it once and copy to all records
-            expressions_clause = ", ".join([f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
+            expressions_clause = ", ".join(
+                [f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
             cursor = self.conn.execute(f"select {expressions_clause}")
             return [dict(cursor.fetchone())] * len(data)
 
