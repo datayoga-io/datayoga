@@ -7,13 +7,13 @@ try:
 
     import sys
     import oracledb
-    import oracledb.exceptions
+    from oracledb.exceptions import DatabaseError
 
     oracledb.version = "8.3.0"
     sys.modules["cx_Oracle"] = oracledb
     try:
         oracledb.init_oracle_client()
-    except oracledb.exceptions.DatabaseError:
+    except DatabaseError:
         pass
 except ImportError:
     pass
