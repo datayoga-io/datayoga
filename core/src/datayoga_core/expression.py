@@ -2,7 +2,6 @@ import json
 import logging
 
 import sqlglot
-from sqlglot.errors import ParseError
 
 try:
     # older linux doesn't have adequate version
