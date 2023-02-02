@@ -1,10 +1,11 @@
 import logging
 
 try:
-    # This hack makes it possible to use the new driver with SQLAlhemy 1.4.*
+    # This hack makes it possible to use the new driver with SQLAlchemy 1.4.*
     # More: https://lnk.pw/swif
 
     import sys
+
     import oracledb
 
     oracledb.version = "8.3.0"
