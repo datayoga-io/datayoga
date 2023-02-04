@@ -104,6 +104,29 @@ def test_validate_invalid_job():
         dy.validate(job_settings)
 
 
+def test_init_invalid_job():
+    # unsupported property specified in this block
+    job_settings = {"steps": [{"uses": "add_field", "with": {
+        "field": "my_field", "expression": "'xxx", "language": "sql"}}]}
+    job = dy.compile(job_settings)
+
+    with pytest.raises(ValueError):
+        job.transform([{"fname": "john"}])
+
+
+def test_reinit_invalid_job():
+    # unsupported property specified in this block
+    job_settings = {"steps": [{"uses": "add_field", "with": {
+        "field": "my_field", "expression": "'xxx", "language": "sql"}}]}
+    job = dy.compile(job_settings)
+
+    with pytest.raises(ValueError):
+        job.transform([{"fname": "john"}])
+
+    with pytest.raises(ValueError):
+        job.transform([{"fname": "john"}])
+
+
 def test_block_not_in_whitelisted_blocks(job_settings):
     with pytest.raises(ValidationError):
         dy.compile(job_settings, whitelisted_blocks=["add_field", "rename_field", "remove_field"])
