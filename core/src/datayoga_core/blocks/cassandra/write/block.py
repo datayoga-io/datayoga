@@ -25,7 +25,7 @@ class Block(DyBlock):
             username=connection_details.get("user"),
             password=connection_details.get("password"))
 
-        cluster = cassandra.cluster.Cluster(
+        self.cluster = cassandra.cluster.Cluster(
             connection_details.get("hosts"),
             port=connection_details.get("port", 9042),
             auth_provider=auth_provider)
@@ -33,7 +33,7 @@ class Block(DyBlock):
         self.keyspace = self.properties.get("keyspace")
 
         logger.debug(f"Connecting to Cassandra")
-        self.session = cluster.connect(self.keyspace)
+        self.session = self.cluster.connect(self.keyspace)
 
         self.opcode_field = self.properties.get("opcode_field")
         self.table = self.properties.get("table")
@@ -91,3 +91,6 @@ class Block(DyBlock):
 
             for future in futures:
                 future.result()
+
+    def stop(self):
+        self.cluster.shutdown()

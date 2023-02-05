@@ -8,10 +8,11 @@ from abc import ABCMeta, abstractmethod
 from os import path
 from typing import Any, Dict, List, Optional
 
+from jsonschema import validate
+
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
-from jsonschema import validate
 
 logger = logging.getLogger("dy")
 
@@ -80,6 +81,13 @@ class Block(metaclass=ABCMeta):
 
         Returns:
             BlockResult: Block result
+        """
+        pass
+
+    def stop(self):
+        """
+        Cleans the block connections and state
+
         """
         pass
 

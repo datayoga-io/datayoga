@@ -19,9 +19,8 @@ class Block(DyBlock):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        engine, db_type = relational_utils.get_engine(self.properties.get("connection"), context)
+        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context)
 
-        self.db_type = db_type
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
         self.opcode_field = self.properties.get("opcode_field")
@@ -29,10 +28,10 @@ class Block(DyBlock):
         self.keys = self.properties.get("keys")
         self.mapping = self.properties.get("mapping")
 
-        self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
+        self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         logger.debug(f"Connecting to {self.db_type}")
-        self.connection = engine.connect()
+        self.connection = self.engine.connect()
 
         if self.db_type in (relational_utils.DbType.MSSQL, relational_utils.DbType.ORACLE):
             # MERGE statement requires this
@@ -141,3 +140,7 @@ class Block(DyBlock):
 
             if records_to_delete:
                 self.execute(self.delete_stmt, records_to_delete)
+
+    def stop(self):
+        self.connection.close()
+        self.engine.dispose()
