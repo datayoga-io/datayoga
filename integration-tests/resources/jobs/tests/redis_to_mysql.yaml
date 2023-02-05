@@ -15,7 +15,7 @@ steps:
       expression:
         {
           _id: _id,
-          full_name: full_name,
+          fullname: full_name,
           country: country_code || ' - ' || UPPER(country_name),
           gender: gender
         }
@@ -29,6 +29,6 @@ steps:
       keys:
         - id: _id
       mapping:
-        - full_name
+        - full_name: fullname
         - country
         - gender

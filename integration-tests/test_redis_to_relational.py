@@ -1,9 +1,10 @@
 import logging
 
 import pytest
+from sqlalchemy.engine import Engine
+
 from common import db_utils, redis_utils
 from common.utils import run_job
-from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
 
@@ -109,6 +110,7 @@ def test_redis_to_mssql():
 
 
 def check_results(engine: Engine, schema: str):
+    # the first record was supposed to be delete due to opcode=="d"
     total_employees = db_utils.select_one_row(engine, f"select count(*) as total from {schema}.emp")
     assert total_employees and total_employees["total"] == 3
 

@@ -12,6 +12,7 @@ mysql-hr:
   database: hr
   user: my_user
   password: my_pass
+  debug: True
 mssql-hr:
   type: mssql
   host: localhost
