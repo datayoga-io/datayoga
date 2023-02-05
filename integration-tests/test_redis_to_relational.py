@@ -1,19 +1,5 @@
 import logging
 
-try:
-    # This hack makes it possible to use the new driver with SQLAlchemy 1.4.*
-    # More: https://lnk.pw/swif
-
-    import sys
-
-    import oracledb
-
-    oracledb.version = "8.3.0"
-    sys.modules["cx_Oracle"] = oracledb
-    oracledb.init_oracle_client()
-except ImportError:
-    pass
-
 import pytest
 from common import db_utils, redis_utils
 from common.utils import run_job
