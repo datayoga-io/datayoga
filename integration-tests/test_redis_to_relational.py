@@ -1,5 +1,7 @@
 import logging
 
+from datayoga_core.blocks import relational  # noqa
+
 import pytest
 from common import db_utils, redis_utils
 from common.utils import run_job
