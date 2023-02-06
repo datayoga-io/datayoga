@@ -6,7 +6,8 @@ from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
-from datayoga_core.result import BlockResult
+from datayoga_core.opcode import OpCode
+from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import ColumnCollection
@@ -56,18 +57,27 @@ class Block(DyBlock):
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
+        rejected_records: List[Result] = []
 
         if self.opcode_field:
-            records_to_insert, records_to_update, records_to_delete = write_utils.group_records_by_opcode(
-                data, self.opcode_field, self.keys)
+            opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
+            # reject any records with unknown or missing Opcode
+            for opcode in set(opcode_groups.keys())-{o.value for o in OpCode}:
+                rejected_records.extend([
+                    Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
+                    for record in opcode_groups[opcode]
+                ])
+            self.execute_upsert(opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE])
+            self.execute_delete(opcode_groups[OpCode.DELETE])
 
-            self.execute_upsert(records_to_insert + records_to_update)
-            self.execute_delete(records_to_delete)
+            return BlockResult(
+                processed=[Result(Status.SUCCESS, payload=record)
+                           for opcode in OpCode for record in opcode_groups[opcode.value]],
+                rejected=rejected_records)
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.execute(self.tbl.insert(), data)
-
-        return utils.all_success(data)
+            return utils.all_success(data)
 
     def generate_upsert_stmt(self) -> Any:
         """Generates an UPSERT statement based on the DB type"""

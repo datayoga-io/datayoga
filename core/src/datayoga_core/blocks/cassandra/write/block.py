@@ -6,7 +6,8 @@ from cassandra.cluster import NoHostAvailable, PreparedStatement
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.result import BlockResult
+from datayoga_core.opcode import OpCode
+from datayoga_core.result import BlockResult, Result, Status
 
 logger = logging.getLogger("dy")
 
@@ -51,21 +52,30 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
 
-        records_to_insert, records_to_update, records_to_delete = write_utils.group_records_by_opcode(
-            data, self.opcode_field, self.keys)
+        opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
+        # reject any records with unknown or missing Opcode
+        rejected_records: List[Result] = []
+
+        for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}:
+            rejected_records.extend([
+                Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
+                for record in opcode_groups[opcode]
+            ])
 
         try:
-            self.execute_upsert(records_to_insert + records_to_update)
-            self.execute_delete(records_to_delete)
+            self.execute_upsert(opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE])
+            self.execute_delete(opcode_groups[OpCode.DELETE])
         except NoHostAvailable as e:
             raise ConnectionError(e)
 
-        return utils.all_success(data)
-
+        return BlockResult(
+            processed=[Result(Status.SUCCESS, payload=record)
+                       for opcode in OpCode for record in opcode_groups[opcode.value]],
+            rejected=rejected_records)
 
     def get_future(self, stmt: PreparedStatement, record: Dict[str, Any]) -> Any:
         future = self.session.execute_async(stmt, record)
-        future.add_errback(utils.reject_record, record)
+        future.add_errback(lambda ex, record: Result(status=Status.REJECTED, payload=record, message=f"{ex}"), record)
         return future
 
     def execute_upsert(self, records: List[Dict[str, Any]]):

@@ -63,7 +63,8 @@ class Step():
                 processed_entries, filtered_entries, rejected_entries = await self.block.run(entry)
 
                 # handle filtered. anything not processed or rejected
-                logger.debug(f"filtered entries: {filtered_entries}, processed entries: {processed_entries}")
+                logger.debug(
+                    f"filtered entries: {filtered_entries}, processed entries: {processed_entries}, rejected entries: {rejected_entries}")
                 if filtered_entries:
                     # ack the filtered entries
                     self.done([row.payload[Block.MSG_ID_FIELD] for row in filtered_entries], [Result(Status.FILTERED)] * len(filtered_entries))
