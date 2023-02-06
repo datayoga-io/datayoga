@@ -1,10 +1,9 @@
 import logging
 
 import pytest
-from sqlalchemy.engine import Engine
-
 from common import db_utils, redis_utils
 from common.utils import run_job
+from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
 

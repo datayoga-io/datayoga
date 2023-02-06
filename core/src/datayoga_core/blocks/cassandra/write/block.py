@@ -56,11 +56,12 @@ class Block(DyBlock):
         # reject any records with unknown or missing Opcode
         rejected_records: List[Result] = []
 
-        for opcode in set(opcode_groups.keys())-{o.value for o in OpCode}:
+        for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}:
             rejected_records.extend([
                 Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
                 for record in opcode_groups[opcode]
             ])
+
         try:
             self.execute_upsert(opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE])
             self.execute_delete(opcode_groups[OpCode.DELETE])
@@ -69,15 +70,12 @@ class Block(DyBlock):
 
         return BlockResult(
             processed=[Result(Status.SUCCESS, payload=record)
-                        for opcode in OpCode for record in opcode_groups[opcode.value]],
+                       for opcode in OpCode for record in opcode_groups[opcode.value]],
             rejected=rejected_records)
-
-
-
 
     def get_future(self, stmt: PreparedStatement, record: Dict[str, Any]) -> Any:
         future = self.session.execute_async(stmt, record)
-        future.add_errback(lambda ex,record: Result(status=Status.REJECTED,payload=record,message=str(ex)), record)
+        future.add_errback(lambda ex, record: Result(status=Status.REJECTED, payload=record, message=f"{ex}"), record)
         return future
 
     def execute_upsert(self, records: List[Dict[str, Any]]):

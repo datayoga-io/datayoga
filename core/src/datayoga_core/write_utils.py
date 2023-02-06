@@ -15,7 +15,7 @@ def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[Li
     valid_records = []
     key_set = set(keys)
     for record in records:
-        if key_set-record.keys():
+        if key_set - record.keys():
             # not all keys are present. add to rejected
             rejected_records.append(
                 Result(status=Status.REJECTED, payload=record, message=f"missing {key_set-record.keys()} field(s)")
@@ -31,7 +31,7 @@ def group_records_by_opcode(records: List[Dict[str, Any]],
     # group records by their opcode, reject records with unsupported opcode or with missing keys
     groups = defaultdict(list)
     for record in records:
-        groups[record.get(opcode_field,"")].append(record)
+        groups[record.get(opcode_field, "")].append(record)
     return groups
 
 

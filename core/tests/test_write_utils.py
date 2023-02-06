@@ -1,17 +1,5 @@
-import pytest
 from datayoga_core import write_utils
-from datayoga_core.result import Result, Status
-
-# def test_group_records_by_opcode_invalid_opcode():
-#     change_records = [
-#         {"id": 1, "opcode": "r"},
-#         {"id": 2, "opcode": "x"}
-#     ]
-#     inserted, updated, deleted, rejected = write_utils.group_records_by_opcode(
-#         change_records,
-#         "opcode",
-
-#     )
+from datayoga_core.result import Status
 
 
 def test_validate_records_missing_key():
