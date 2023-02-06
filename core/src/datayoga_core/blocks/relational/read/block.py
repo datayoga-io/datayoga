@@ -14,8 +14,7 @@ logger = logging.getLogger("dy")
 class Block(DyProducer):
 
     def init(self, context: Optional[Context] = None):
-        engine, db_type = relational_utils.get_engine(self.properties.get("connection"), context)
-        self.db_type = db_type
+        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context)
 
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
@@ -24,10 +23,10 @@ class Block(DyProducer):
         self.keys = self.properties.get("keys")
         self.mapping = self.properties.get("mapping")
 
-        self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
+        self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
         logger.debug(f"Connecting to {self.db_type}")
-        self.connection = engine.connect()
+        self.connection = self.engine.connect()
 
     def produce(self) -> Generator[Message, None, None]:
         result = self.connection.execution_options(stream_results=True).execute(
@@ -40,3 +39,7 @@ class Block(DyProducer):
                 break
             for row in chunk:
                 yield utils.add_uid(dict(row))
+
+    def stop(self):
+        self.connection.close()
+        self.engine.dispose()

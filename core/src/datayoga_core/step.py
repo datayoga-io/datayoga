@@ -112,6 +112,10 @@ class Step():
         await self.join()
         logger.debug("joined")
 
+        # stop the block
+        if self.block:
+            self.block.stop()
+
         # stop any downstream workers
         if self.next_step:
             await self.next_step.stop()

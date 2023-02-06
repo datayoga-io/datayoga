@@ -12,18 +12,24 @@ from datayoga_core.step_buffer import StepBuffer
 logger = logging.getLogger("dy")
 
 
-class SleepBlock():
+class SleepBlock(Block):
     def init(self):
         pass
+
+    def validate(self):
+        return True
 
     async def run(self, i):
         await asyncio.sleep(i[0]["sleep"])
         return utils.all_success(i)
 
 
-class ExceptionBlock():
+class ExceptionBlock(Block):
     def init(self):
         pass
+
+    def validate(self):
+        return True
 
     async def run(self, i):
         if (i[0]):
@@ -32,9 +38,11 @@ class ExceptionBlock():
             return utils.all_success(i)
 
 
-class EchoBlock():
+class EchoBlock(Block):
     def init(self):
         pass
+    def validate(self):
+        return True
 
     async def run(self, i):
         return utils.all_success(i)

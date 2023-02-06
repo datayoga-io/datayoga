@@ -15,6 +15,7 @@ from jsonschema import validate
 
 logger = logging.getLogger("dy")
 
+
 class Block(metaclass=ABCMeta):
     INTERNAL_FIELD_PREFIX = "__$$"
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
@@ -80,6 +81,12 @@ class Block(metaclass=ABCMeta):
 
         Returns:
             BlockResult: Block result
+        """
+        pass
+
+    def stop(self):
+        """
+        Cleans the block connections and state
         """
         pass
 
