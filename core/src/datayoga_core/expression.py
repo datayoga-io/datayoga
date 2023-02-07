@@ -28,7 +28,11 @@ class Language(str, Enum):
 def get_nested_value(data: Dict[str, Any], key: Tuple[str]) -> Any:
     # get nested key
     for level in key:
-        data = data[level]
+        try:
+            data = data[level]
+        except KeyError:
+            # such field does not exist, return None
+            return None
     return data
 
 
@@ -117,7 +121,7 @@ class SQLExpression(Expression):
                 self._column_names.update(
                     [tuple(column.sql().replace('"', "").split("."))
                      for column in sqlglot.parse_one("SELECT " + _exp.replace('`', '"')).find_all(sqlglot.exp.Column)])
-            except Exception as pe:
+            except Exception:
                 # a parse error
                 raise ValueError(f"Cannot parse SQL expression: {_exp}")
 

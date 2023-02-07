@@ -1,6 +1,7 @@
 import logging
 
 import pytest
+
 from common import cassandra_utils, redis_utils
 from common.utils import run_job
 
