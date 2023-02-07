@@ -110,5 +110,5 @@ def test_sql_nonexistent_filter_ifnull():
 def test_sql_concat_null():
     sql_expression = SQLExpression()
     sql_expression.compile("a||' '||b")
-    assert sql_expression.search_bulk([{"a":"Y","b":"Z"},{"b":"c"}])==["Y Z",None]
+    assert sql_expression.search_bulk([{"a": "Y", "b": "Z"}, {"b": "c"}]) == ["Y Z", None]
 
