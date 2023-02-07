@@ -86,3 +86,24 @@ def test_sql_expression_batch():
             {"fullname": "john smith", "fname": "JOHN"},
             {"fullname": "john2 smith2", "fname": "JOHN2"}
         ]
+
+def test_sql_nonexistent():
+    sql_expression = SQLExpression()
+    sql_expression.compile("a")
+    assert sql_expression.search({"b":"c"})==None
+
+def test_sql_nonexistent_bulk():
+    sql_expression = SQLExpression()
+    sql_expression.compile("a")
+    assert sql_expression.search_bulk([{"b":"c"}])==[None]
+
+def test_sql_nonexistent_filter():
+    sql_expression = SQLExpression()
+    sql_expression.compile("a='Y'")
+    assert sql_expression.filter([{"a":"Y"},{"b":"c"}])==[{"a":"Y"}]
+
+def test_sql_nonexistent_filter_ifnull():
+    sql_expression = SQLExpression()
+    sql_expression.compile("IFNULL(a,'Y')='Y'")
+    assert sql_expression.filter([{"a":"Y"},{"b":"c"},{"a":"d"}])==[{"a":"Y"},{"b":"c"}]
+

@@ -14,6 +14,7 @@ from enum import Enum, unique
 from typing import Any, Dict, List, Tuple, Union
 
 import jmespath
+
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -28,7 +29,11 @@ class Language(str, Enum):
 def get_nested_value(data: Dict[str, Any], key: Tuple[str]) -> Any:
     # get nested key
     for level in key:
-        data = data[level]
+        try:
+            data = data[level]
+        except KeyError:
+            # such field does not exist, return None
+            return None
     return data
 
 
