@@ -10,7 +10,7 @@ def get_cassandra_container() -> DockerContainer:
         with_bind_ports(9042, 9042)
 
 
-def get_cassandra_session(hosts: List[str], timeout=35000) -> Session:
+def get_cassandra_session(hosts: List[str], timeout=60000) -> Session:
     start_time = time.time() * 1000
     while True:
         if time.time() * 1000 - start_time > timeout:

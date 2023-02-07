@@ -14,7 +14,6 @@ from enum import Enum, unique
 from typing import Any, Dict, List, Tuple, Union
 
 import jmespath
-
 from datayoga_core.jmespath_custom_functions import JmespathCustomFunctions
 
 logger = logging.getLogger("dy")
@@ -122,7 +121,7 @@ class SQLExpression(Expression):
                 self._column_names.update(
                     [tuple(column.sql().replace('"', "").split("."))
                      for column in sqlglot.parse_one("SELECT " + _exp.replace('`', '"')).find_all(sqlglot.exp.Column)])
-            except Exception as pe:
+            except Exception:
                 # a parse error
                 raise ValueError(f"Cannot parse SQL expression: {_exp}")
 
