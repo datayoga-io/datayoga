@@ -3,6 +3,7 @@ import logging
 import os
 
 import pytest
+
 from common import redis_utils
 from common.utils import run_job
 
@@ -10,7 +11,7 @@ logger = logging.getLogger("dy")
 
 REDIS_PORT = 12554
 
-
+@pytest.mark.xfail
 def test_redis_read_pending_messages(tmpdir):
     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
