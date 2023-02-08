@@ -11,7 +11,7 @@ try:
     sys.modules["cx_Oracle"] = oracledb
     try:
         oracledb.init_oracle_client()
-    except DatabaseError:
+    except:  # noqa
         pass
 except ImportError:
     pass
