@@ -95,10 +95,6 @@ class Block(metaclass=ABCMeta):
 
     @staticmethod
     def create(block_name: str, properties: Dict[str, Any]) -> Block:
-        if block_name.startswith('relational'):
-            # Fixes oracle import hack.
-            import datayoga_core.blocks.relational # noqa
-
         module_name = f"datayoga_core.blocks.{block_name}.block"
         module = importlib.import_module(module_name)
         block: Block = getattr(module, "Block")(properties)
