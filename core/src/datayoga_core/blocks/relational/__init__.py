@@ -5,7 +5,6 @@ try:
     import sys
 
     import oracledb
-    from oracledb.exceptions import DatabaseError
 
     oracledb.version = "8.3.0"
     sys.modules["cx_Oracle"] = oracledb
