@@ -33,8 +33,13 @@ def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine
     if db_type == DbType.ORACLE:
         try:
             import oracledb
-            oracledb.init_oracle_client()
-        except:  # noqa
+            from oracledb.exceptions import DatabaseError
+            try:
+
+                oracledb.init_oracle_client()
+            except DatabaseError:
+                pass
+        except ImportError:
             pass
 
     engine = sa.create_engine(
