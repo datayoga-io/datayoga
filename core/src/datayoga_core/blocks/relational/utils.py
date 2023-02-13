@@ -30,18 +30,6 @@ def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine
 
     db_type = DbType(connection.get("type", "").lower())
 
-    if db_type == DbType.ORACLE:
-        try:
-            import oracledb
-            from oracledb.exceptions import DatabaseError
-            try:
-
-                oracledb.init_oracle_client()
-            except DatabaseError:
-                pass
-        except ImportError:
-            pass
-
     engine = sa.create_engine(
         sa.engine.URL.create(
             drivername=connection.get("driver", DEFAULT_DRIVERS.get(db_type)),
