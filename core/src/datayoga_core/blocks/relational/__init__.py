@@ -10,6 +10,9 @@ try:
     sys.modules["cx_Oracle"] = oracledb
     try:
         oracledb.init_oracle_client()
+    # Here we're ignoring the DatabaseError from oracledb.
+    # Because there may be side effects of re-importing in some cases,
+    # we must mute all exceptions.
     except:  # noqa
         pass
 except ImportError:
