@@ -49,8 +49,9 @@ def get_engine(db_container: DbContainer) -> Engine:
 
 
 def create_schema(engine: Engine, schema_name: str):
-    if not engine.dialect.has_schema(engine, schema_name):
-        engine.execute(sqlalchemy.schema.CreateSchema(schema_name))
+    with engine.connect() as connection:
+        if not engine.dialect.has_schema(connection, schema_name):
+            connection.execute(sqlalchemy.schema.CreateSchema(schema_name))
 
 
 def create_emp_table(engine: Engine, schema_name: str):
@@ -79,4 +80,5 @@ def insert_to_emp_table(engine: Engine, schema_name: str):
 
 
 def select_one_row(engine: Engine, query: str) -> Optional[Row]:
-    return engine.execute(query).fetchone()
+    with engine.connect() as connection:
+        return connection.execute(text(query)).fetchone()
