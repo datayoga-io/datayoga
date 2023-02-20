@@ -1,9 +1,8 @@
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Table, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import DbContainer
 from testcontainers.mssql import SqlServerContainer
