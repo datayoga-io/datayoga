@@ -8,8 +8,8 @@ from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import DbContainer
 from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
-from testcontainers.postgres import PostgresContainer
 from testcontainers.oracle import OracleDbContainer
+from testcontainers.postgres import PostgresContainer
 
 
 def get_mssql_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
@@ -69,12 +69,13 @@ def create_emp_table(engine: Engine, schema_name: str):
 
 
 def insert_to_emp_table(engine: Engine, schema_name: str):
-    engine.execute(
-        f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')")
-    engine.execute(
-        f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')")
-    engine.execute(
-        f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')")
+    with engine.connect() as connection:
+        connection.execute(
+            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')")
+        connection.execute(
+            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')")
+        connection.execute(
+            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')")
 
 
 def select_one_row(engine: Engine, query: str) -> Optional[Row]:
