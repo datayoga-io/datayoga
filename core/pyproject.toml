@@ -40,7 +40,7 @@ oracledb = { version="^1.2.2", optional = true}
 pymssql = { version="^2.2.7", optional = true }
 PyMySQL = { version="^1.0.2", optional = true }
 redis = { version = "^4.3.5", optional = true }
-SQLAlchemy = { version = "^1.4.44", optional = true }
+SQLAlchemy = { version = "^2.0.4", optional = true }
 sqlglot = "^10.4.3"
 
 [tool.poetry.extras]
