@@ -2,6 +2,8 @@ import logging
 from typing import Any, Dict, List, Optional
 
 import sqlalchemy as sa
+from sqlalchemy import text
+
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.blocks.relational import utils as relational_utils
@@ -127,7 +129,7 @@ class Block(DyBlock):
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
         try:
-            return self.connection.execute(statement, records)
+            return self.connection.execute(text(statement), records)
         except OperationalError as e:
             raise ConnectionError(e)
 
