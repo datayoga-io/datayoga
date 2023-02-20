@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Table, text
@@ -79,6 +79,8 @@ def insert_to_emp_table(engine: Engine, schema_name: str):
             f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
 
 
-def select_one_row(engine: Engine, query: str) -> Optional[Row]:
+def select_one_row(engine: Engine, query: str) -> Optional[Dict[str, Any]]:
     with engine.connect() as connection:
-        return connection.execute(text(query)).first()
+        row = connection.execute(text(query)).first()
+        if row:
+            return row._asdict()
