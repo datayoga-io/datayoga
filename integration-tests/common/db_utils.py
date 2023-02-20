@@ -81,4 +81,4 @@ def insert_to_emp_table(engine: Engine, schema_name: str):
 
 def select_one_row(engine: Engine, query: str) -> Optional[Row]:
     with engine.connect() as connection:
-        return connection.execute(text(query)).fetchone()
+        return connection.execute(text(query)).first()
