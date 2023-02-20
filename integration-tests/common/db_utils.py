@@ -1,7 +1,7 @@
 from typing import Optional
 
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, Table
+from sqlalchemy import Column, Integer, String, Table, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import declarative_base
@@ -70,12 +70,12 @@ def create_emp_table(engine: Engine, schema_name: str):
 
 def insert_to_emp_table(engine: Engine, schema_name: str):
     with engine.connect() as connection:
-        connection.execute(
-            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')")
-        connection.execute(
-            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')")
-        connection.execute(
-            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')")
+        connection.execute(text(
+            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')"))
+        connection.execute(text(
+            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')"))
+        connection.execute(text(
+            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
 
 
 def select_one_row(engine: Engine, query: str) -> Optional[Row]:
