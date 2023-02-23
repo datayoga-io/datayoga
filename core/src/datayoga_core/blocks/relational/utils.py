@@ -20,7 +20,7 @@ class DbType(str, Enum):
 DEFAULT_DRIVERS = {
     DbType.MYSQL: "mysql+pymysql",
     DbType.MSSQL: "mssql+pymssql",
-    DbType.ORACLE: "oracle",
+    DbType.ORACLE: "oracle+oracledb",
     DbType.PSQL: "postgresql"
 }
 
@@ -30,6 +30,11 @@ def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine
 
     db_type = DbType(connection.get("type", "").lower())
 
+    extra = {}
+
+    if db_type == DbType.ORACLE:
+        extra['thick_mode'] = {}
+
     engine = sa.create_engine(
         sa.engine.URL.create(
             drivername=connection.get("driver", DEFAULT_DRIVERS.get(db_type)),
@@ -38,6 +43,8 @@ def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine
             username=connection.get("user"),
             password=connection.get("password"),
             database=connection.get("database")),
-        echo=connection.get("debug", False), connect_args=connection.get("connect_args", {}))
+        echo=connection.get("debug", False), connect_args=connection.get("connect_args", {}),
+        isolation_level="AUTOCOMMIT",
+        **extra)
 
     return engine, db_type

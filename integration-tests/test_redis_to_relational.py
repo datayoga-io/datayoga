@@ -38,79 +38,82 @@ def test_redis_to_mysql():
             mysql_container.stop()  # noqa
 
 
-# def test_redis_to_pg():
-#     schema = "hr"
-#
-#     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
-#     redis_container.start()
-#
-#     redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
-#
-#     postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
-#     postgres_container.start()
-#
-#     engine = db_utils.get_engine(postgres_container)
-#     db_utils.create_schema(engine, schema)
-#     db_utils.create_emp_table(engine, schema)
-#     db_utils.insert_to_emp_table(engine, schema)
-#
-#     run_job("tests.redis_to_pg")
-#
-#     check_results(engine, schema)
-#
-#     redis_container.stop()
-#     postgres_container.stop()
+def test_redis_to_pg():
+    schema = "hr"
+
+    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+    redis_container.start()
+
+    redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+
+    postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
+    postgres_container.start()
+
+    engine = db_utils.get_engine(postgres_container)
+    db_utils.create_schema(engine, schema)
+    db_utils.create_emp_table(engine, schema)
+    db_utils.insert_to_emp_table(engine, schema)
+
+    run_job("tests.redis_to_pg")
+
+    check_results(engine, schema)
+
+    redis_container.stop()
+    postgres_container.stop()
 
 
-# def test_redis_to_oracle():
-#     schema = "hr"
-#
-#     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
-#     redis_container.start()
-#
-#     redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
-#
-#     oracle_container = db_utils.get_oracle_container()
-#     oracle_container.start()
-#
-#     engine = db_utils.get_engine(oracle_container)
-#     db_utils.create_emp_table(engine, schema)
-#     db_utils.insert_to_emp_table(engine, schema)
-#
-#     run_job("tests.redis_to_oracle")
-#
-#     check_results(engine, schema)
-#
-#     redis_container.stop()
-#     oracle_container.stop()
+def test_redis_to_oracle():
+    schema = "hr"
+
+    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+    redis_container.start()
+
+    redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+
+    oracle_container = db_utils.get_oracle_container()
+    oracle_container.start()
+
+    engine = db_utils.get_engine(oracle_container)
+    db_utils.create_emp_table(engine, schema)
+    db_utils.insert_to_emp_table(engine, schema)
+
+    # from time import sleep
+    # sleep(10000)
+
+    run_job("tests.redis_to_oracle")
+
+    check_results(engine, schema)
+
+    redis_container.stop()
+    oracle_container.stop()
 
 
-# @pytest.mark.xfail
-# # fails due https://github.com/testcontainers/testcontainers-python/issues/285
-# # will be changed once this [1] PR is merged:
-# #
-# # [1] https://github.com/testcontainers/testcontainers-python/pull/286
-# def test_redis_to_mssql():
-#     schema = "dbo"
+@pytest.mark.xfail
+# fails due https://github.com/testcontainers/testcontainers-python/issues/285
+# will be changed once this [1] PR is merged:
 #
-#     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
-#     redis_container.start()
-#
-#     redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
-#
-#     mssql_container = db_utils.get_mssql_container("tempdb", "sa")
-#     mssql_container.start()
-#
-#     engine = db_utils.get_engine(mssql_container)
-#     db_utils.create_emp_table(engine, schema)
-#     db_utils.insert_to_emp_table(engine, schema)
-#
-#     run_job("tests.redis_to_mssql")
-#
-#     check_results(engine, schema)
-#
-#     redis_container.stop()
-#     mssql_container.stop()
+# [1] https://github.com/testcontainers/testcontainers-python/pull/286
+def test_redis_to_mssql():
+    schema = "dbo"
+
+    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+    redis_container.start()
+
+    redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+
+    mssql_container = db_utils.get_mssql_container("tempdb", "sa")
+    mssql_container.start()
+
+    engine = db_utils.get_engine(mssql_container)
+    db_utils.create_emp_table(engine, schema)
+    db_utils.insert_to_emp_table(engine, schema)
+
+    run_job("tests.redis_to_mssql")
+
+    check_results(engine, schema)
+
+    redis_container.stop()
+    mssql_container.stop()
 
 
 def check_results(engine: Engine, schema: str):

@@ -11,7 +11,7 @@ import datayoga_core as dy
 import jsonschema
 from datayoga.cli_helpers import handle_critical
 from datayoga_core import utils
-from pkg_resources import get_distribution
+from pkg_resources import get_distribution, DistributionNotFound
 
 from datayoga import cli_helpers
 
@@ -30,8 +30,15 @@ ch.setFormatter(cli_helpers.CustomFormatter())
 logger.addHandler(ch)
 
 
+def get_dy_distribution() -> str:
+    try:
+        return get_distribution("datayoga").version
+    except DistributionNotFound:
+        return "0.0.0"
+
+
 @click.group(name="datayoga", help="DataYoga command line tool")
-@click.version_option(get_distribution("datayoga").version)
+@click.version_option(get_dy_distribution())
 def cli():
     pass
 

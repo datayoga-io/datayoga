@@ -4,7 +4,8 @@ import sqlalchemy
 from sqlalchemy import Column, Integer, String, Table, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
-from testcontainers.core.generic import DbContainer
+from testcontainers.core.generic import DbContainer, ADDITIONAL_TRANSIENT_ERRORS
+from testcontainers.core.waiting_utils import wait_container_is_ready
 from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
 from testcontainers.oracle import OracleDbContainer
@@ -40,7 +41,20 @@ def get_postgres_container(db_name: str, db_user: str, db_password: str) -> Post
 
 
 def get_oracle_container() -> OracleDbContainer:
-    return OracleDbContainer().with_bind_ports(1521, 11521)
+    class FixedOracleDbContainer(OracleDbContainer):
+        def get_connection_url(self):
+            return super()._create_connection_url(
+                dialect="oracle+oracledb", username="system", password="oracle", port=self.container_port,
+                db_name="xe"
+            )
+
+        @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
+        def _connect(self):
+            import sqlalchemy
+            engine = sqlalchemy.create_engine(self.get_connection_url(), thick_mode={}, isolation_level="AUTOCOMMIT")
+            engine.connect()
+
+    return FixedOracleDbContainer().with_bind_ports(1521, 11521)
 
 
 def get_engine(db_container: DbContainer) -> Engine:
@@ -70,12 +84,13 @@ def create_emp_table(engine: Engine, schema_name: str):
 
 def insert_to_emp_table(engine: Engine, schema_name: str):
     with engine.connect() as connection:
-        connection.execute(text(
-            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')"))
-        connection.execute(text(
-            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')"))
-        connection.execute(text(
-            f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
+        with connection.begin():
+            connection.execute(text(
+                f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')"))
+            connection.execute(text(
+                f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')"))
+            connection.execute(text(
+                f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
 
 
 def select_one_row(engine: Engine, query: str) -> Optional[Dict[str, Any]]:
