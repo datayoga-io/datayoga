@@ -129,7 +129,9 @@ class Block(DyBlock):
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
         try:
-            return self.connection.execute(text(statement), records)
+            if type(statement) == str:
+                statement = text(statement)
+            return self.connection.execute(statement, records)
         except OperationalError as e:
             raise ConnectionError(e)
 
