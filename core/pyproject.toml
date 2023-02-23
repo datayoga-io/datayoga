@@ -19,7 +19,7 @@ classifiers = [
 [tool.poetry.dependencies]
 certifi = "^2022.12.7"
 pysqlite3-binary = { version = "^0.4.0", platform = "linux" }
-cryptography = "^38.0.4"
+cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
 python = "^3.7"
