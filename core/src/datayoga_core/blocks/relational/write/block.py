@@ -34,7 +34,7 @@ class Block(DyBlock):
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = self.engine.connect()
 
-        if self.db_type in (relational_utils.DbType.MSSQL, relational_utils.DbType.ORACLE):
+        if self.db_type in (relational_utils.DbType.SQLSERVER, relational_utils.DbType.ORACLE):
             # MERGE statement requires this
             self.connection = self.connection.execution_options(autocommit=True)
 
@@ -95,7 +95,7 @@ class Block(DyBlock):
             return insert_stmt.on_duplicate_key_update(ColumnCollection(
                 columns=[(x.name, x) for x in [insert_stmt.inserted[column] for column in self.columns]]))
 
-        if self.db_type == relational_utils.DbType.MSSQL:
+        if self.db_type == relational_utils.DbType.SQLSERVER:
             return sa.sql.text("""
                     MERGE %s AS target
                     USING (VALUES (%s)) AS source (%s) ON (%s)

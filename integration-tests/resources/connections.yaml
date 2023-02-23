@@ -13,8 +13,8 @@ mysql-hr:
   user: my_user
   password: my_pass
   debug: True
-mssql-hr:
-  type: mssql
+sqlserver-hr:
+  type: sqlserver
   host: localhost
   port: 11433
   database: tempdb
