@@ -8,11 +8,11 @@ from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import DbContainer
 from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
-from testcontainers.postgres import PostgresContainer
 from testcontainers.oracle import OracleDbContainer
+from testcontainers.postgres import PostgresContainer
 
 
-def get_mssql_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
+def get_sqlserver_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
     return SqlServerContainer(dbname=db_name, user=db_user, password=db_password).with_bind_ports(1433, 11433)
 
 
