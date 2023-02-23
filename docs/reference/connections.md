@@ -27,7 +27,7 @@ SQL database
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|DB type<br/>Enum: `"mssql"`, `"mysql"`, `"oracle"`, `"postgresql"`<br/>|yes|
+|**type**|`string`|DB type<br/>Enum: `"mysql"`, `"oracle"`, `"postgresql"`, `"sqlserver"`<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
 |**driver**|`string`|Driver<br/>|no|

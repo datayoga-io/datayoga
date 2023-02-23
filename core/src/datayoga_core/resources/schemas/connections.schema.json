@@ -12,7 +12,7 @@
             "type": {
               "description": "DB type",
               "type": "string",
-              "enum": ["mssql", "mysql", "oracle", "postgresql"]
+              "enum": ["mysql", "oracle", "postgresql", "sqlserver"]
             },
             "host": { "description": "DB host", "type": "string" },
             "port": {
