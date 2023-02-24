@@ -27,6 +27,8 @@ oracle-hr:
   database: xe
   user: system
   password: oracle
+  oracle_thick_mode: true
+#  oracle_thick_mode_lib_dir: /path/to/oracle/driver
 cache:
   type: redis
   host: localhost
