@@ -29,9 +29,7 @@ class Block(DyProducer):
         self.connection = self.engine.connect()
 
     def produce(self) -> Generator[Message, None, None]:
-        result = self.connection.execution_options(stream_results=True).execute(
-            self.tbl.select()
-        )
+        result = self.connection.execution_options(stream_results=True, autocommit=True).execute(self.tbl.select())
 
         while True:
             chunk = result.fetchmany(10000)
