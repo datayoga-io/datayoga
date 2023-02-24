@@ -63,8 +63,8 @@ def get_engine(db_container: DbContainer) -> Engine:
 
 def create_schema(engine: Engine, schema_name: str):
     with engine.connect() as connection:
-        if not engine.dialect.has_schema(connection, schema_name):
-            connection.execute(sqlalchemy.schema.CreateSchema(schema_name))
+        with connection.begin():
+            connection.execute(sqlalchemy.schema.CreateSchema(schema_name, if_not_exists=True))
 
 
 def create_emp_table(engine: Engine, schema_name: str):
