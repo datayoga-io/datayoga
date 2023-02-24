@@ -29,14 +29,15 @@ class Block(DyProducer):
         self.connection = self.engine.connect()
 
     def produce(self) -> Generator[Message, None, None]:
-        result = self.connection.execution_options(stream_results=True, autocommit=True).execute(self.tbl.select())
+        with self.connection.begin():
+            result = self.connection.execution_options(stream_results=True, autocommit=True).execute(self.tbl.select())
 
-        while True:
-            chunk = result.fetchmany(10000)
-            if not chunk:
-                break
-            for row in chunk:
-                yield utils.add_uid(dict(row))
+            while True:
+                chunk = result.fetchmany(10000)
+                if not chunk:
+                    break
+                for row in chunk:
+                    yield utils.add_uid(dict(row))
 
     def stop(self):
         self.connection.close()
