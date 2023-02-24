@@ -1,4 +1,5 @@
 import logging
+
 from contextlib import suppress
 
 import pytest
@@ -77,9 +78,6 @@ def test_redis_to_oracle():
     db_utils.create_emp_table(engine, schema)
     db_utils.insert_to_emp_table(engine, schema)
 
-    # from time import sleep
-    # sleep(10000)
-
     run_job("tests.redis_to_oracle")
 
     check_results(engine, schema)
@@ -93,7 +91,7 @@ def test_redis_to_oracle():
 # will be changed once this [1] PR is merged:
 #
 # [1] https://github.com/testcontainers/testcontainers-python/pull/286
-def test_redis_to_mssql():
+def test_redis_to_sqlserver():
     schema = "dbo"
 
     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
@@ -101,19 +99,19 @@ def test_redis_to_mssql():
 
     redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
 
-    mssql_container = db_utils.get_mssql_container("tempdb", "sa")
-    mssql_container.start()
+    sqlserver_container = db_utils.get_sqlserver_container("tempdb", "sa")
+    sqlserver_container.start()
 
-    engine = db_utils.get_engine(mssql_container)
+    engine = db_utils.get_engine(sqlserver_container)
     db_utils.create_emp_table(engine, schema)
     db_utils.insert_to_emp_table(engine, schema)
 
-    run_job("tests.redis_to_mssql")
+    run_job("tests.redis_to_sqlserver")
 
     check_results(engine, schema)
 
     redis_container.stop()
-    mssql_container.stop()
+    sqlserver_container.stop()
 
 
 def check_results(engine: Engine, schema: str):

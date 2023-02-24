@@ -45,11 +45,11 @@ sqlglot = "^10.4.3"
 
 [tool.poetry.extras]
 cassandra = ["cassandra-driver"]
-mssql = ["pymssql", "SQLAlchemy"]
 mysql = ["PyMySQL", "SQLAlchemy"]
-pg = ["psycopg2-binary","SQLAlchemy"]
 oracle = ["oracledb", "SQLAlchemy"]
+pg = ["psycopg2-binary","SQLAlchemy"]
 redis = ["redis"]
+sqlserver = ["pymssql", "SQLAlchemy"]
 test = [
         "cassandra-driver",
         "mock",
