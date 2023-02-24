@@ -25,15 +25,18 @@ DEFAULT_DRIVERS = {
 }
 
 
-def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine, DbType]:
+def get_engine(connection_name: str, context: Context, autocommit: bool = True) -> Tuple[sa.engine.Engine, DbType]:
     connection = utils.get_connection_details(connection_name, context)
 
     db_type = DbType(connection.get("type", "").lower())
 
     extra = {}
 
+    if autocommit:
+        extra["isolation_level"] = "AUTOCOMMIT"
+
     if db_type == DbType.ORACLE:
-        extra['thick_mode'] = {}
+        extra["thick_mode"] = {}
 
     engine = sa.create_engine(
         sa.engine.URL.create(
@@ -44,7 +47,6 @@ def get_engine(connection_name: str, context: Context) -> Tuple[sa.engine.Engine
             password=connection.get("password"),
             database=connection.get("database")),
         echo=connection.get("debug", False), connect_args=connection.get("connect_args", {}),
-        isolation_level="AUTOCOMMIT",
         **extra)
 
     return engine, db_type
