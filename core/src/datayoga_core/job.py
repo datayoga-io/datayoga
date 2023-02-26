@@ -191,17 +191,21 @@ class Job():
                 schema = utils.read_json(f"{schema_path}")
                 # append to the array of oneOf for the full schema
                 block_schemas.append({
-                    "type": "object",
-                    "properties": {
-                        "uses": {
-                            "description": "Block type",
-                            "type": "string",
-                            "const": block_type
+                    "if": {
+                        "properties": {
+                            "uses": {
+                                "description": "Block type",
+                                "type": "string",
+                                "const": block_type
+                            },
                         },
-                        "with": schema,
+                        "required": ["uses"]
                     },
-                    "additionalProperties": False,
-                    "required": ["uses"],
+                    "then": {
+                        "properties": {
+                            "with": schema,
+                        }
+                    }
                 })
 
         job_schema = utils.read_json(
@@ -210,7 +214,6 @@ class Job():
                 "resources", "schemas", "job.schema.json"))
         job_schema["definitions"]["block"] = {
             "type": "object",
-            "oneOf": block_schemas
+            "allOf": block_schemas
         }
-
         return job_schema

@@ -23,7 +23,7 @@
       "env": {
         "PYTHONDEVMODE": "1"
       },
-      "program": "${workspaceFolder}/core/tests/tmp_test.py",
+      "program": "${file}",
       "justMyCode": false
     }
   ]
