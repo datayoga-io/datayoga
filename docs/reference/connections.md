@@ -80,14 +80,12 @@ Oracle SQL database
 
 ```yaml
 hr:
-  type: postgresql
+  type: oracle
   host: localhost
   port: 5432
-  database: postgres
-  user: postgres
-  password: postgres
-  connect_args:
-    connect_timeout: 10
+  database: orcl
+  user: scott
+  password: tiger
   oracle_thick_mode: true
   oracle_thick_mode_lib_dir: /opt/oracle/instantclient_21_8/
 
