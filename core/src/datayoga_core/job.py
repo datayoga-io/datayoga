@@ -178,13 +178,14 @@ class Job():
         # to avoid importing all of the block classes
         schema_paths = Path(os.path.join(utils.get_bundled_dir(), "blocks") if utils.is_bundled() else os.path.dirname(
             os.path.realpath(blocks.__file__))).rglob("**/block.schema.json")
-
+        block_types = []
         for schema_path in schema_paths:
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
                 os.path.dirname(os.path.realpath(blocks.__file__))
             )
             block_type = block_type.replace(os.path.sep, ".")
+            block_types.append(block_type)
 
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
                 # load schema file
@@ -213,6 +214,7 @@ class Job():
             os.path.join(
                 utils.get_bundled_dir() if utils.is_bundled() else os.path.dirname(os.path.realpath(__file__)),
                 "resources", "schemas", "job.schema.json"))
+        job_schema["definitions"]["block"]["properties"]["uses"]["enum"] = block_types
         job_schema["definitions"]["block"] = {
             "type": "object",
             "allOf": block_schemas
