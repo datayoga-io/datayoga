@@ -1,6 +1,9 @@
 import logging
+import os
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.job import Job
 from datayoga_core.result import JobResult
@@ -66,3 +69,39 @@ def transform(job_settings: Dict[str, Any],
     job.init(context)
     logger.debug("Transforming data")
     return job.transform(data)
+
+
+def get_connections_json_schema() -> Dict[str, Any]:
+    # get the folder of all connection-specific schemas
+    connection_schemas_folder = utils.get_resource_path(os.path.join("schemas", "connections"))
+    # we traverse the json schemas for connection types
+    schema_paths = Path(connection_schemas_folder).rglob("**/*.schema.json")
+    connection_types = []
+    connection_schemas = []
+    for schema_path in schema_paths:
+        connection_type = schema_path.name.split(".")[0]
+        connection_types.append(connection_type)
+
+        schema = utils.read_json(f"{schema_path}")
+        # append to the array of allOf for the full schema
+        connection_schemas.append({
+            "if": {
+                "properties": {
+                    "type": {
+                        "description": "Connection type",
+                        "type": "string",
+                        "const": connection_type
+                    },
+                },
+                "required": ["type"]
+            },
+            "then": schema
+        })
+
+    connections_general_schema = utils.read_json(
+        os.path.join(
+            utils.get_bundled_dir() if utils.is_bundled() else os.path.dirname(os.path.realpath(__file__)),
+            "resources", "schemas", "connections.schema.json"))
+    connections_general_schema["patternProperties"]["."]["allOf"] = connection_schemas
+    connections_general_schema["patternProperties"]["."]["properties"]["type"]["enum"] = connection_types
+    return connections_general_schema

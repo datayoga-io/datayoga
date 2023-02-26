@@ -3,6 +3,7 @@ import asyncio
 import logging
 import os
 import shutil
+import sys
 from os import path
 from pathlib import Path
 
@@ -90,16 +91,25 @@ def run(
     set_logging_level(loglevel)
 
     logger.info("Runner started...")
+
+    # validate the connections
+    connections_file = path.join(directory, "connections.yaml")
+    try:
+        connections = utils.read_yaml(connections_file)
+        logger.debug(f"connections: {connections}")
+        connections_schema = dy.get_connections_json_schema()
+        jsonschema.validate(instance=connections, schema=connections_schema)
+
+    except jsonschema.exceptions.ValidationError as schema_error:
+        # print a validation message with the source lines
+        cli_helpers.pprint_yaml_validation_error(connections_file, schema_error, logger)
+        sys.exit(1)
+
+    # validate the job
     job_file = path.join(directory, "jobs", job_name.replace(".", os.sep) + ".yaml")
     try:
         job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
-
-        connections = utils.read_yaml(path.join(directory, "connections.yaml"))
-        logger.debug(f"connections: {connections}")
-
-        jsonschema.validate(instance=connections, schema=utils.read_json(
-            utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
         context = dy.Context({
             "connections": connections,

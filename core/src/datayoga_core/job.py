@@ -189,7 +189,8 @@ class Job():
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
                 # load schema file
                 schema = utils.read_json(f"{schema_path}")
-                # append to the array of oneOf for the full schema
+                # append to the array of allOf for the full schema
+                # we use allOf for better error reporting
                 block_schemas.append({
                     "if": {
                         "properties": {
