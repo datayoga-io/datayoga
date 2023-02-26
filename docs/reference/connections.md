@@ -27,7 +27,7 @@ SQL database
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|DB type<br/>Enum: `"mysql"`, `"oracle"`, `"postgresql"`, `"sqlserver"`<br/>|yes|
+|**type**|`string`|DB type<br/>Enum: `"mysql"`, `"postgresql"`, `"sqlserver"`<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
 |**driver**|`string`|Driver<br/>|no|
@@ -56,6 +56,44 @@ hr:
 
    
 **Option 2 (optional):** 
+Oracle SQL database
+
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**type**|`string`|DB type<br/>Enum: `"oracle"`<br/>|yes|
+|**host**|`string`|DB host<br/>|yes|
+|**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
+|**driver**|`string`|Driver<br/>|no|
+|**database**|`string`|DB name<br/>|yes|
+|**user**|`string`|DB user<br/>|yes|
+|**password**|`string`|DB password<br/>|no|
+|[**connect\_args**](#option2connect_args)|`object`|Additional arguments to use when connecting to the DB<br/>|no|
+|**oracle\_thick\_mode**|`boolean`|Enable oracle's thick mode(requires installed Oracle Client)<br/>Default: `false`<br/>|no|
+|**oracle\_thick\_mode\_lib\_dir**|`string`|Path to Oracle Client libraries<br/>|no|
+|**debug**<br/>(Debug mode)|`boolean`|Echo all SQL commands to stdout<br/>Default: `false`<br/>|no|
+
+**Additional Properties:** not allowed  
+**Example**
+
+```yaml
+hr:
+  type: oracle
+  host: localhost
+  port: 5432
+  database: orcl
+  user: scott
+  password: tiger
+  oracle_thick_mode: true
+  oracle_thick_mode_lib_dir: /opt/oracle/instantclient_21_8/
+
+```
+
+
+   
+**Option 3 (optional):** 
 Redis
 
 
@@ -81,7 +119,7 @@ cache:
 
 
    
-**Option 3 (optional):** 
+**Option 4 (optional):** 
 Cassandra
 
 
@@ -90,7 +128,7 @@ Cassandra
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**type**|`string`|DB type<br/>Enum: `"cassandra"`<br/>|yes|
-|[**hosts**](#option3hosts)|`string[]`|Cassandra hosts<br/>|yes|
+|[**hosts**](#option4hosts)|`string[]`|Cassandra hosts<br/>|yes|
 |**port**|`integer`|Cassandra DB port<br/>Default: `9042`<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
 |**database**|`string`|DB name<br/>|no|
 |**user**|`string`|DB user<br/>|no|
@@ -120,8 +158,16 @@ Additional arguments to use when connecting to the DB
 
 **No properties.**
 
-<a name="option3hosts"></a>
-## Option 3\]: hosts\[\]: array
+<a name="option2connect_args"></a>
+## Option 2\]: connect\_args: object
+
+Additional arguments to use when connecting to the DB
+
+
+**No properties.**
+
+<a name="option4hosts"></a>
+## Option 4\]: hosts\[\]: array
 
 Cassandra hosts
 

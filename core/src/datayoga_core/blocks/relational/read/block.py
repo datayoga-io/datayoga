@@ -14,7 +14,11 @@ logger = logging.getLogger("dy")
 class Block(DyProducer):
 
     def init(self, context: Optional[Context] = None):
-        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context)
+        self.engine, self.db_type = relational_utils.get_engine(
+            self.properties.get("connection"),
+            context,
+            autocommit=False
+        )
 
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
@@ -29,16 +33,14 @@ class Block(DyProducer):
         self.connection = self.engine.connect()
 
     def produce(self) -> Generator[Message, None, None]:
-        result = self.connection.execution_options(stream_results=True).execute(
-            self.tbl.select()
-        )
+        result = self.connection.execution_options(stream_results=True).execute(self.tbl.select())
 
         while True:
             chunk = result.fetchmany(10000)
             if not chunk:
                 break
             for row in chunk:
-                yield utils.add_uid(dict(row))
+                yield utils.add_uid(dict(row._asdict()))
 
     def stop(self):
         self.connection.close()

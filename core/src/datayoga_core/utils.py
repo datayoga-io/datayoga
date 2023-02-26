@@ -102,6 +102,6 @@ def all_success(records: List[Dict[str, Any]]) -> BlockResult:
 def is_rejected(record: Dict[str, Any]) -> bool:
     return record.get(Block.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
 
+
 def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
     return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
-

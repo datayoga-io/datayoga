@@ -2,6 +2,8 @@ import logging
 from typing import Any, Dict, List, Optional
 
 import sqlalchemy as sa
+from sqlalchemy import text
+
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.blocks.relational import utils as relational_utils
@@ -127,6 +129,8 @@ class Block(DyBlock):
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
         try:
+            if type(statement) == str:
+                statement = text(statement)
             return self.connection.execute(statement, records)
         except OperationalError as e:
             raise ConnectionError(e)
