@@ -185,9 +185,9 @@ class Job():
                 os.path.dirname(os.path.realpath(blocks.__file__))
             )
             block_type = block_type.replace(os.path.sep, ".")
-            block_types.append(block_type)
 
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
+                block_types.append(block_type)
                 # load schema file
                 schema = utils.read_json(f"{schema_path}")
                 # append to the array of allOf for the full schema
@@ -214,9 +214,14 @@ class Job():
             os.path.join(
                 utils.get_bundled_dir() if utils.is_bundled() else os.path.dirname(os.path.realpath(__file__)),
                 "resources", "schemas", "job.schema.json"))
-        job_schema["definitions"]["block"]["properties"]["uses"]["enum"] = block_types
         job_schema["definitions"]["block"] = {
             "type": "object",
+            "properties": {
+                "uses": {
+                    "enum": block_types,
+                }
+            },
             "allOf": block_schemas
         }
+        logger.error(job_schema)
         return job_schema
