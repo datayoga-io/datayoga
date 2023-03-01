@@ -17,9 +17,9 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         for row in data:
-            for property in self.properties["fields"]:
+            for prop in self.properties["fields"]:
                 obj = row
-                from_field_path = utils.split_field(property["field"])
+                from_field_path = utils.split_field(prop["field"])
 
                 for index, key in enumerate(from_field_path):
                     key = utils.unescape_field(key)

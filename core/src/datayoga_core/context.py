@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 
 @dataclass
-class Context():
+class Context:
     """
     Context
 

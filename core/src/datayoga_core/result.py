@@ -2,18 +2,22 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-Status = Enum("Status", "SUCCESS REJECTED FILTERED")
+
+class Status(Enum):
+    SUCCESS = "SUCCESS"
+    REJECTED = "REJECTED"
+    FILTERED = "FILTERED"
 
 
 @dataclass
-class Result():
+class Result:
     status: Status
     payload: Optional[Dict[str, Any]] = None
     message: Optional[str] = None
 
 
 @dataclass
-class BlockResult():
+class BlockResult:
     processed: List[Result] = field(default_factory=list)
     filtered: List[Result] = field(default_factory=list)
     rejected: List[Result] = field(default_factory=list)

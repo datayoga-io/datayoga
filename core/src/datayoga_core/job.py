@@ -5,13 +5,13 @@ import logging
 import marshal
 import os
 import sys
+from contextlib import suppress
 from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -27,7 +27,7 @@ class ErrorHandling(str, Enum):
     IGNORE = "ignore"
 
 
-class Job():
+class Job:
     """
     Job
 
@@ -35,17 +35,17 @@ class Job():
         steps List[Block]: List of steps
     """
 
-    def __init__(self, steps: Optional[List[Step]] = None, input: Optional[Block] = None,
+    def __init__(self, steps: Optional[List[Step]] = None, input_block: Optional[Block] = None,
                  error_handling: Optional[ErrorHandling] = None):
         """
         Constructs a job and its blocks
 
         Args:
             steps (List[Dict[str, Any]]): Job steps
-            input (Optional[Block]): Block to be used as a producer
+            input_block (Optional[Block]): Block to be used as a producer
             error_handling (Optional[ErrorHandling]): error handling strategy
         """
-        self.input = input
+        self.input = input_block
         self.steps = steps
         self.error_handling = error_handling if error_handling else ErrorHandling.IGNORE
         self.initialized = False
@@ -118,11 +118,9 @@ class Job():
             result.processed = [Result(Status.SUCCESS, payload=row) for row in transformed_data]
         finally:
             # close the event loop
-            try:
-                loop.close()
-            except NotImplementedError as noe:
+            with suppress(NotImplementedError):
                 # for pyodide. doesn't implement loop.close, ignore
-                pass
+                loop.close()
 
         return result
 
@@ -163,12 +161,12 @@ class Job():
             steps.append(step)
 
         # parse the input
-        input = None
+        input_block = None
         if source.get("input") is not None:
             input_definition = source.get("input")
-            input = Block.create(input_definition.get("uses"), input_definition.get("with"))
+            input_block = Block.create(input_definition.get("uses"), input_definition.get("with"))
 
-        return Job(steps, input, source.get("error_handling"))
+        return Job(steps, input_block, source.get("error_handling"))
 
     @staticmethod
     def get_json_schema(whitelisted_blocks: Optional[List[str]] = None) -> Dict[str, Any]:

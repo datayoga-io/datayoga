@@ -7,8 +7,7 @@ from datayoga_core.result import Result, Status
 logger = logging.getLogger("dy")
 
 
-def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[List[Dict[str, Any]],
-                                                                              List[Result]]:
+def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[List[Dict[str, Any]], List[Result]]:
 
     # validate that the specified keys exist in the records
     rejected_records: List[Result] = []

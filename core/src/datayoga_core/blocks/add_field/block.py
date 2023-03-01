@@ -15,10 +15,10 @@ class Block(DyBlock):
         self.properties = utils.format_block_properties(self.properties)
 
         self.fields = {}
-        for property in self.properties["fields"]:
-            self.fields[property["field"]] = expression.compile(
-                property["language"],
-                property["expression"])
+        for prop in self.properties["fields"]:
+            self.fields[prop["field"]] = expression.compile(
+                prop["language"],
+                prop["expression"])
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")

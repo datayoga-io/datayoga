@@ -11,9 +11,9 @@ from datayoga_core.result import Result, Status
 logger = logging.getLogger("dy")
 
 
-class Step():
-    def __init__(self, id: str, block: Block, concurrency=1):
-        self.id = id
+class Step:
+    def __init__(self, sid: str, block: Block, concurrency=1):
+        self.id = sid
         self.block = block
         self.next_step = None
         self.active_entries = set()
@@ -30,12 +30,12 @@ class Step():
         # start pool of workers for parallelization
         logger.debug("starting pool")
         self.queue = asyncio.Queue(maxsize=1)
-        for id in range(self.concurrency):
-            worker = self.workers[id]
+        for cid in range(self.concurrency):
+            worker = self.workers[cid]
             if worker is None or not worker.done():
-                self.workers[id] = asyncio.create_task(self.run(id))
+                self.workers[cid] = asyncio.create_task(self.run(cid))
             else:
-                logger.debug(f"worker {id} is running: {not worker.done()}")
+                logger.debug(f"worker {cid} is running: {not worker.done()}")
 
     def add_done_callback(self, callback: Callable[[str], None]):
         self.done_callback = callback
