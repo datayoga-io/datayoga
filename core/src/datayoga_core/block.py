@@ -95,7 +95,6 @@ class Block(metaclass=ABCMeta):
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
-    @abstractmethod
     def produce(self) -> Generator[Message, None, None]:
         """ Produces data
 
