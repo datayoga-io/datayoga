@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, unique
 from typing import Any, Dict, List, Optional
 
-
-class Status(Enum):
+@unique
+class Status(str, Enum):
     SUCCESS = "SUCCESS"
     REJECTED = "REJECTED"
     FILTERED = "FILTERED"

@@ -13,8 +13,8 @@ logger = logging.getLogger("dy")
 
 
 class Step:
-    def __init__(self, sid: str, block: Block, concurrency=1):
-        self.id = sid
+    def __init__(self, step_id: str, block: Block, concurrency=1):
+        self.id = step_id
         self.block = block
         self.next_step = None
         self.active_entries = set()
@@ -31,12 +31,12 @@ class Step:
         # start pool of workers for parallelization
         logger.debug("starting pool")
         self.queue = asyncio.Queue(maxsize=1)
-        for cid in range(self.concurrency):
-            worker = self.workers[cid]
+        for worker_id in range(self.concurrency):
+            worker = self.workers[worker_id]
             if worker is None or not worker.done():
-                self.workers[cid] = asyncio.create_task(self.run(cid))
+                self.workers[worker_id] = asyncio.create_task(self.run(worker_id))
             else:
-                logger.debug(f"worker {cid} is running: {not worker.done()}")
+                logger.debug(f"worker {worker_id} is running: {not worker.done()}")
 
     def add_done_callback(self, callback: Callable[[List[str], List[Result]], None]):
         self.done_callback = callback

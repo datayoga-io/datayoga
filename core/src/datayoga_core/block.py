@@ -28,7 +28,7 @@ class Block(metaclass=ABCMeta):
         properties Dict[str, Any]: Block properties
     """
 
-    def __init__(self, properties: Dict[str, Any] = None):
+    def __init__(self, properties: Optional[Dict[str, Any]] = None):
         """
         Constructs a block
 

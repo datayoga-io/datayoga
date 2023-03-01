@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from datayoga_core.result import Result, Status
 
@@ -41,7 +41,7 @@ def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[s
 
 def map_record(record: Dict[str, Any],
                keys: List[Union[Dict[str, str], str]],
-               mapping: List[Union[Dict[str, str], str]] = None):
+               mapping: Optional[List[Union[Dict[str, str], str]]] = None):
     # map the record based on the mapping definitions
     # add nulls for missing mapping fields
     mapping = mapping or []
