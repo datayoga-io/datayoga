@@ -1,11 +1,7 @@
-import logging
 from abc import abstractmethod
-from typing import Any, Dict, Generator, List, TypedDict
+from typing import Generator, List
 
-from .block import Block
-
-logger = logging.getLogger("dy")
-Message = TypedDict("Message", msg_id=str, value=Dict[str, Any])
+from .block import Block, Message
 
 
 class Producer(Block):

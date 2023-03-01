@@ -1,4 +1,5 @@
 import logging
+from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
 from datayoga_core.block import Block as DyBlock
@@ -7,7 +8,8 @@ from datayoga_core.context import Context
 logger = logging.getLogger(__name__)
 
 
-class Block(DyBlock):
+class Block(DyBlock, metaclass=ABCMeta):
+
     def init(self, context: Optional[Context] = None):
         pass
 

@@ -1,4 +1,5 @@
 import logging
+from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
@@ -12,7 +13,8 @@ from datayoga_core.utils import get_connection_details
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock):
+class Block(DyBlock, metaclass=ABCMeta):
+
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 

@@ -6,12 +6,14 @@ import os
 import sys
 from abc import ABCMeta, abstractmethod
 from os import path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generator, List, Optional, TypedDict
 
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
 from jsonschema import validate
+
+Message = TypedDict("Message", dict(msg_id=str, value=Dict[str, Any]))
 
 logger = logging.getLogger("dy")
 
@@ -93,10 +95,21 @@ class Block(metaclass=ABCMeta):
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
-    def produce(self):
+    @abstractmethod
+    def produce(self) -> Generator[Message, None, None]:
+        """ Produces data
+
+        Returns:
+            Generator[Message]: Produced data
+        """
         raise NotImplementedError
 
     def ack(self, msg_ids: List[str]):
+        """ Sends acknowledge for the message IDs of the records that have been processed
+
+        Args:
+            msg_ids (List[str]): Message IDs
+        """
         raise NotImplementedError
 
     @staticmethod
