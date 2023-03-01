@@ -41,9 +41,10 @@ def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[s
 
 def map_record(record: Dict[str, Any],
                keys: List[Union[Dict[str, str], str]],
-               mapping: List[Union[Dict[str, str], str]] = []):
+               mapping: List[Union[Dict[str, str], str]] = None):
     # map the record based on the mapping definitions
     # add nulls for missing mapping fields
+    mapping = mapping or []
     mapped_record = {}
     for item in keys + mapping:
         source = next(iter(item.values())) if isinstance(item, dict) else item

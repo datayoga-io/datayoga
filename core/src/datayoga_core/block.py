@@ -28,14 +28,14 @@ class Block(metaclass=ABCMeta):
         properties Dict[str, Any]: Block properties
     """
 
-    def __init__(self, properties: Dict[str, Any] = {}):
+    def __init__(self, properties: Dict[str, Any] = None):
         """
         Constructs a block
 
         Args:
             properties (Dict[str, Any]): Block [properties]
         """
-        self.properties = properties
+        self.properties = properties or {}
         self.validate()
 
     def validate(self):
