@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from asyncio import Task
 from typing import Any, Callable, Dict, List, Optional
 
 from datayoga_core.block import Block
@@ -18,7 +19,7 @@ class Step:
         self.next_step = None
         self.active_entries = set()
         self.concurrency = concurrency
-        self.workers = [None]*self.concurrency
+        self.workers: List[Optional[Task]] = [None]*self.concurrency
         self.done_callback = None
         self.initialized = False
 
@@ -37,7 +38,7 @@ class Step:
             else:
                 logger.debug(f"worker {cid} is running: {not worker.done()}")
 
-    def add_done_callback(self, callback: Callable[[str], None]):
+    def add_done_callback(self, callback: Callable[[List[str], List[Result]], None]):
         self.done_callback = callback
 
     def __or__(self, other: Step):

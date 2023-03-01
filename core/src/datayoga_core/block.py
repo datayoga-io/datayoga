@@ -93,6 +93,12 @@ class Block(metaclass=ABCMeta):
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
+    def produce(self):
+        raise NotImplementedError
+
+    def ack(self, msg_ids: List[str]):
+        raise NotImplementedError
+
     @staticmethod
     def create(block_name: str, properties: Dict[str, Any]) -> Block:
         module_name = f"datayoga_core.blocks.{block_name}.block"
