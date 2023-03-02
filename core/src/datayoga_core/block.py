@@ -13,7 +13,7 @@ from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
 from jsonschema import validate
 
-Message = TypedDict("Message", {'msg_id': str, 'value': Dict[str, Any]})
+Message = TypedDict("Message", {"msg_id": str, "value": Dict[str, Any]})
 
 logger = logging.getLogger("dy")
 
@@ -76,7 +76,7 @@ class Block(metaclass=ABCMeta):
         raise NotImplementedError
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
-        """ Transforms data
+        """Transforms data
 
         Args:
             data (List[Dict[str, Any]]): Data
@@ -96,7 +96,7 @@ class Block(metaclass=ABCMeta):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
     def produce(self) -> Generator[Message, None, None]:
-        """ Produces data
+        """Produces data
 
         Returns:
             Generator[Message]: Produced data
@@ -104,7 +104,7 @@ class Block(metaclass=ABCMeta):
         raise NotImplementedError
 
     def ack(self, msg_ids: List[str]):
-        """ Sends acknowledge for the message IDs of the records that have been processed
+        """Sends acknowledge for the message IDs of the records that have been processed
 
         Args:
             msg_ids (List[str]): Message IDs

@@ -8,7 +8,7 @@ class Producer(Block):
 
     @abstractmethod
     def produce(self) -> Generator[Message, None, None]:
-        """ Produces data
+        """Produces data
 
         Returns:
             Generator[Message]: Produced data
@@ -16,7 +16,7 @@ class Producer(Block):
         raise NotImplementedError
 
     def ack(self, msg_ids: List[str]):
-        """ Sends acknowledge for the message IDs of the records that have been processed
+        """Sends acknowledge for the message IDs of the records that have been processed
 
         Args:
             msg_ids (List[str]): Message IDs
