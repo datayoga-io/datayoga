@@ -1,0 +1,32 @@
+{
+  "description": "Redis",
+  "properties": {
+    "type": {
+      "description": "DB type",
+      "type": "string",
+      "enum": ["redis"]
+    },
+    "host": { "description": "Redis DB host", "type": "string" },
+    "port": {
+      "description": "Redis DB port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "password": {
+      "description": "Redis DB password",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["type", "host", "port"],
+  "examples": [
+    {
+      "cache": {
+        "type": "redis",
+        "host": "localhost",
+        "port": 6379
+      }
+    }
+  ]
+}

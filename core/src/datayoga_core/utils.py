@@ -7,7 +7,6 @@ from os import path
 from typing import Any, Dict, List
 
 import yaml
-
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -24,8 +23,8 @@ def read_json(filename: str) -> Any:
     Returns:
         Any: JSON object
     """
-    with open(filename, "r", encoding="utf8") as f:
-        return json.load(f)
+    with open(filename, "r", encoding="utf8") as json_file:
+        return json.load(json_file)
 
 
 def read_yaml(filename: str) -> Dict[str, Any]:
@@ -42,8 +41,8 @@ def read_yaml(filename: str) -> Dict[str, Any]:
          Dict[str, Any]: YAML python object
     """
     try:
-        with open(filename, "r", encoding="utf8") as stream:
-            return yaml.safe_load(stream)
+        with open(filename, "r", encoding="utf8") as yaml_file:
+            return yaml.safe_load(yaml_file)
     except Exception as e:
         raise ValueError(f"Malformed YAML: {e}")
 

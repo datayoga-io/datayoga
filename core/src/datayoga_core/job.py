@@ -11,7 +11,6 @@ from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -178,7 +177,7 @@ class Job():
         # to avoid importing all of the block classes
         schema_paths = Path(os.path.join(utils.get_bundled_dir(), "blocks") if utils.is_bundled() else os.path.dirname(
             os.path.realpath(blocks.__file__))).rglob("**/block.schema.json")
-
+        block_types = []
         for schema_path in schema_paths:
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
@@ -187,21 +186,27 @@ class Job():
             block_type = block_type.replace(os.path.sep, ".")
 
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
+                block_types.append(block_type)
                 # load schema file
                 schema = utils.read_json(f"{schema_path}")
-                # append to the array of oneOf for the full schema
+                # append to the array of allOf for the full schema
+                # we use allOf for better error reporting
                 block_schemas.append({
-                    "type": "object",
-                    "properties": {
-                        "uses": {
-                            "description": "Block type",
-                            "type": "string",
-                            "const": block_type
+                    "if": {
+                        "properties": {
+                            "uses": {
+                                "description": "Block type",
+                                "type": "string",
+                                "const": block_type
+                            },
                         },
-                        "with": schema,
+                        "required": ["uses"]
                     },
-                    "additionalProperties": False,
-                    "required": ["uses"],
+                    "then": {
+                        "properties": {
+                            "with": schema,
+                        }
+                    }
                 })
 
         job_schema = utils.read_json(
@@ -210,7 +215,12 @@ class Job():
                 "resources", "schemas", "job.schema.json"))
         job_schema["definitions"]["block"] = {
             "type": "object",
-            "oneOf": block_schemas
+            "properties": {
+                "uses": {
+                    "enum": block_types,
+                }
+            },
+            "allOf": block_schemas
         }
 
         return job_schema

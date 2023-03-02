@@ -1,0 +1,42 @@
+{
+  "description": "Cassandra",
+  "properties": {
+    "type": {
+      "description": "DB type",
+      "type": "string",
+      "enum": ["cassandra"]
+    },
+    "hosts": {
+      "description": "Cassandra hosts",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "title": "Address of Cassandra node"
+      }
+    },
+    "port": {
+      "description": "Cassandra DB port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535,
+      "default": 9042
+    },
+    "database": { "description": "DB name", "type": "string" },
+    "user": { "description": "DB user", "type": "string" },
+    "password": { "description": "DB password", "type": "string" }
+  },
+  "additionalProperties": false,
+  "required": ["type", "hosts"],
+  "examples": [
+    {
+      "cache": {
+        "type": "cassandra",
+        "hosts": ["localhost"],
+        "port": 9042,
+        "database": "myDB",
+        "user": "myUser",
+        "password": "myPassword"
+      }
+    }
+  ]
+}

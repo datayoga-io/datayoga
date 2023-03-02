@@ -3,15 +3,15 @@ import asyncio
 import logging
 import os
 import shutil
+import sys
 from os import path
 from pathlib import Path
 
 import click
 import datayoga_core as dy
 import jsonschema
-from datayoga.cli_helpers import handle_critical
 from datayoga_core import utils
-from pkg_resources import get_distribution, DistributionNotFound
+from pkg_resources import DistributionNotFound, get_distribution
 
 from datayoga import cli_helpers
 
@@ -67,7 +67,7 @@ def init(
 
         print(f"Initialized {project_name} successfully")
     except Exception as e:
-        handle_critical(logger, f"Error while initializing {project_name}", e)
+        cli_helpers.handle_critical(logger, f"Error while initializing {project_name}", e)
 
 
 @cli.command(name="validate", help="Validates a job in dry run mode")
@@ -89,17 +89,25 @@ def run(
 ):
     set_logging_level(loglevel)
 
+    logger.info("Runner started...")
+
+    # validate the connections
+    connections_file = path.join(directory, "connections.yaml")
     try:
-        logger.info("Runner started...")
-        job_file = path.join(directory, "jobs", job_name.replace(".", os.sep) + ".yaml")
+        connections = utils.read_yaml(connections_file)
+        logger.debug(f"connections: {connections}")
+        connections_schema = dy.get_connections_json_schema()
+        jsonschema.validate(instance=connections, schema=connections_schema)
+    except jsonschema.exceptions.ValidationError as schema_error:
+        # print a validation message with the source lines
+        cli_helpers.pprint_yaml_validation_error(connections_file, schema_error, logger)
+        sys.exit(1)
+
+    # validate the job
+    job_file = path.join(directory, "jobs", job_name.replace(".", os.sep) + ".yaml")
+    try:
         job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")
-
-        connections = utils.read_yaml(path.join(directory, "connections.yaml"))
-        logger.debug(f"connections: {connections}")
-
-        jsonschema.validate(instance=connections, schema=utils.read_json(
-            utils.get_resource_path(os.path.join("schemas", "connections.schema.json"))))
 
         context = dy.Context({
             "connections": connections,
@@ -113,6 +121,9 @@ def run(
         logger.info(f"Producing from {producer.__module__}")
         job.init(context)
         asyncio.run(job.run())
+    except jsonschema.exceptions.ValidationError as schema_error:
+        # print a validation message with the source lines
+        cli_helpers.pprint_yaml_validation_error(job_file, schema_error, logger)
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)
 
