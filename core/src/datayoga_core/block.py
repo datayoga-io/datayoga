@@ -13,7 +13,7 @@ from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
 from jsonschema import validate
 
-Message = TypedDict("Message", dict(msg_id=str, value=Dict[str, Any]))
+Message = TypedDict("Message", {'msg_id': str, 'value': Dict[str, Any]})
 
 logger = logging.getLogger("dy")
 
@@ -35,7 +35,7 @@ class Block(metaclass=ABCMeta):
         Constructs a block
 
         Args:
-            properties (Dict[str, Any]): Block [properties]
+            properties (Optional[Dict[str, Any]]): Block [properties]
         """
         self.properties = properties or {}
         self.validate()

@@ -13,7 +13,7 @@ logger = logging.getLogger("dy")
 
 
 class Step:
-    def __init__(self, step_id: str, block: Block, concurrency=1):
+    def __init__(self, step_id: str, block: Optional[Block], concurrency=1):
         self.id = step_id
         self.block = block
         self.next_step = None
