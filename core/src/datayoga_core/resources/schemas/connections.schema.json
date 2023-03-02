@@ -9,7 +9,7 @@
         "type": {
           "description": "DB type",
           "type": "string",
-          "enum": ["mysql", "postgresql", "sqlserver", "redis", "cassandra"]
+          "enum": ["cassandra", "mysql", "postgresql", "redis", "sqlserver"]
         },
         "driver": {
           "description": "Explicit driver to use, if not using default",

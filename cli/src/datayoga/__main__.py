@@ -10,7 +10,6 @@ from pathlib import Path
 import click
 import datayoga_core as dy
 import jsonschema
-import yaml
 from datayoga_core import utils
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -99,7 +98,6 @@ def run(
         logger.debug(f"connections: {connections}")
         connections_schema = dy.get_connections_json_schema()
         jsonschema.validate(instance=connections, schema=connections_schema)
-
     except jsonschema.exceptions.ValidationError as schema_error:
         # print a validation message with the source lines
         cli_helpers.pprint_yaml_validation_error(connections_file, schema_error, logger)
@@ -123,11 +121,9 @@ def run(
         logger.info(f"Producing from {producer.__module__}")
         job.init(context)
         asyncio.run(job.run())
-
     except jsonschema.exceptions.ValidationError as schema_error:
         # print a validation message with the source lines
         cli_helpers.pprint_yaml_validation_error(job_file, schema_error, logger)
-
     except Exception as e:
         cli_helpers.handle_critical(logger, "Error while running a job", e)
 

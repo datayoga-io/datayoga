@@ -104,4 +104,5 @@ def get_connections_json_schema() -> Dict[str, Any]:
             "resources", "schemas", "connections.schema.json"))
     connections_general_schema["patternProperties"]["."]["allOf"] = connection_schemas
     connections_general_schema["patternProperties"]["."]["properties"]["type"]["enum"] = connection_types
+
     return connections_general_schema

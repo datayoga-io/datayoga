@@ -11,7 +11,6 @@ from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
-
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
@@ -223,5 +222,5 @@ class Job():
             },
             "allOf": block_schemas
         }
-        logger.error(job_schema)
+
         return job_schema
