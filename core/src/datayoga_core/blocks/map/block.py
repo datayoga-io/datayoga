@@ -1,3 +1,4 @@
+import json
 import logging
 from abc import ABCMeta
 from typing import Any, Dict, List, Optional, Union
@@ -15,16 +16,18 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     @staticmethod
     def _prepare_expression(language: Language, expr: Union[dict, str]) -> str:
+        if language == Language.SQL:
+            return json.dumps(expr) if isinstance(expr, dict) else expr.strip()
+
         if isinstance(expr, dict):
             expr = ", ".join([f"{k}: {v}" for k, v in expr.items()])
             expr = f"{{{expr}}}"
 
         expr = expr.strip()
 
-        if language == Language.JMESPATH:
-            # jmespath expression for map block must be enclosed in { }
-            if not (expr.startswith("{") and expr.endswith("}")):
-                raise ValueError("map expression must be in a json-like format enclosed in { }")
+        # jmespath expression for map block must be enclosed in { }
+        if not (expr.startswith("{") and expr.endswith("}")):
+            raise ValueError("map expression must be in a json-like format enclosed in { }")
 
         return expr
 
