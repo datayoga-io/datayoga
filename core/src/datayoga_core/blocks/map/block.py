@@ -19,23 +19,24 @@ class Block(DyBlock, metaclass=ABCMeta):
         if language == Language.SQL:
             return json.dumps(expr) if isinstance(expr, dict) else expr.strip()
 
+        def prepare_key(key: str) -> str:
+            return f'"{key}"' if " " in key else key
+
         if isinstance(expr, dict):
-            expr = ", ".join([f"{k}: {v}" for k, v in expr.items()])
+            expr = ", ".join([f"{prepare_key(k)}: {v}" for k, v in expr.items()])
             expr = f"{{{expr}}}"
 
-        expr = expr.strip()
-
-        # jmespath expression for map block must be enclosed in { }
-        if not (expr.startswith("{") and expr.endswith("}")):
-            raise ValueError("map expression must be in a json-like format enclosed in { }")
-
-        return expr
+        return expr.strip()
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         language = self.properties["language"]
         expression_prop = self._prepare_expression(language, self.properties["expression"])
+
+        # jmespath expression for map block must be enclosed in { }
+        if not (expression_prop.startswith("{") and expression_prop.endswith("}")):
+            raise ValueError("map expression must be in a json-like format enclosed in { }")
 
         self.expression = expression.compile(language, expression_prop)
 
