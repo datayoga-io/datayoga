@@ -23,7 +23,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             return f'"{key}"' if " " in key else key
 
         if isinstance(expr, dict):
-            expr = ", ".join([f"{prepare_key(k)}: {v}" for k, v in expr.items()])
+            expr = ", ".join(f"{prepare_key(k)}: {v}" for k, v in expr.items())
             expr = f"{{{expr}}}"
 
         return expr.strip()
