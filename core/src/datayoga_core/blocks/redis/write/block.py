@@ -13,7 +13,7 @@ from datayoga_core.utils import get_connection_details
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock, metaclass=ABCMeta):
+class Block(DyBlock):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")

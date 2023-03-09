@@ -11,7 +11,7 @@ from datayoga_core.result import BlockResult, Result, Status
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock, metaclass=ABCMeta):
+class Block(DyBlock):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
