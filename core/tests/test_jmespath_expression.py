@@ -238,3 +238,8 @@ def test_jmespath_filter_tombstone():
         {"fname": "a", "id": 1},
         None,
         {"fname": "a", "id": 3}]
+
+
+def test_jmespath_json_parse():
+    expression.compile("json_parse(data)")
+    assert expression.search({"data": """{"greeting": "hello world!"}"""}) == {"greeting1": "hello world!"}

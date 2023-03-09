@@ -142,3 +142,10 @@ class JmespathCustomFunctions(functions.Functions):
         Returns True if the iterable contains the given element.
         """
         return element in iterable
+
+    @functions.signature({"types": ["string"]})
+    def _func_json_parse(self, data: str) -> Any:
+        """\
+        Returns parsed object from the given json string.
+        """
+        return json.loads(data)
