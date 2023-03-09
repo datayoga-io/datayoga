@@ -242,4 +242,4 @@ def test_jmespath_filter_tombstone():
 
 def test_jmespath_json_parse():
     expression.compile("json_parse(data)")
-    assert expression.search({"data": """{"greeting": "hello world"}"""}) == {"greeting1": "hello world!"}
+    assert expression.search({"data": """{"greeting": "hello world!"}"""}) == {"greeting": "hello world!"}
