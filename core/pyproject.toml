@@ -12,7 +12,7 @@ classifiers = [
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Database'
 ]
 
@@ -22,7 +22,7 @@ pysqlite3-binary = { version = "^0.4.0", platform = "linux" }
 cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
-python = "^3.7"
+python = "^3.8"
 PyYAML = "^6.0"
 
 mock = { version = "^4.0.3", optional = true }
@@ -42,6 +42,7 @@ PyMySQL = { version="^1.0.2", optional = true }
 redis = { version = "^4.3.5", optional = true }
 SQLAlchemy = { version = "^2.0.4", optional = true }
 sqlglot = "^10.4.3"
+fastparquet = "^2023.2.0"
 
 [tool.poetry.extras]
 cassandra = ["cassandra-driver"]
@@ -50,6 +51,7 @@ oracle = ["oracledb", "SQLAlchemy"]
 pg = ["psycopg2-binary","SQLAlchemy"]
 redis = ["redis"]
 sqlserver = ["pymssql", "SQLAlchemy"]
+parquet = ["fastparquet"]
 test = [
         "cassandra-driver",
         "mock",
@@ -65,7 +67,8 @@ test = [
         "redis",
         "requests-mock",
         "SQLAlchemy",
-        "testcontainers"
+        "testcontainers",
+        "fastparquet"
 ]
 
 [tool.poetry.urls]
