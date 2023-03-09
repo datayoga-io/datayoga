@@ -9,7 +9,7 @@ from typing import Any, Dict, List
 import yaml
 
 from datayoga_core import result
-from datayoga_core.block import Block
+from datayoga_core.entity import Entity
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult, Result, Status
 
@@ -100,8 +100,8 @@ def all_success(records: List[Dict[str, Any]]) -> BlockResult:
 
 
 def is_rejected(record: Dict[str, Any]) -> bool:
-    return record.get(Block.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
+    return record.get(Entity.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
 
 
 def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
-    return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
+    return {Entity.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
