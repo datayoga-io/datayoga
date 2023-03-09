@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 from abc import ABCMeta
@@ -34,6 +33,5 @@ class Block(DyProducer, metaclass=ABCMeta):
         count = 0
         for df in pf.iter_row_groups():
             for _, data in df.iterrows():
-                data = json.loads(data.to_dict()['data'])
-                yield {self.MSG_ID_FIELD: str(count), **data}
+                yield {self.MSG_ID_FIELD: str(count), **data.to_dict()}
                 count += 1
