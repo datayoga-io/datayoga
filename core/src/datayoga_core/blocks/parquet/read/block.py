@@ -23,7 +23,6 @@ class Block(DyProducer, metaclass=ABCMeta):
             self.file = os.path.join(context.properties.get("data_path"), parquet_file)
 
         logger.debug(f"file: {self.file}")
-        self.batch_size = self.properties.get("batch_size", 1000)
 
     def produce(self) -> Generator[Message, None, None]:
         logger.debug("Reading parquet")

@@ -26,7 +26,6 @@ class Block(DyBlock, metaclass=ABCMeta):
             self.file = os.path.join(context.properties.get("data_path"), parquet_file)
 
         logger.debug(f"file: {self.file}")
-        self.batch_size = self.properties.get("batch_size", 1000)
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug("Writing parquet")

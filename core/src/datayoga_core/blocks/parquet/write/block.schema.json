@@ -6,11 +6,6 @@
     "file": {
       "description": "Filename. Can contain a regexp or glob expression",
       "type": "string"
-    },
-    "batch_size": {
-      "description": "Number of records to read per batch",
-      "type": "number",
-      "default": "1000"
     }
   },
   "additionalProperties": false,
