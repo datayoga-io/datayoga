@@ -8,8 +8,7 @@ from abc import ABCMeta, abstractmethod
 from os import path
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
-from datayoga_core.context import Context
-from datayoga_core.utils import get_bundled_dir, is_bundled, read_json
+from datayoga_core import Context, utils
 from jsonschema import validate
 
 if TYPE_CHECKING:
@@ -66,15 +65,15 @@ class Entity(metaclass=ABCMeta):
             Dict[str, Any]: JSON Schema
         """
         json_schema_file = path.join(
-            get_bundled_dir(),
+            utils.get_bundled_dir(),
             os.path.relpath(
                 os.path.dirname(sys.modules[self.__module__].__file__),
                 start=os.path.dirname(__file__)),
-            "block.schema.json") if is_bundled() else path.join(
+            "block.schema.json") if utils.is_bundled() else path.join(
             os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
             "block.schema.json")
         logger.debug(f"loading schema from {json_schema_file}")
-        return read_json(json_schema_file)
+        return utils.read_json(json_schema_file)
 
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
