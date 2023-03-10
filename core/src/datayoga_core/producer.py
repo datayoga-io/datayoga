@@ -1,7 +1,9 @@
 from abc import abstractmethod
-from typing import Generator, List
+from typing import Any, Dict, Generator, List, TypedDict
 
-from .block import Block, Message
+from .block import Block
+
+Message = TypedDict("Message", {"msg_id": str, "value": Dict[str, Any]})
 
 
 class Producer(Block):

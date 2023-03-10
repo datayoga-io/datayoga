@@ -6,14 +6,12 @@ import os
 import sys
 from abc import ABCMeta, abstractmethod
 from os import path
-from typing import Any, Dict, Generator, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
 
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
 from jsonschema import validate
-
-Message = TypedDict("Message", {"msg_id": str, "value": Dict[str, Any]})
 
 logger = logging.getLogger("dy")
 
