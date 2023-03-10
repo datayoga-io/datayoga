@@ -15,6 +15,7 @@ import jsonschema
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.producer import Producer
 from datayoga_core.result import JobResult, Result, Status
 from datayoga_core.step import Step
 
@@ -35,17 +36,17 @@ class Job:
         steps List[Block]: List of steps
     """
 
-    def __init__(self, steps: Optional[List[Step]] = None, input_block: Optional[Block] = None,
+    def __init__(self, steps: Optional[List[Step]] = None, producer: Optional[Producer] = None,
                  error_handling: Optional[ErrorHandling] = None):
         """
         Constructs a job and its blocks
 
         Args:
             steps (List[Dict[str, Any]]): Job steps
-            input_block (Optional[Block]): Block to be used as a producer
+            producer (Optional[Producer]): Block to be used as a producer
             error_handling (Optional[ErrorHandling]): error handling strategy
         """
-        self.input = input_block
+        self.producer = producer
         self.steps = steps
         self.error_handling = error_handling if error_handling else ErrorHandling.IGNORE
         self.initialized = False
@@ -68,8 +69,8 @@ class Job:
 
                 last_step = last_step.append(step)
 
-        if self.input:
-            self.input.init(context)
+        if self.producer:
+            self.producer.init(context)
 
         self.initialized = True
 
@@ -125,7 +126,7 @@ class Job:
         return result
 
     async def run(self):
-        for record in self.input.produce():
+        for record in self.producer.produce():
             logger.debug(f"Retrieved record:\n\t{record}")
             await self.root.process([record])
 
@@ -143,7 +144,7 @@ class Job:
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 
-        self.input.ack(msg_ids)
+        self.producer.ack(msg_ids)
 
     @staticmethod
     def validate(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):

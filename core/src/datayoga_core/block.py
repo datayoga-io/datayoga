@@ -95,22 +95,6 @@ class Block(metaclass=ABCMeta):
     def get_block_name(self):
         return os.path.basename(os.path.dirname(sys.modules[self.__module__].__file__))
 
-    def produce(self) -> Generator[Message, None, None]:
-        """Produces data
-
-        Returns:
-            Generator[Message]: Produced data
-        """
-        raise NotImplementedError
-
-    def ack(self, msg_ids: List[str]):
-        """Sends acknowledge for the message IDs of the records that have been processed
-
-        Args:
-            msg_ids (List[str]): Message IDs
-        """
-        raise NotImplementedError
-
     @staticmethod
     def create(block_name: str, properties: Dict[str, Any]) -> Block:
         module_name = f"datayoga_core.blocks.{block_name}.block"
