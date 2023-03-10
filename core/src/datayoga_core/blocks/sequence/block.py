@@ -8,7 +8,7 @@ from datayoga_core.context import Context
 logger = logging.getLogger(__name__)
 
 
-class Block(DyBlock):
+class Block(DyBlock, metaclass=ABCMeta):
 
     def init(self, context: Optional[Context] = None):
         pass

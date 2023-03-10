@@ -1,12 +1,10 @@
-from abc import ABCMeta, abstractmethod
-from typing import Any, Dict, Generator, List, TypedDict
+from abc import abstractmethod
+from typing import Generator, List
 
-from .entity import Entity
-
-Message = TypedDict("Message", {'msg_id': str, 'value': Dict[str, Any]})
+from .block import Block, Message
 
 
-class Producer(Entity, metaclass=ABCMeta):
+class Producer(Block):
 
     @abstractmethod
     def produce(self) -> Generator[Message, None, None]:

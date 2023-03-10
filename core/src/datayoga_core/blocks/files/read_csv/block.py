@@ -11,7 +11,7 @@ from datayoga_core.producer import Producer as DyProducer
 logger = logging.getLogger("dy")
 
 
-class Block(DyProducer):
+class Block(DyProducer, metaclass=ABCMeta):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
