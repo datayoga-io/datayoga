@@ -1,0 +1,27 @@
+{
+  "properties": {
+    "host": { "description": "DB host", "type": "string" },
+    "port": {
+      "description": "DB port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "database": { "description": "DB name", "type": "string" },
+    "user": { "description": "DB user", "type": "string" },
+    "password": { "description": "DB password", "type": "string" }
+  },
+  "required": ["type", "host", "database", "user"],
+  "examples": [
+    {
+      "hr": {
+        "type": "sqlserver",
+        "host": "localhost",
+        "port": 1433,
+        "database": "hr",
+        "user": "myuser",
+        "password": "mypass"
+      }
+    }
+  ]
+}

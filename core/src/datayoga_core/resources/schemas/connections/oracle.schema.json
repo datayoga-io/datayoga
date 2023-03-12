@@ -1,0 +1,40 @@
+{
+  "description": "Oracle",
+  "properties": {
+    "host": { "description": "DB host", "type": "string" },
+    "port": {
+      "description": "DB port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "driver": { "description": "Driver", "type": "string" },
+    "database": { "description": "DB name", "type": "string" },
+    "user": { "description": "DB user", "type": "string" },
+    "password": { "description": "DB password", "type": "string" },
+    "oracle_thick_mode": {
+      "description": "Enable oracle's thick mode(requires installed Oracle Client)",
+      "type": "boolean",
+      "default": false
+    },
+    "oracle_thick_mode_lib_dir": {
+      "description": "Path to Oracle Client libraries",
+      "type": "string"
+    }
+  },
+  "required": ["type", "host", "database", "user"],
+  "examples": [
+    {
+      "hr": {
+        "type": "oracle",
+        "host": "localhost",
+        "port": 5432,
+        "database": "orcl",
+        "user": "scott",
+        "password": "tiger",
+        "oracle_thick_mode": true,
+        "oracle_thick_mode_lib_dir": "/opt/oracle/instantclient_21_8/"
+      }
+    }
+  ]
+}
