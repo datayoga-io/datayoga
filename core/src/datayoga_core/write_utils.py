@@ -1,14 +1,13 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from datayoga_core.result import Result, Status
 
 logger = logging.getLogger("dy")
 
 
-def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[List[Dict[str, Any]],
-                                                                              List[Result]]:
+def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[List[Dict[str, Any]], List[Result]]:
 
     # validate that the specified keys exist in the records
     rejected_records: List[Result] = []
@@ -42,9 +41,10 @@ def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[s
 
 def map_record(record: Dict[str, Any],
                keys: List[Union[Dict[str, str], str]],
-               mapping: List[Union[Dict[str, str], str]] = []):
+               mapping: Optional[List[Union[Dict[str, str], str]]] = None):
     # map the record based on the mapping definitions
     # add nulls for missing mapping fields
+    mapping = mapping or []
     mapped_record = {}
     for item in keys + mapping:
         source = next(iter(item.values())) if isinstance(item, dict) else item

@@ -117,7 +117,7 @@ def run(
 
         job = dy.compile(job_settings)
 
-        producer = job.input
+        producer = job.producer
         logger.info(f"Producing from {producer.__module__}")
         job.init(context)
         asyncio.run(job.run())

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from asyncio import Task
 from typing import Any, Callable, Dict, List, Optional
 
 from datayoga_core.block import Block
@@ -11,14 +12,14 @@ from datayoga_core.result import Result, Status
 logger = logging.getLogger("dy")
 
 
-class Step():
-    def __init__(self, id: str, block: Block, concurrency=1):
-        self.id = id
+class Step:
+    def __init__(self, step_id: str, block: Optional[Block], concurrency=1):
+        self.id = step_id
         self.block = block
         self.next_step = None
         self.active_entries = set()
         self.concurrency = concurrency
-        self.workers = [None]*self.concurrency
+        self.workers: List[Optional[Task]] = [None]*self.concurrency
         self.done_callback = None
         self.initialized = False
 
@@ -30,14 +31,14 @@ class Step():
         # start pool of workers for parallelization
         logger.debug("starting pool")
         self.queue = asyncio.Queue(maxsize=1)
-        for id in range(self.concurrency):
-            worker = self.workers[id]
+        for worker_id in range(self.concurrency):
+            worker = self.workers[worker_id]
             if worker is None or not worker.done():
-                self.workers[id] = asyncio.create_task(self.run(id))
+                self.workers[worker_id] = asyncio.create_task(self.run(worker_id))
             else:
-                logger.debug(f"worker {id} is running: {not worker.done()}")
+                logger.debug(f"worker {worker_id} is running: {not worker.done()}")
 
-    def add_done_callback(self, callback: Callable[[str], None]):
+    def add_done_callback(self, callback: Callable[[List[str], List[Result]], None]):
         self.done_callback = callback
 
     def __or__(self, other: Step):

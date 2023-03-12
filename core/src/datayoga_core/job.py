@@ -5,6 +5,7 @@ import logging
 import marshal
 import os
 import sys
+from contextlib import suppress
 from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -14,6 +15,7 @@ import jsonschema
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.producer import Producer
 from datayoga_core.result import JobResult, Result, Status
 from datayoga_core.step import Step
 
@@ -26,7 +28,7 @@ class ErrorHandling(str, Enum):
     IGNORE = "ignore"
 
 
-class Job():
+class Job:
     """
     Job
 
@@ -34,17 +36,17 @@ class Job():
         steps List[Block]: List of steps
     """
 
-    def __init__(self, steps: Optional[List[Step]] = None, input: Optional[Block] = None,
+    def __init__(self, steps: Optional[List[Step]] = None, producer: Optional[Producer] = None,
                  error_handling: Optional[ErrorHandling] = None):
         """
         Constructs a job and its blocks
 
         Args:
             steps (List[Dict[str, Any]]): Job steps
-            input (Optional[Block]): Block to be used as a producer
+            producer (Optional[Producer]): Block to be used as a producer
             error_handling (Optional[ErrorHandling]): error handling strategy
         """
-        self.input = input
+        self.producer = producer
         self.steps = steps
         self.error_handling = error_handling if error_handling else ErrorHandling.IGNORE
         self.initialized = False
@@ -67,8 +69,8 @@ class Job():
 
                 last_step = last_step.append(step)
 
-        if self.input:
-            self.input.init(context)
+        if self.producer:
+            self.producer.init(context)
 
         self.initialized = True
 
@@ -117,16 +119,14 @@ class Job():
             result.processed = [Result(Status.SUCCESS, payload=row) for row in transformed_data]
         finally:
             # close the event loop
-            try:
-                loop.close()
-            except NotImplementedError as noe:
+            with suppress(NotImplementedError):
                 # for pyodide. doesn't implement loop.close, ignore
-                pass
+                loop.close()
 
         return result
 
     async def run(self):
-        for record in self.input.produce():
+        for record in self.producer.produce():
             logger.debug(f"Retrieved record:\n\t{record}")
             await self.root.process([record])
 
@@ -144,7 +144,7 @@ class Job():
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 
-        self.input.ack(msg_ids)
+        self.producer.ack(msg_ids)
 
     @staticmethod
     def validate(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
@@ -162,12 +162,12 @@ class Job():
             steps.append(step)
 
         # parse the input
-        input = None
+        input_block = None
         if source.get("input") is not None:
             input_definition = source.get("input")
-            input = Block.create(input_definition.get("uses"), input_definition.get("with"))
+            input_block = Block.create(input_definition.get("uses"), input_definition.get("with"))
 
-        return Job(steps, input, source.get("error_handling"))
+        return Job(steps, input_block, source.get("error_handling"))
 
     @staticmethod
     def get_json_schema(whitelisted_blocks: Optional[List[str]] = None) -> Dict[str, Any]:

@@ -30,7 +30,8 @@ class Block(DyProducer):
             for record in self.get_records(data):
                 yield self.get_message(record)
 
-    def get_records(self, data: str) -> List[Dict[str, Any]]:
+    @staticmethod
+    def get_records(data: str) -> List[Dict[str, Any]]:
         records = json.loads(data)
 
         if isinstance(records, dict):

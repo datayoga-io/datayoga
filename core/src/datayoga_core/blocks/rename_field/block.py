@@ -1,4 +1,5 @@
 import logging
+from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
 from datayoga_core import utils
@@ -9,7 +10,8 @@ from datayoga_core.result import BlockResult
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock):
+class Block(DyBlock, metaclass=ABCMeta):
+
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.properties = utils.format_block_properties(self.properties)
@@ -17,11 +19,11 @@ class Block(DyBlock):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         for row in data:
-            for property in self.properties["fields"]:
+            for prop in self.properties["fields"]:
                 key_found = True
                 obj = row
                 value = None
-                from_field_path = utils.split_field(property["from_field"])
+                from_field_path = utils.split_field(prop["from_field"])
 
                 for index, key in enumerate(from_field_path):
                     key = utils.unescape_field(key)
@@ -38,7 +40,7 @@ class Block(DyBlock):
 
                 if key_found:
                     obj = row
-                    to_field_path = utils.split_field(property["to_field"])
+                    to_field_path = utils.split_field(prop["to_field"])
 
                     for key in to_field_path[:-1]:
                         key = utils.unescape_field(key)

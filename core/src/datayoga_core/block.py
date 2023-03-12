@@ -28,14 +28,14 @@ class Block(metaclass=ABCMeta):
         properties Dict[str, Any]: Block properties
     """
 
-    def __init__(self, properties: Dict[str, Any] = {}):
+    def __init__(self, properties: Optional[Dict[str, Any]] = None):
         """
         Constructs a block
 
         Args:
-            properties (Dict[str, Any]): Block [properties]
+            properties (Optional[Dict[str, Any]]): Block [properties]
         """
-        self.properties = properties
+        self.properties = properties or {}
         self.validate()
 
     def validate(self):
@@ -74,7 +74,7 @@ class Block(metaclass=ABCMeta):
         raise NotImplementedError
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
-        """ Transforms data
+        """Transforms data
 
         Args:
             data (List[Dict[str, Any]]): Data

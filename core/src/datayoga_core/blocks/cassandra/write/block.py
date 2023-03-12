@@ -1,4 +1,5 @@
 import logging
+from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
 import cassandra.auth
@@ -12,7 +13,7 @@ from datayoga_core.result import BlockResult, Result, Status
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock):
+class Block(DyBlock, metaclass=ABCMeta):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")

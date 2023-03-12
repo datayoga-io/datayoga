@@ -1,16 +1,17 @@
 import logging
+from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
 from datayoga_core import expression
 from datayoga_core.block import Block as DyBlock
-from datayoga_core.block import BlockResult
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult, Result, Status
 
 logger = logging.getLogger("dy")
 
 
-class Block(DyBlock):
+class Block(DyBlock, metaclass=ABCMeta):
+
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.expression = expression.compile(self.properties["language"], self.properties["expression"])

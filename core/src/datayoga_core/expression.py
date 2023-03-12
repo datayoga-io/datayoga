@@ -36,7 +36,7 @@ def get_nested_value(data: Dict[str, Any], key: Tuple[str]) -> Any:
     return data
 
 
-class Expression():
+class Expression:
     @abstractmethod
     def compile(self, expression: str):
         """Compiles an expression
@@ -75,7 +75,7 @@ class Expression():
 
         Args:
             data (List[Dict[str, Any]]): Data
-            tombestone: if True, returns None for filtered values
+            tombstone: if True, returns None for filtered values
 
         Returns:
             List[Dict[str, Any]]: Filtered data
