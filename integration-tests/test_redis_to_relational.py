@@ -1,5 +1,4 @@
 import logging
-
 from contextlib import suppress
 
 import pytest
@@ -92,11 +91,6 @@ def test_redis_to_oracle():
             oracle_container.stop()  # noqa
 
 
-@pytest.mark.xfail
-# fails due https://github.com/testcontainers/testcontainers-python/issues/285
-# will be changed once this [1] PR is merged:
-#
-# [1] https://github.com/testcontainers/testcontainers-python/pull/286
 def test_redis_to_sqlserver():
     try:
         schema = "dbo"
