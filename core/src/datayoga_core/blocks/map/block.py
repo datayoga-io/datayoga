@@ -16,6 +16,8 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     @staticmethod
     def _prepare_expression(language: Language, expr: Union[dict, str]) -> str:
+        """Prepares the expression to compile."""
+
         if language == Language.SQL:
             return json.dumps(expr) if isinstance(expr, dict) else expr.strip()
 
