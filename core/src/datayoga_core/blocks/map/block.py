@@ -16,7 +16,9 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     @staticmethod
     def _prepare_expression(language: Language, expr: Union[dict, str]) -> str:
-        """Prepares the expression to compile."""
+        """Prepares the expression to compile.
+        The sql expression will be dumped as json.
+        For the jmespath the expression will be generated."""
 
         if language == Language.SQL:
             return json.dumps(expr) if isinstance(expr, dict) else expr.strip()
@@ -24,6 +26,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         def prepare_key(key: str) -> str:
             return f'"{key}"' if " " in key else key
 
+        # If there is an object here, we generate an expression.
         if isinstance(expr, dict):
             expr = ", ".join(f"{prepare_key(k)}: {v}" for k, v in expr.items())
             expr = f"{{{expr}}}"
