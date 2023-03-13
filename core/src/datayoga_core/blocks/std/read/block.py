@@ -1,10 +1,10 @@
-import json
 import logging
 import select
 import sys
 import uuid
 from typing import Any, Dict, Generator, List, Optional
 
+import orjson
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer
@@ -32,7 +32,7 @@ class Block(DyProducer):
 
     @staticmethod
     def get_records(data: str) -> List[Dict[str, Any]]:
-        records = json.loads(data)
+        records = orjson.loads(data)
 
         if isinstance(records, dict):
             records = [records]

@@ -1,8 +1,8 @@
-import json
 import logging
 from abc import ABCMeta
 from typing import Any, Dict, List, Optional, Union
 
+import orjson
 from datayoga_core import expression
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
@@ -21,7 +21,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         For the jmespath the expression will be generated."""
 
         if language == Language.SQL:
-            return json.dumps(expr) if isinstance(expr, dict) else expr.strip()
+            return orjson.dumps(expr).decode() if isinstance(expr, dict) else expr.strip()
 
         def prepare_key(key: str) -> str:
             return f'"{key}"' if " " in key else key
