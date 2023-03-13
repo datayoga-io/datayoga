@@ -31,7 +31,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         logger.debug("Writing parquet")
 
         # remove the internal $$msg_id column
-        out = [dict(data={i: record[i] for i in record if i != Block.MSG_ID_FIELD}) for record in data]
+        out = [{"data": {i: record[i] for i in record if i != Block.MSG_ID_FIELD}} for record in data]
 
         append = os.path.exists(self.file)
         write(self.file, DataFrame(out), append=append, has_nulls=True)

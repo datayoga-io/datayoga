@@ -3,6 +3,7 @@ version: "3.9"
 services:
 
   dy-dev:
+    platform: linux/amd64
     build:
       context: ../
       dockerfile: ./dev/Dockerfile
