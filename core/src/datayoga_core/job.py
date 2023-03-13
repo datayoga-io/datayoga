@@ -15,6 +15,7 @@ import jsonschema
 from datayoga_core import blocks, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.producer import Producer
 from datayoga_core.result import JobResult, Result, Status
 from datayoga_core.step import Step
 
@@ -35,17 +36,17 @@ class Job:
         steps List[Block]: List of steps
     """
 
-    def __init__(self, steps: Optional[List[Step]] = None, input_block: Optional[Block] = None,
+    def __init__(self, steps: Optional[List[Step]] = None, producer: Optional[Producer] = None,
                  error_handling: Optional[ErrorHandling] = None):
         """
         Constructs a job and its blocks
 
         Args:
             steps (List[Dict[str, Any]]): Job steps
-            input_block (Optional[Block]): Block to be used as a producer
+            producer (Optional[Producer]): Block to be used as a producer
             error_handling (Optional[ErrorHandling]): error handling strategy
         """
-        self.input = input_block
+        self.producer = producer
         self.steps = steps
         self.error_handling = error_handling if error_handling else ErrorHandling.IGNORE
         self.initialized = False
@@ -68,8 +69,8 @@ class Job:
 
                 last_step = last_step.append(step)
 
-        if self.input:
-            self.input.init(context)
+        if self.producer:
+            self.producer.init(context)
 
         self.initialized = True
 
@@ -125,7 +126,7 @@ class Job:
         return result
 
     async def run(self):
-        for record in self.input.produce():
+        for record in self.producer.produce():
             logger.debug(f"Retrieved record:\n\t{record}")
             await self.root.process([record])
 
@@ -143,7 +144,7 @@ class Job:
             logger.critical("Aborting due to rejected record(s)")
             sys.exit(1)
 
-        self.input.ack(msg_ids)
+        self.producer.ack(msg_ids)
 
     @staticmethod
     def validate(source: Dict[str, Any], whitelisted_blocks: Optional[List[str]] = None):
@@ -176,7 +177,7 @@ class Job:
         # to avoid importing all of the block classes
         schema_paths = Path(os.path.join(utils.get_bundled_dir(), "blocks") if utils.is_bundled() else os.path.dirname(
             os.path.realpath(blocks.__file__))).rglob("**/block.schema.json")
-
+        block_types = []
         for schema_path in schema_paths:
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
@@ -185,21 +186,27 @@ class Job:
             block_type = block_type.replace(os.path.sep, ".")
 
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
+                block_types.append(block_type)
                 # load schema file
                 schema = utils.read_json(f"{schema_path}")
-                # append to the array of oneOf for the full schema
+                # append to the array of allOf for the full schema
+                # we use allOf for better error reporting
                 block_schemas.append({
-                    "type": "object",
-                    "properties": {
-                        "uses": {
-                            "description": "Block type",
-                            "type": "string",
-                            "const": block_type
+                    "if": {
+                        "properties": {
+                            "uses": {
+                                "description": "Block type",
+                                "type": "string",
+                                "const": block_type
+                            },
                         },
-                        "with": schema,
+                        "required": ["uses"]
                     },
-                    "additionalProperties": False,
-                    "required": ["uses"],
+                    "then": {
+                        "properties": {
+                            "with": schema,
+                        }
+                    }
                 })
 
         job_schema = utils.read_json(
@@ -208,7 +215,12 @@ class Job:
                 "resources", "schemas", "job.schema.json"))
         job_schema["definitions"]["block"] = {
             "type": "object",
-            "oneOf": block_schemas
+            "properties": {
+                "uses": {
+                    "enum": block_types,
+                }
+            },
+            "allOf": block_schemas
         }
 
         return job_schema
