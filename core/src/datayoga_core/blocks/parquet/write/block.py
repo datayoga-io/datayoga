@@ -1,4 +1,3 @@
-
 import logging
 import os
 from abc import ABCMeta
@@ -8,6 +7,7 @@ from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult
+from datayoga_core.utils import remove_msg_id
 from fastparquet import write
 from pandas import DataFrame
 
@@ -30,9 +30,7 @@ class Block(DyBlock, metaclass=ABCMeta):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug("Writing parquet")
 
-        # remove the internal $$msg_id column
-        out = [{"data": {i: record[i] for i in record if i != Block.MSG_ID_FIELD}} for record in data]
-
+        out = [{"data": remove_msg_id(record)} for record in data]
         append = os.path.exists(self.file)
         write(self.file, DataFrame(out), append=append, has_nulls=True)
 

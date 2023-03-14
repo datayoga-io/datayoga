@@ -104,3 +104,7 @@ def is_rejected(record: Dict[str, Any]) -> bool:
 
 def add_uid(record: Dict[str, Any]) -> Dict[str, Any]:
     return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
+
+
+def remove_msg_id(record: dict) -> dict:
+    return {k: v for k, v in record.items() if k != Block.MSG_ID_FIELD}
