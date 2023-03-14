@@ -95,12 +95,16 @@ def get_connection_details(connection_name: str, context: Context) -> Dict[str, 
 
 
 def all_success(records: List[Dict[str, Any]]) -> BlockResult:
-    return BlockResult(processed=[Result(Status.SUCCESS,payload=row) for row in records])
+    return BlockResult(processed=[Result(Status.SUCCESS, payload=row) for row in records])
 
 
 def is_rejected(record: Dict[str, Any]) -> bool:
     return record.get(Block.RESULT_FIELD, result.SUCCESS).status == Status.REJECTED
 
 
-def add_uid(record: Dict[str, Any]) -> Dict[str,Any]:
+def add_uid(record: Dict[str, Any]) -> Dict[str, Any]:
     return {Block.MSG_ID_FIELD: f"{uuid.uuid4()}", **record}
+
+
+def remove_msg_id(record: dict) -> dict:
+    return {k: v for k, v in record.items() if k != Block.MSG_ID_FIELD}

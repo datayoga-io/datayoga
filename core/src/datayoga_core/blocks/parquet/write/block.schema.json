@@ -1,0 +1,18 @@
+{
+  "title": "parquet.write",
+  "description": "Write data to parquet",
+  "type": "object",
+  "properties": {
+    "file": {
+      "description": "Filename. Can contain a regexp or glob expression",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["file"],
+  "examples": [
+    {
+      "file": "data.parquet"
+    }
+  ]
+}
