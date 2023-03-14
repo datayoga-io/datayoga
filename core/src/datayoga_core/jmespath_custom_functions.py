@@ -91,7 +91,6 @@ class JmespathCustomFunctions(functions.Functions):
             if isinstance(obj, str):
                 return obj.encode()
 
-            # the 'separators' arg is needed to remove whitespace in the resulting string
             return orjson.dumps(obj, option=orjson.OPT_SORT_KEYS)
 
         h = hashlib.new(hash_name)
