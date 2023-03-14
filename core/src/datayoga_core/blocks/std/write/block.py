@@ -1,9 +1,9 @@
-import json
 import logging
 import sys
 from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
+import orjson
 from datayoga_core import utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
@@ -21,7 +21,7 @@ class Block(DyBlock, metaclass=ABCMeta):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         for record in data:
             filtered_record = remove_msg_id(record)
-            sys.stdout.write(f"{json.dumps(filtered_record)}\n")
+            sys.stdout.write(f"{orjson.dumps(filtered_record).decode()}\n")
 
         # if we made it here, it is a success. return the data and the success result
         return utils.all_success(data)

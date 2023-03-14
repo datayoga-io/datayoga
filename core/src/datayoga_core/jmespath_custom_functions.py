@@ -1,11 +1,11 @@
 import hashlib
-import json
 import re
 import string
 from datetime import datetime, timezone
 from typing import Any, Iterable, Union
 from uuid import uuid4
 
+import orjson
 from jmespath import functions
 
 
@@ -91,8 +91,7 @@ class JmespathCustomFunctions(functions.Functions):
             if isinstance(obj, str):
                 return obj.encode()
 
-            # the 'separators' arg is needed to remove whitespace in the resulting string
-            return json.dumps(obj, separators=(',', ':')).encode("utf-8")
+            return orjson.dumps(obj, option=orjson.OPT_SORT_KEYS)
 
         h = hashlib.new(hash_name)
         h.update(prepare())
@@ -138,4 +137,4 @@ class JmespathCustomFunctions(functions.Functions):
     @functions.signature({"types": ["string"]})
     def _func_json_parse(self, data: str) -> Any:
         """Returns parsed object from the given json string."""
-        return json.loads(data)
+        return orjson.loads(data)

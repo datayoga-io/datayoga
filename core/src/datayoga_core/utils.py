@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import sys
@@ -6,6 +5,7 @@ import uuid
 from os import path
 from typing import Any, Dict, List
 
+import orjson
 import yaml
 from datayoga_core import result
 from datayoga_core.block import Block
@@ -24,7 +24,7 @@ def read_json(filename: str) -> Any:
         Any: JSON object
     """
     with open(filename, "r", encoding="utf8") as json_file:
-        return json.load(json_file)
+        return orjson.loads(json_file.read())
 
 
 def read_yaml(filename: str) -> Dict[str, Any]:

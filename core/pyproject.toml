@@ -22,6 +22,7 @@ pysqlite3-binary = { version = "^0.4.0", platform = "linux" }
 cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
+orjson = "^3.8.7"
 python = "^3.8"
 PyYAML = "^6.0"
 
