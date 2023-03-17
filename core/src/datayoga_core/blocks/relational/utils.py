@@ -40,6 +40,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
         lib_dir = connection.get("oracle_thick_mode_lib_dir")
         extra["thick_mode"] = {'lib_dir': lib_dir} if lib_dir else {}
 
+    # PSQL specific parameters to be passed in the query string for SSL connection
     if db_type == DbType.PSQL:
         args = connection.get("connect_args", {})
         ssl_args["sslmode"] = args.get("sslmode")
