@@ -31,6 +31,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
     db_type = DbType(connection.get("type", "").lower())
 
     extra = {}
+    ssl_args = {}
 
     if autocommit:
         extra["isolation_level"] = "AUTOCOMMIT"
@@ -39,6 +40,17 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
         lib_dir = connection.get("oracle_thick_mode_lib_dir")
         extra["thick_mode"] = {'lib_dir': lib_dir} if lib_dir else {}
 
+    if db_type == DbType.PSQL:
+        args = connection.get("connect_args", {})
+        ssl_args["sslmode"] = args.get("sslmode")
+        ssl_args["sslrootcert"] = args.get("sslrootcert")
+        ssl_args["sslkey"] = args.get("sslkey")
+        ssl_args["sslcert"] = args.get("sslcert")
+        ssl_args["sslpassword"] = args.get("sslpassword")
+
+        connection["connect_args"] = {k: v for k, v in args.items() if k not in ssl_args.keys()}
+        ssl_args = {k: v for k, v in ssl_args.items() if v is not None}
+
     engine = sa.create_engine(
         sa.engine.URL.create(
             drivername=connection.get("driver", DEFAULT_DRIVERS.get(db_type)),
@@ -46,8 +58,10 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
             port=connection.get("port"),
             username=connection.get("user"),
             password=connection.get("password"),
-            database=connection.get("database")),
-        echo=connection.get("debug", False), connect_args=connection.get("connect_args", {}),
+            database=connection.get("database"),
+            query=ssl_args),
+        echo=connection.get("debug", False),
+        connect_args=connection.get("connect_args", {}),
         **extra)
 
     return engine, db_type
