@@ -1,11 +1,11 @@
 import hashlib
-import json
 import re
 import string
 from datetime import datetime, timezone
 from typing import Any, Iterable, Union
 from uuid import uuid4
 
+import orjson
 from jmespath import functions
 
 
@@ -61,8 +61,7 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"], "variadic": True})
     def _func_hash(self, obj, hash_name="sha1"):
-        """\
-        Calculates a hash using given the `hash_name` hash function and returns its hexadecimal representation.
+        """Calculates a hash using given the `hash_name` hash function and returns its hexadecimal representation.
 
         Supported algorithms:
 
@@ -92,8 +91,7 @@ class JmespathCustomFunctions(functions.Functions):
             if isinstance(obj, str):
                 return obj.encode()
 
-            # the 'separators' arg is needed to remove whitespace in the resulting string
-            return json.dumps(obj, separators=(',', ':')).encode("utf-8")
+            return orjson.dumps(obj, option=orjson.OPT_SORT_KEYS)
 
         h = hashlib.new(hash_name)
         h.update(prepare())
@@ -101,8 +99,7 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_days(self, dt):
-        """\
-        Returns the number of days between given `dt` and now (positive)
+        """Returns the number of days between given `dt` and now (positive)
         or the number of days that have passed from now (negative).
 
         If `dt` is a string, ISO datetime (2011-11-04T00:05:23+04:00, for example) is assumed.
@@ -115,8 +112,7 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["string", "number"]})
     def _func_time_delta_seconds(self, dt):
-        """\
-        Returns the number of seconds between given `dt` and now (positive)
+        """Returns the number of seconds between given `dt` and now (positive)
         or the number of seconds that have passed from now (negative).
 
         If `dt` is a string, ISO datetime (2011-11-04T00:05:23+04:00, for example) is assumed.
@@ -130,15 +126,15 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["string"]}, {"types": ["string"]}, {"types": ["string"]})
     def _func_regex_replace(self, text: str, pattern: str, replacement: str) -> str:
-        """\
-        Replaces matched patterns in the string by the given replacement.
-        """
-
+        """Replaces matched patterns in the string by the given replacement."""
         return re.sub(pattern, replacement, text)
 
     @functions.signature({"types": ["number", "string", "boolean", "array", "object", "null"]}, {"types": ["array"]})
     def _func_in(self, element: Any, iterable: Iterable) -> bool:
-        """\
-        Returns True if the iterable contains the given element.
-        """
+        """Returns True if the iterable contains the given element."""
         return element in iterable
+
+    @functions.signature({"types": ["string"]})
+    def _func_json_parse(self, data: str) -> Any:
+        """Returns parsed object from the given json string."""
+        return orjson.loads(data)

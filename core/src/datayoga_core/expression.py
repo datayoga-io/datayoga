@@ -1,6 +1,6 @@
-import json
 import logging
 
+import orjson
 import sqlglot
 
 try:
@@ -100,7 +100,7 @@ class SQLExpression(Expression):
         # we support both single field expressions and multiple fields
         self._is_single_field = True
         try:
-            self._fields = json.loads(expression)
+            self._fields = orjson.loads(expression)
 
             # verify this is a dict, and not a list or document ('x' is a valid json)
             if isinstance(self._fields, dict):
@@ -109,7 +109,7 @@ class SQLExpression(Expression):
                 # this is not a dict, treat as a simple expression
                 self._fields = {"expr": expression}
 
-        except json.JSONDecodeError:
+        except orjson.JSONDecodeError:
             # this is not a json, treat as a simple expression
             self._fields = {"expr": expression}
 

@@ -1,8 +1,8 @@
-import json
 import logging
 from typing import Generator, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
+import orjson
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer
@@ -37,12 +37,12 @@ class Block(DyProducer):
         while True:
             # Read pending messages (fetched by us before but not acknowledged) in the first time, then consume new messages
             streams = self.redis_client.xreadgroup(self.consumer_group, self.requesting_consumer, {
-                                                   self.stream: "0" if read_pending else ">"}, None, 100 if self.snapshot else 0)
+                self.stream: "0" if read_pending else ">"}, None, 100 if self.snapshot else 0)
 
             for stream in streams:
                 logger.debug(f"Messages in {self.stream} stream (pending: {read_pending}):\n\t{stream}")
                 for key, value in stream[1]:
-                    payload = json.loads(value[next(iter(value))])
+                    payload = orjson.loads(value[next(iter(value))])
                     payload[self.MSG_ID_FIELD] = key
                     yield payload
 
