@@ -1,10 +1,8 @@
 import logging
 from contextlib import suppress
 
-import pytest
 from common import db_utils, redis_utils
 from common.utils import run_job
-from datayoga_core.blocks import relational  # noqa
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
