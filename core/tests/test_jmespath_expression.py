@@ -16,92 +16,92 @@ def test_jmespath_capitalize_expression():
 
 
 def test_jmespath_lower_expression():
-    expression.compile(f"lower(product)")
+    expression.compile("lower(product)")
     assert expression.search({"product": "PhonE"}) == "phone"
 
 
 def test_jmespath_capitalize_expression_null():
     expression.compile("capitalize(name)")
-    assert expression.search({"name": None}) == None
+    assert expression.search({"name": None}) is None
 
 
 def test_jmespath_lower_expression_null():
-    expression.compile(f"lower(product)")
-    assert expression.search({"product": None}) == None
+    expression.compile("lower(product)")
+    assert expression.search({"product": None}) is None
 
 
 def test_jmespath_upper_expression():
-    expression.compile(f"upper(product)")
+    expression.compile("upper(product)")
     assert expression.search({"product": "PhonE"}) == "PHONE"
 
 
 def test_jmespath_upper_expression_null():
-    expression.compile(f"upper(product)")
-    assert expression.search({"product": None}) == None
+    expression.compile("upper(product)")
+    assert expression.search({"product": None}) is None
 
 
 def test_jmespath_replace_empty_string():
-    expression.compile(f"replace(sentence, '', 'two')")
+    expression.compile("replace(sentence, '', 'two')")
     assert expression.search({"sentence": "one four three four!"}) == "one four three four!"
 
 
 def test_jmespath_replace_expression():
-    expression.compile(f"replace(sentence, 'four', 'two')")
+    expression.compile("replace(sentence, 'four', 'two')")
     assert expression.search({"sentence": "one four three four!"}) == "one two three two!"
 
 
 def test_jmespath_replace_expression_null():
-    expression.compile(f"replace(sentence, 'four', 'two')")
-    assert expression.search({"sentence": None}) == None
+    expression.compile("replace(sentence, 'four', 'two')")
+    assert expression.search({"sentence": None}) is None
 
 
 def test_jmespath_right_expression():
-    expression.compile(f"right(sentence, `5`)")
+    expression.compile("right(sentence, `5`)")
     assert expression.search({"sentence": "one four three four!"}) == "four!"
 
 
 def test_jmespath_right_expression_null():
-    expression.compile(f"right(sentence, `5`)")
-    assert expression.search({}) == None
+    expression.compile("right(sentence, `5`)")
+    assert expression.search({}) is None
 
 
 def test_jmespath_left_expression():
-    expression.compile(f"left(sentence, `3`)")
+    expression.compile("left(sentence, `3`)")
     assert expression.search({"sentence": "one four three four!"}) == "one"
 
 
 def test_jmespath_left_expression_null():
-    expression.compile(f"left(sentence, `5`)")
-    assert expression.search({}) == None
+    expression.compile("left(sentence, `5`)")
+    assert expression.search({}) is None
 
 
 def test_jmespath_mid_expression():
-    expression.compile(f"mid(sentence, `3`, `7`)")
+    expression.compile("mid(sentence, `3`, `7`)")
     assert expression.search({"sentence": "one four three four!"}) == " four t"
 
 
 def test_jmespath_mid_expression_null():
-    expression.compile(f"mid(sentence, `1`, `4`)")
-    assert expression.search({}) == None
+    expression.compile("mid(sentence, `1`, `4`)")
+    assert expression.search({}) is None
 
 
 def test_jmespath_split_expression():
-    expression.compile(f"split(departments)")
+    expression.compile("split(departments)")
     assert expression.search({"departments": "finance,hr,r&d"}) == ["finance", "hr", "r&d"]
 
 
 def test_jmespath_split_expression_null():
-    expression.compile(f"split(animals, ',')")
-    assert expression.search({"animals": None}) == None
+    expression.compile("split(animals, ',')")
+    assert expression.search({"animals": None}) is None
 
 
 def test_jmespath_split_delimiter_expression():
-    expression.compile(f"split(animals, '|')")
+    expression.compile("split(animals, '|')")
     assert expression.search({"animals": "cat|dog|frog|mouse"}) == ["cat", "dog", "frog", "mouse"]
 
 
 def test_jmespath_uuid():
-    expression.compile(f"uuid()")
+    expression.compile("uuid()")
     val = expression.search(None)
 
     assert len(val) == 36
@@ -115,22 +115,22 @@ def test_jmespath_uuid():
 
 def test_jmespath_hash():
     # Test default hash(sha1)
-    expression.compile(f"hash(null)")
+    expression.compile("hash(null)")
     assert expression.search(None) == 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
 
-    expression.compile(f"hash(some_null)")
+    expression.compile("hash(some_null)")
     assert expression.search({"some_null": None}) == 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
 
-    expression.compile(f"hash(some_arr)")
+    expression.compile("hash(some_arr)")
     assert expression.search({"some_arr": [1, 2, "3", {}]}) == '55ff109a5a35588b4128d36b7806f3cbcd4f59f2'
 
-    expression.compile(f"hash(some_str)")
+    expression.compile("hash(some_str)")
     assert expression.search({"some_str": "some_value"}) == '8c818171573b03feeae08b0b4ffeb6999e3afc05'
 
-    expression.compile(f"hash(some_bool)")
+    expression.compile("hash(some_bool)")
     assert expression.search({"some_bool": True}) == '5ffe533b830f08a0326348a9160afafc8ada44db'
 
-    expression.compile(f"hash(some_obj)")
+    expression.compile("hash(some_obj)")
     assert expression.search({"some_obj": {"some_inner": "some_value"}}) == 'c756dab1743ae081dc9214a837a1ed4a4c341e5a'
 
     #  Test hashes comes from empty string
@@ -159,7 +159,7 @@ def test_jmespath_hash():
 
 
 def test_jmespath_time_delta_days():
-    expression.compile(f"time_delta_days(dt)")
+    expression.compile("time_delta_days(dt)")
 
     dt = datetime.now(tz=timezone.utc) - timedelta(days=365)
     assert expression.search({"dt": dt.isoformat()}) == 365
@@ -175,7 +175,7 @@ def test_jmespath_time_delta_days():
 
 
 def test_jmespath_time_delta_seconds():
-    expression.compile(f"time_delta_seconds(dt)")
+    expression.compile("time_delta_seconds(dt)")
 
     dt = datetime.now(tz=timezone.utc) - timedelta(seconds=31557600)
     assert expression.search({"dt": dt.isoformat()}) == 31557600
@@ -191,7 +191,7 @@ def test_jmespath_time_delta_seconds():
 
 
 def test_regex_replace():
-    expression.compile(f"regex_replace(text, pattern, replacement)")
+    expression.compile("regex_replace(text, pattern, replacement)")
 
     assert expression.search({"text": "Banana Bannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple Apple"
     assert expression.search({"text": "Bana\nBannnana", "pattern": r"Ban\w+", "replacement": "Apple"}) == "Apple\nApple"
@@ -203,7 +203,7 @@ def test_regex_replace():
 
 
 def test_jmespath_in():
-    expression.compile(f"in(el, itr)")
+    expression.compile("in(el, itr)")
 
     assert expression.search({"el": 2, "itr": [1, 2, 3, 4]})
     assert expression.search({"el": "c", "itr": ["a", "b", "c", "d"]})
@@ -211,7 +211,7 @@ def test_jmespath_in():
     assert not expression.search({"el": 0, "itr": [1, 2, 3, 4]})
     assert not expression.search({"el": "x", "itr": ["a", "b", "c", "d"]})
 
-    expression.compile(f"in(el, `[1, 2, 3, 4, 5]`)")
+    expression.compile("in(el, `[1, 2, 3, 4, 5]`)")
 
     assert expression.search({"el": 1})
     assert not expression.search({"el": 0})
