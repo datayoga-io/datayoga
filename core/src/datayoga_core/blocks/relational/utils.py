@@ -37,7 +37,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
 
     if db_type == DbType.ORACLE and connection.get("oracle_thick_mode", False):
         lib_dir = connection.get("oracle_thick_mode_lib_dir")
-        extra["thick_mode"] = {'lib_dir': lib_dir} if lib_dir else {}
+        extra["thick_mode"] = {"lib_dir": lib_dir} if lib_dir else {}
 
     engine = sa.create_engine(
         sa.engine.URL.create(
