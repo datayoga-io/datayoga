@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 import sys
@@ -10,6 +11,7 @@ import yaml
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.expression import JMESPathExpression
 from datayoga_core.result import BlockResult, Result, Status
 
 
@@ -86,8 +88,8 @@ def unescape_field(field: str) -> str:
 
 
 def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
-    if context:
-        connection = context.properties.get("connections").get(connection_name)
+    if context and context.properties:
+        connection = context.properties.get("connections", {}).get(connection_name)
         if connection:
             return connection
 
@@ -108,3 +110,23 @@ def add_uid(record: Dict[str, Any]) -> Dict[str, Any]:
 
 def remove_msg_id(record: dict) -> dict:
     return {k: v for k, v in record.items() if k != Block.MSG_ID_FIELD}
+
+
+def explode_records(records: List[Dict[str, Any]], field_expression: str) -> List[Dict[str, Any]]:
+    field_name, expression = map(str.strip, field_expression.split(":", maxsplit=1))
+
+    jmespath_expr = JMESPathExpression()
+    jmespath_expr.compile(expression)
+
+    exploded_records = []
+
+    for record in records:
+        exploded_fields = jmespath_expr.search(record)
+
+        if exploded_fields:
+            for exploded_field in exploded_fields:
+                new_record = copy.deepcopy(record)
+                new_record[field_name] = exploded_field
+                exploded_records.append(new_record)
+
+    return exploded_records
