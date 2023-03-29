@@ -17,6 +17,7 @@ Write into a SQL-compatible data store
 |**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |[**keys**](#keys)<br/>(Business keys to use in case of \`load\_strategy\` is UPSERT or working with \`opcode\_field\`)|`array`||no|
 |[**mapping**](#mapping)<br/>(Fields to write)|`array`||no|
+|**foreach**<br/>(Split a column into multiple records with a JMESPath expression)|`string`|Use a JMESPath expression to split a column into multiple records. The expression should be in the format column: expression.<br/>|no|
 |**opcode\_field**|`string`|Name of the field in the payload that holds the operation (c - create, d - delete, u - update) for this record in the DB<br/>|no|
 |**load\_strategy**|`string`|type of target<br/>Default: `"APPEND"`<br/>Enum: `"APPEND"`, `"REPLACE"`, `"UPSERT"`, `"TYPE2"`<br/>|no|
 |**active\_record\_indicator**|`string`|Used for `TYPE2` load_strategy. An SQL expression used to identify which rows are active<br/>|no|
