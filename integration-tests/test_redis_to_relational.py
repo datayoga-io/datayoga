@@ -49,6 +49,7 @@ def test_redis_to_pg():
         postgres_container.start()
 
         engine = db_utils.get_engine(postgres_container)
+        db_utils.create_schema(engine, schema_name)
         setup_database(engine, schema_name)
 
         run_job("tests.redis_to_pg")
