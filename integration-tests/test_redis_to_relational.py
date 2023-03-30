@@ -13,7 +13,7 @@ REDIS_PORT = 12554
 
 def test_redis_to_mysql():
     try:
-        schema = "hr"
+        schema_name = "hr"
 
         redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
         redis_container.start()
@@ -24,10 +24,11 @@ def test_redis_to_mysql():
         redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
 
         engine = db_utils.get_engine(mysql_container)
-        prepare_db(engine, schema)
+        db_utils.create_schema(engine, schema_name)
+        setup_database(engine, schema_name)
 
         run_job("tests.redis_to_mysql")
-        check_results(engine, schema)
+        check_results(engine, schema_name)
     finally:
         with suppress(Exception):
             redis_container.stop()  # noqa
@@ -37,7 +38,7 @@ def test_redis_to_mysql():
 
 def test_redis_to_pg():
     try:
-        schema = "hr"
+        schema_name = "hr"
 
         redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
         redis_container.start()
@@ -48,10 +49,10 @@ def test_redis_to_pg():
         postgres_container.start()
 
         engine = db_utils.get_engine(postgres_container)
-        prepare_db(engine, schema)
+        setup_database(engine, schema_name)
 
         run_job("tests.redis_to_pg")
-        check_results(engine, schema)
+        check_results(engine, schema_name)
     finally:
         with suppress(Exception):
             redis_container.stop()  # noqa
@@ -61,7 +62,7 @@ def test_redis_to_pg():
 
 def test_redis_to_oracle():
     try:
-        schema = "hr"
+        schema_name = "hr"
 
         redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
         redis_container.start()
@@ -72,11 +73,11 @@ def test_redis_to_oracle():
         oracle_container.start()
 
         engine = db_utils.get_engine(oracle_container)
-        prepare_db(engine, schema)
+        setup_database(engine, schema_name)
 
         run_job("tests.redis_to_oracle")
 
-        check_results(engine, schema)
+        check_results(engine, schema_name)
     finally:
         with suppress(Exception):
             redis_container.stop()  # noqa
@@ -91,7 +92,7 @@ def test_redis_to_oracle():
 # [1] https://github.com/testcontainers/testcontainers-python/pull/286
 def test_redis_to_sqlserver():
     try:
-        schema = "dbo"
+        schema_name = "dbo"
 
         redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
         redis_container.start()
@@ -102,11 +103,11 @@ def test_redis_to_sqlserver():
         sqlserver_container.start()
 
         engine = db_utils.get_engine(sqlserver_container)
-        prepare_db(engine, schema)
+        setup_database(engine, schema_name)
 
         run_job("tests.redis_to_sqlserver")
 
-        check_results(engine, schema)
+        check_results(engine, schema_name)
     finally:
         with suppress(Exception):
             redis_container.stop()  # noqa
@@ -114,8 +115,7 @@ def test_redis_to_sqlserver():
             sqlserver_container.stop()  # noqa
 
 
-def prepare_db(engine: Engine, schema_name: str):
-    db_utils.create_schema(engine, schema_name)
+def setup_database(engine: Engine, schema_name: str):
     db_utils.create_emp_table(engine, schema_name)
     db_utils.create_address_table(engine, schema_name)
     db_utils.insert_to_emp_table(engine, schema_name)
