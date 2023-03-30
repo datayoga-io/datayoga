@@ -56,6 +56,7 @@
       "type": "string",
       "title": "Split a column into multiple records with a JMESPath expression",
       "description": "Use a JMESPath expression to split a column into multiple records. The expression should be in the format column: expression.",
+      "pattern": "^(?!:).*:.*(?<!:)$",
       "examples": ["order_line: lines[]"]
     },
     "opcode_field": {

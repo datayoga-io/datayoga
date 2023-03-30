@@ -106,32 +106,32 @@ def test_jmespath_uuid():
 
     assert len(val) == 36
     assert isinstance(val, str)
-    assert val[8] == '-'
-    assert val[13] == '-'
-    assert val[13] == '-'
-    assert val[18] == '-'
-    assert val[23] == '-'
+    assert val[8] == "-"
+    assert val[13] == "-"
+    assert val[13] == "-"
+    assert val[18] == "-"
+    assert val[23] == "-"
 
 
 def test_jmespath_hash():
     # Test default hash(sha1)
     expression.compile("hash(null)")
-    assert expression.search(None) == 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+    assert expression.search(None) == "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
     expression.compile("hash(some_null)")
-    assert expression.search({"some_null": None}) == 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+    assert expression.search({"some_null": None}) == "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
     expression.compile("hash(some_arr)")
-    assert expression.search({"some_arr": [1, 2, "3", {}]}) == '55ff109a5a35588b4128d36b7806f3cbcd4f59f2'
+    assert expression.search({"some_arr": [1, 2, "3", {}]}) == "55ff109a5a35588b4128d36b7806f3cbcd4f59f2"
 
     expression.compile("hash(some_str)")
-    assert expression.search({"some_str": "some_value"}) == '8c818171573b03feeae08b0b4ffeb6999e3afc05'
+    assert expression.search({"some_str": "some_value"}) == "8c818171573b03feeae08b0b4ffeb6999e3afc05"
 
     expression.compile("hash(some_bool)")
-    assert expression.search({"some_bool": True}) == '5ffe533b830f08a0326348a9160afafc8ada44db'
+    assert expression.search({"some_bool": True}) == "5ffe533b830f08a0326348a9160afafc8ada44db"
 
     expression.compile("hash(some_obj)")
-    assert expression.search({"some_obj": {"some_inner": "some_value"}}) == 'c756dab1743ae081dc9214a837a1ed4a4c341e5a'
+    assert expression.search({"some_obj": {"some_inner": "some_value"}}) == "c756dab1743ae081dc9214a837a1ed4a4c341e5a"
 
     #  Test hashes comes from empty string
     hashes_null = (
