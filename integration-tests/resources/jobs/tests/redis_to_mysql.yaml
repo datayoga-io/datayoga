@@ -14,7 +14,7 @@ steps:
     with:
       expression:
         _id: _id
-        fullname: full_name,
+        fullname: full_name
         country: concat([country_code, ' - ', upper(country_name)])
         gender: gender
         addresses: addresses
