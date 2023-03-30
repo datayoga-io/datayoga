@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
 import sqlalchemy
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
+from sqlalchemy import Column, Integer, String, Table, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import (ADDITIONAL_TRANSIENT_ERRORS,
