@@ -70,8 +70,14 @@ class Block(DyBlock, metaclass=ABCMeta):
                     for record in opcode_groups[opcode]
                 ])
 
-            self.execute_upsert(self.explode_if_specified(opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE]))
-            self.execute_delete(self.explode_if_specified(opcode_groups[OpCode.DELETE]))
+            records_to_upsert = opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE]
+            records_to_delete = opcode_groups[OpCode.DELETE]
+            if self.foreach:
+                self.execute_upsert(utils.explode_records(records_to_upsert, self.foreach))
+                self.execute_delete(utils.explode_records(records_to_delete, self.foreach))
+            else:
+                self.execute_upsert(records_to_upsert)
+                self.execute_delete(records_to_delete)
 
             return BlockResult(
                 processed=[Result(Status.SUCCESS, payload=record)
@@ -81,18 +87,6 @@ class Block(DyBlock, metaclass=ABCMeta):
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.execute(self.tbl.insert(), data)
             return utils.all_success(data)
-
-    def explode_if_specified(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Explodes the input records into multiple records if the `foreach` flag is set to true,
-            and returns the original records as is otherwise.
-
-        Args:
-            records (List[Dict[str, Any]]): The input records to process
-
-        Returns:
-            List[Dict[str, Any]]: The processed records
-        """
-        return utils.explode_records(records, self.foreach) if self.foreach else records
 
     def generate_upsert_stmt(self) -> Any:
         """Generates an UPSERT statement based on the DB type"""

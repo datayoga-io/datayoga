@@ -113,6 +113,17 @@ def remove_msg_id(record: dict) -> dict:
 
 
 def explode_records(records: List[Dict[str, Any]], field_expression: str) -> List[Dict[str, Any]]:
+    """
+    Takes a list of records and a JMESPath expression specifying a field to be exploded, and returns a new list of records
+    where each record has been "exploded" into multiple records based on the values in the specified field.
+
+    Args:
+        records (List[Dict[str, Any]]): A list of dictionaries representing records.
+        field_expression (str): A string specifying the field to be exploded, in the form "field_name: expression".
+
+    Returns:
+        List[Dict[str, Any]]: A new list of dictionaries representing the exploded records.
+    """
     field_name, expression = map(str.strip, field_expression.split(":", maxsplit=1))
 
     jmespath_expr = JMESPathExpression()
@@ -121,12 +132,14 @@ def explode_records(records: List[Dict[str, Any]], field_expression: str) -> Lis
     exploded_records = []
 
     for record in records:
-        exploded_fields = jmespath_expr.search(record)
+        # Apply the JMESPath expression to the current record to obtain the values to be exploded.
+        field_values = jmespath_expr.search(record)
 
-        if exploded_fields:
-            for exploded_field in exploded_fields:
+        # If the JMESPath expression returned any values, create a new record for each value and add it to the output list.
+        if field_values:
+            for field_value in field_values:
                 new_record = copy.deepcopy(record)
-                new_record[field_name] = exploded_field
+                new_record[field_name] = field_value
                 exploded_records.append(new_record)
 
     return exploded_records
