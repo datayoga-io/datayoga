@@ -74,11 +74,11 @@ test = [
 ]
 
 [tool.poetry.envs]
-cassandra = {python = "3.7"}
-mysql = {python = "3.7"}
-oracle = {python = "3.7"}
-pg = {python = "3.7"}
-sqlserver = {python = "3.7"}
+cassandra = {python = ">=3.7"}
+mysql = {python = ">=3.7"}
+oracle = {python = ">=3.7"}
+pg = {python = ">=3.7"}
+sqlserver = {python = ">=3.7"}
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
