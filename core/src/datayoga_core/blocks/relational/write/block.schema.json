@@ -52,6 +52,13 @@
       },
       "examples": [["fname", { "lname": "last_name" }, "address", "gender"]]
     },
+    "foreach": {
+      "type": "string",
+      "title": "Split a column into multiple records with a JMESPath expression",
+      "description": "Use a JMESPath expression to split a column into multiple records. The expression should be in the format column: expression.",
+      "pattern": "^(?!:).*:.*(?<!:)$",
+      "examples": ["order_line: lines[]"]
+    },
     "opcode_field": {
       "type": "string",
       "description": "Name of the field in the payload that holds the operation (c - create, d - delete, u - update) for this record in the DB"

@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 import sys
@@ -10,6 +11,7 @@ import yaml
 from datayoga_core import result
 from datayoga_core.block import Block
 from datayoga_core.context import Context
+from datayoga_core.expression import JMESPathExpression
 from datayoga_core.result import BlockResult, Result, Status
 
 
@@ -86,8 +88,8 @@ def unescape_field(field: str) -> str:
 
 
 def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
-    if context:
-        connection = context.properties.get("connections").get(connection_name)
+    if context and context.properties:
+        connection = context.properties.get("connections", {}).get(connection_name)
         if connection:
             return connection
 
@@ -108,3 +110,36 @@ def add_uid(record: Dict[str, Any]) -> Dict[str, Any]:
 
 def remove_msg_id(record: dict) -> dict:
     return {k: v for k, v in record.items() if k != Block.MSG_ID_FIELD}
+
+
+def explode_records(records: List[Dict[str, Any]], field_expression: str) -> List[Dict[str, Any]]:
+    """
+    Takes a list of records and a JMESPath expression specifying a field to be exploded, and returns a new list of records
+    where each record has been "exploded" into multiple records based on the values in the specified field.
+
+    Args:
+        records (List[Dict[str, Any]]): A list of dictionaries representing records.
+        field_expression (str): A string specifying the field to be exploded, in the form "field_name: expression".
+
+    Returns:
+        List[Dict[str, Any]]: A new list of dictionaries representing the exploded records.
+    """
+    field_name, expression = map(str.strip, field_expression.split(":", maxsplit=1))
+
+    jmespath_expr = JMESPathExpression()
+    jmespath_expr.compile(expression)
+
+    exploded_records = []
+
+    for record in records:
+        # Apply the JMESPath expression to the current record to obtain the values to be exploded.
+        field_values = jmespath_expr.search(record)
+
+        # If the JMESPath expression returned any values, create a new record for each value and add it to the output list.
+        if field_values:
+            for field_value in field_values:
+                new_record = copy.deepcopy(record)
+                new_record[field_name] = field_value
+                exploded_records.append(new_record)
+
+    return exploded_records
