@@ -37,6 +37,5 @@ language: sql
 Expression
 
 
-**Required Properties:**
-
+**No properties.**
 
