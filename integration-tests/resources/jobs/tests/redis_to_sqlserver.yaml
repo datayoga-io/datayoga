@@ -22,7 +22,7 @@ steps:
   - uses: relational.write
     with:
       connection: sqlserver-hr
-      schema: hr
+      schema: dbo
       table: emp
       opcode_field: __$$opcode
       keys:
@@ -34,7 +34,7 @@ steps:
   - uses: relational.write
     with:
       connection: sqlserver-hr
-      schema: hr
+      schema: dbo
       table: address
       opcode_field: __$$opcode
       foreach: "addresses: addresses[]"
