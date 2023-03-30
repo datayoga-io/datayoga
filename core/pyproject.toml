@@ -73,33 +73,12 @@ test = [
         "testcontainers"
 ]
 
-[tool.poetry.extras.cassandra]
-python = ">=3.7"
-requires = ["cassandra-driver"]
-
-[tool.poetry.extras.mysql]
-python = ">=3.7"
-requires = ["PyMySQL", "SQLAlchemy"]
-
-[tool.poetry.extras.oracle]
-python = ">=3.7"
-requires = ["oracledb", "SQLAlchemy"]
-
-[tool.poetry.extras.parquet]
-python = ">=3.8"
-requires = ["fastparquet"]
-
-[tool.poetry.extras.pg]
-python = ">=3.7"
-requires = ["psycopg2-binary", "SQLAlchemy"]
-
-[tool.poetry.extras.redis]
-python = ">=3.8"
-requires = ["redis"]
-
-[tool.poetry.extras.sqlserver]
-python = ">=3.7"
-requires = ["pymssql", "SQLAlchemy"]
+[tool.poetry.envs]
+cassandra = {python = "3.7"}
+mysql = {python = "3.7"}
+oracle = {python = "3.7"}
+pg = {python = "3.7"}
+sqlserver = {python = "3.7"}
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
