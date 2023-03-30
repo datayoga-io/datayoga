@@ -23,8 +23,9 @@ jobs:
           cd core
           pip install wheel
           CASS_DRIVER_NO_CYTHON=1 pip install cassandra-driver
-          pip install .
-          pip install .[test]
+          pip install poetry
+          poetry install
+          poetry install --extras "test"
 
       - name: Run tests
         run: |
