@@ -1,10 +1,11 @@
 from typing import Any, Dict, Optional
 
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, Table, text
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
-from testcontainers.core.generic import DbContainer, ADDITIONAL_TRANSIENT_ERRORS
+from testcontainers.core.generic import (ADDITIONAL_TRANSIENT_ERRORS,
+                                         DbContainer)
 from testcontainers.core.waiting_utils import wait_container_is_ready
 from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
@@ -82,6 +83,20 @@ def create_emp_table(engine: Engine, schema_name: str):
     base.metadata.create_all(engine)
 
 
+def create_address_table(engine: Engine, schema_name: str):
+    base = declarative_base()
+
+    columns = [
+        Column("id", Integer, primary_key=True, nullable=False, autoincrement=False),
+        Column("emp_id", Integer),
+        Column("country_code", String(2)),
+        Column("address", String(100))
+    ]
+    Table("address", base.metadata, *columns, schema=schema_name)
+
+    base.metadata.create_all(engine)
+
+
 def insert_to_emp_table(engine: Engine, schema_name: str):
     with engine.connect() as connection:
         with connection.begin():
@@ -91,6 +106,17 @@ def insert_to_emp_table(engine: Engine, schema_name: str):
                 f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')"))
             connection.execute(text(
                 f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
+
+
+def insert_to_address_table(engine: Engine, schema_name: str):
+    with engine.connect() as connection:
+        with connection.begin():
+            connection.execute(text(
+                f"INSERT INTO {schema_name}.address (id, emp_id, country_code, address) VALUES (1, 1, 'IL', 'my address 1')"))
+            connection.execute(text(
+                f"INSERT INTO {schema_name}.address (id, emp_id, country_code, address) VALUES (2, 1, 'US', 'my address 2')"))
+            connection.execute(text(
+                f"INSERT INTO {schema_name}.address (id, emp_id, country_code, address) VALUES (5, 12, 'US', 'my address 0')"))
 
 
 def select_one_row(engine: Engine, query: str) -> Optional[Dict[str, Any]]:

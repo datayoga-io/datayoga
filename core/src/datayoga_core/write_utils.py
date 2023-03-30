@@ -2,6 +2,7 @@ import logging
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from datayoga_core import utils
 from datayoga_core.result import Result, Status
 
 logger = logging.getLogger("dy")
@@ -51,6 +52,14 @@ def map_record(record: Dict[str, Any],
 
         # columns with spaces will be later used with underscores in the bind variables
         target = (next(iter(item.keys())) if isinstance(item, dict) else item).replace(" ", "_")
-        mapped_record[target] = None if source not in record else record[source]
+
+        source_path = utils.split_field(source)
+        obj = record
+        for key in source_path:
+            key = utils.unescape_field(key)
+            if key in obj:
+                obj = obj[key]
+
+        mapped_record[target] = obj if obj != record else None
 
     return mapped_record
