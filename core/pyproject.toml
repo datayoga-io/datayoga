@@ -23,7 +23,7 @@ cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
 orjson = "^3.8.7"
-python = "^3.8"
+python = "^3.7"
 PyYAML = "^6.0"
 
 mock = { version = "^4.0.3", optional = true }
@@ -46,13 +46,13 @@ SQLAlchemy = { version = "^2.0.4", optional = true }
 sqlglot = "^10.4.3"
 
 [tool.poetry.extras]
-cassandra = { python = ">=3.7", packages = ["cassandra-driver"] }
-mysql = { python = ">=3.7", packages = ["PyMySQL", "SQLAlchemy"] }
-oracle = { python = ">=3.7", packages = ["oracledb", "SQLAlchemy"] }
-parquet = { python = ">=3.8", packages = ["fastparquet"] }
-pg = { python = ">=3.7", packages = ["psycopg2-binary","SQLAlchemy"] }
-redis = { python = ">=3.7", packages = ["redis"] }
-sqlserver = { python = ">=3.7", packages = ["pymssql", "SQLAlchemy"] }
+cassandra = {python = ">=3.7", packages = ["cassandra-driver"]}
+mysql = {python = ">=3.7", packages = ["PyMySQL", "SQLAlchemy"]}
+oracle = {python = ">=3.7", packages = ["oracledb", "SQLAlchemy"]}
+pg = {python = ">=3.7", packages = ["psycopg2-binary","SQLAlchemy"]}
+redis = {python = ">=3.7", packages = ["redis"]}
+sqlserver = {python = ">=3.7", packages = ["pymssql", "SQLAlchemy"]}
+parquet = {python = ">=3.8", packages = ["fastparquet"]}
 
 
 test = [
