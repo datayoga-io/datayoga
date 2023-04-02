@@ -23,7 +23,7 @@ cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
 orjson = "^3.8.7"
-python = "^3.8"
+python = "^3.7"
 PyYAML = "^6.0"
 
 mock = { version = "^4.0.3", optional = true }
@@ -36,7 +36,7 @@ requests-mock = { version = "^1.9.3", optional = true }
 testcontainers = { version = "^3.7.0", optional = true }
 
 cassandra-driver = { version = "^3.25.0", optional = true }
-fastparquet = { version = "^2023.2.0", optional = true }
+fastparquet = { version = "^2023.2.0", optional = true, platform = "python>=3.8" }
 psycopg2-binary = { version="^2.9.5", optional = true}
 oracledb = { version="^1.2.2", optional = true}
 pymssql = { version="^2.2.7", optional = true }
@@ -50,9 +50,10 @@ cassandra = ["cassandra-driver"]
 mysql = ["PyMySQL", "SQLAlchemy"]
 oracle = ["oracledb", "SQLAlchemy"]
 parquet = ["fastparquet"]
-pg = ["psycopg2-binary","SQLAlchemy"]
+pg = ["psycopg2-binary", "SQLAlchemy"]
 redis = ["redis"]
 sqlserver = ["pymssql", "SQLAlchemy"]
+
 
 test = [
         "cassandra-driver",
@@ -72,13 +73,6 @@ test = [
         "SQLAlchemy",
         "testcontainers"
 ]
-
-[tool.poetry.envs]
-cassandra = {python = ">=3.7"}
-mysql = {python = ">=3.7"}
-oracle = {python = ">=3.7"}
-pg = {python = ">=3.7"}
-sqlserver = {python = ">=3.7"}
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
