@@ -46,13 +46,14 @@ SQLAlchemy = { version = "^2.0.4", optional = true }
 sqlglot = "^10.4.3"
 
 [tool.poetry.extras]
-cassandra = ["cassandra-driver"]
-mysql = ["PyMySQL", "SQLAlchemy"]
-oracle = ["oracledb", "SQLAlchemy"]
-parquet = ["fastparquet"]
-pg = ["psycopg2-binary","SQLAlchemy"]
-redis = ["redis"]
-sqlserver = ["pymssql", "SQLAlchemy"]
+cassandra = { python = ">=3.7", packages = ["cassandra-driver"] }
+mysql = { python = ">=3.7", packages = ["PyMySQL", "SQLAlchemy"] }
+oracle = { python = ">=3.7", packages = ["oracledb", "SQLAlchemy"] }
+parquet = { python = ">=3.8", packages = ["fastparquet"] }
+pg = { python = ">=3.7", packages = ["psycopg2-binary","SQLAlchemy"] }
+redis = { python = ">=3.7", packages = ["redis"] }
+sqlserver = { python = ">=3.7", packages = ["pymssql", "SQLAlchemy"] }
+
 
 test = [
         "cassandra-driver",
@@ -72,13 +73,6 @@ test = [
         "SQLAlchemy",
         "testcontainers"
 ]
-
-[tool.poetry.envs]
-cassandra = {python = ">=3.7"}
-mysql = {python = ">=3.7"}
-oracle = {python = ">=3.7"}
-pg = {python = ">=3.7"}
-sqlserver = {python = ">=3.7"}
 
 [tool.poetry.urls]
 url = "https://datayoga.io"
