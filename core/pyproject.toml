@@ -49,10 +49,10 @@ sqlglot = "^10.4.3"
 cassandra = ["cassandra-driver"]
 mysql = ["PyMySQL", "SQLAlchemy"]
 oracle = ["oracledb", "SQLAlchemy"]
+parquet = ["fastparquet"]
 pg = ["psycopg2-binary", "SQLAlchemy"]
 redis = ["redis"]
 sqlserver = ["pymssql", "SQLAlchemy"]
-parquet = ["fastparquet"]
 
 
 test = [
