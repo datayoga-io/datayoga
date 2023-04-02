@@ -3,14 +3,13 @@ from abc import ABCMeta
 from typing import Any, Dict, List, Optional
 
 import sqlalchemy as sa
-from sqlalchemy import text
-
 from datayoga_core import utils, write_utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
+from sqlalchemy import text
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import ColumnCollection
@@ -31,6 +30,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.load_strategy = self.properties.get("load_strategy")
         self.keys = self.properties.get("keys")
         self.mapping = self.properties.get("mapping")
+        self.foreach = self.properties.get("foreach")
 
         self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
@@ -69,8 +69,15 @@ class Block(DyBlock, metaclass=ABCMeta):
                     Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
                     for record in opcode_groups[opcode]
                 ])
-            self.execute_upsert(opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE])
-            self.execute_delete(opcode_groups[OpCode.DELETE])
+
+            records_to_upsert = opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE]
+            records_to_delete = opcode_groups[OpCode.DELETE]
+            if self.foreach:
+                self.execute_upsert(utils.explode_records(records_to_upsert, self.foreach))
+                self.execute_delete(utils.explode_records(records_to_delete, self.foreach))
+            else:
+                self.execute_upsert(records_to_upsert)
+                self.execute_delete(records_to_delete)
 
             return BlockResult(
                 processed=[Result(Status.SUCCESS, payload=record)

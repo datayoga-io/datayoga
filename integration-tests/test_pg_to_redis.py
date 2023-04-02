@@ -1,5 +1,4 @@
 import logging
-
 from contextlib import suppress
 
 from common import db_utils, redis_utils
