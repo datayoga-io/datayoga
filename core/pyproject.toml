@@ -46,13 +46,13 @@ SQLAlchemy = { version = "^2.0.4", optional = true }
 sqlglot = "^10.4.3"
 
 [tool.poetry.extras]
-cassandra = {optional = true, python = ">=3.7", packages = ["cassandra-driver"]}
-mysql = {optional = true, python = ">=3.7", packages = ["PyMySQL", "SQLAlchemy"]}
-oracle = {optional = true, python = ">=3.7", packages = ["oracledb", "SQLAlchemy"]}
-pg = {optional = true, python = ">=3.7", packages = ["psycopg2-binary","SQLAlchemy"]}
-redis = {optional = true, python = ">=3.7", packages = ["redis"]}
-sqlserver = {optional = true, python = ">=3.7", packages = ["pymssql", "SQLAlchemy"]}
-parquet = {optional = true, python = ">=3.8", packages = ["fastparquet"]}
+cassandra = ["cassandra-driver"]
+mysql = ["PyMySQL", "SQLAlchemy"]
+oracle = ["oracledb", "SQLAlchemy"]
+pg = ["psycopg2-binary", "SQLAlchemy"]
+redis = ["redis"]
+sqlserver = ["pymssql", "SQLAlchemy"]
+parquet = [ { version = "^2023.2.0", python = "^3.8" }, "fastparquet" ]
 
 
 test = [
