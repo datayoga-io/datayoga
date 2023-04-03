@@ -30,8 +30,9 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
 
     db_type = DbType(connection.get("type", "").lower())
 
+    query_args = connection.get("query_args", {})
+    connect_args = connection.get("connect_args", {})
     extra = {}
-    ssl_args = {}
 
     if autocommit:
         extra["isolation_level"] = "AUTOCOMMIT"
@@ -42,13 +43,10 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
 
     # PSQL specific parameters to be passed in the query string for SSL connection
     if db_type == DbType.PSQL:
-        args = connection.get("connect_args", {})
         for field in ("sslmode", "sslrootcert", "sslkey", "sslcert", "sslpassword"):
-            if field in args:
-                ssl_args[field] = args[field]
-                del args[field]
-
-        connection["connect_args"] = args
+            if field in connect_args:
+                query_args[field] = connect_args[field]
+                del connect_args[field]
 
     engine = sa.create_engine(
         sa.engine.URL.create(
@@ -58,9 +56,9 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
             username=connection.get("user"),
             password=connection.get("password"),
             database=connection.get("database"),
-            query=ssl_args),
+            query=query_args),
         echo=connection.get("debug", False),
-        connect_args=connection.get("connect_args", {}),
+        connect_args=connect_args,
         **extra)
 
     return engine, db_type

@@ -19,6 +19,10 @@
           "description": "Additional arguments to use when connecting to the DB",
           "type": "object"
         },
+        "query_args": {
+          "description": "Additional query string arguments to use when connecting to the DB",
+          "type": "object"
+        },
         "debug": {
           "title": "Debug mode",
           "description": "Echo all SQL commands to stdout",
