@@ -30,6 +30,8 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
 
     db_type = DbType(connection.get("type", "").lower())
 
+    query_args = connection.get("query_args", {})
+    connect_args = connection.get("connect_args", {})
     extra = {}
 
     if autocommit:
@@ -46,8 +48,10 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
             port=connection.get("port"),
             username=connection.get("user"),
             password=connection.get("password"),
-            database=connection.get("database")),
-        echo=connection.get("debug", False), connect_args=connection.get("connect_args", {}),
+            database=connection.get("database"),
+            query=query_args),
+        echo=connection.get("debug", False),
+        connect_args=connect_args,
         **extra)
 
     return engine, db_type
