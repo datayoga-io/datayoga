@@ -45,7 +45,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
         args = connection.get("connect_args", {})
         for field in ("sslmode", "sslrootcert", "sslkey", "sslcert", "sslpassword"):
             if field in args:
-                ssl_args[field] = args.get(field)
+                ssl_args[field] = args[field]
                 del args[field]
 
         connection["connect_args"] = args
