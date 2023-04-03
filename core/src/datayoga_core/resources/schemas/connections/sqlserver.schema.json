@@ -9,7 +9,17 @@
     },
     "database": { "description": "DB name", "type": "string" },
     "user": { "description": "DB user", "type": "string" },
-    "password": { "description": "DB password", "type": "string" }
+    "password": { "description": "DB password", "type": "string" },
+    "connect_args": {
+      "description": "Additional arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "query_args": {
+      "description": "Additional query string arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    }
   },
   "required": ["type", "host", "database", "user"],
   "examples": [

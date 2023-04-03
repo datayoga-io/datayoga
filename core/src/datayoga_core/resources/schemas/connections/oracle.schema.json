@@ -20,6 +20,16 @@
     "oracle_thick_mode_lib_dir": {
       "description": "Path to Oracle Client libraries",
       "type": "string"
+    },
+    "connect_args": {
+      "description": "Additional arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "query_args": {
+      "description": "Additional query string arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
     }
   },
   "required": ["type", "host", "database", "user"],
