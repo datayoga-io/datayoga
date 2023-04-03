@@ -43,11 +43,8 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
     # PSQL specific parameters to be passed in the query string for SSL connection
     if db_type == DbType.PSQL:
         args = connection.get("connect_args", {})
-        ssl_args["sslmode"] = args.get("sslmode")
-        ssl_args["sslrootcert"] = args.get("sslrootcert")
-        ssl_args["sslkey"] = args.get("sslkey")
-        ssl_args["sslcert"] = args.get("sslcert")
-        ssl_args["sslpassword"] = args.get("sslpassword")
+        for field in ("sslmode", "sslrootcert", "sslkey", "sslcert", "sslpassword"):
+            ssl_args[field] = args[field]
 
         connection["connect_args"] = {k: v for k, v in args.items() if k not in ssl_args.keys()}
         ssl_args = {k: v for k, v in ssl_args.items() if v is not None}
