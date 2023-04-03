@@ -30,7 +30,12 @@
         "port": 3306,
         "database": "hr",
         "user": "myuser",
-        "password": "mypass"
+        "password": "mypass",
+        "connect_args": {
+          "ssl_ca": "/opt/ssl/ca.crt",
+          "ssl_cert": "/opt/ssl/client.crt",
+          "ssl_key": "/opt/ssl/client.key"
+        }
       }
     }
   ]

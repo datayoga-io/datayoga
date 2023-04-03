@@ -31,7 +31,13 @@
         "database": "postgres",
         "user": "postgres",
         "password": "postgres",
-        "connect_args": { "connect_timeout": 10 }
+        "connect_args": { "connect_timeout": 10 },
+        "query_args": {
+          "sslmode": "verify-ca",
+          "sslrootcert": "/opt/ssl/ca.crt",
+          "sslcert": "/opt/ssl/client.crt",
+          "sslkey": "/opt/ssl/client.key"
+        }
       }
     }
   ]
