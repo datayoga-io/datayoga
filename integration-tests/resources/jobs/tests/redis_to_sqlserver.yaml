@@ -13,13 +13,12 @@ steps:
   - uses: map
     with:
       expression:
-        {
-          _id: _id,
-          full_name: full_name,
-          country: country_code || ' - ' || UPPER(country_name),
-          gender: gender
-        }
-      language: sql
+        _id: _id
+        full_name: full_name
+        country: concat([country_code, ' - ', upper(country_name)])
+        gender: gender
+        addresses: addresses
+      language: jmespath
   - uses: relational.write
     with:
       connection: sqlserver-hr
@@ -32,3 +31,16 @@ steps:
         - full_name
         - country
         - gender
+  - uses: relational.write
+    with:
+      connection: sqlserver-hr
+      schema: dbo
+      table: address
+      opcode_field: __$$opcode
+      foreach: "addresses: addresses[]"
+      keys:
+        - id: addresses.id
+      mapping:
+        - emp_id: _id
+        - country_code: addresses.country_code
+        - address: addresses.address
