@@ -44,10 +44,11 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
     if db_type == DbType.PSQL:
         args = connection.get("connect_args", {})
         for field in ("sslmode", "sslrootcert", "sslkey", "sslcert", "sslpassword"):
-            ssl_args[field] = args[field]
+            if field in args:
+                ssl_args[field] = args.get(field)
+                del args[field]
 
-        connection["connect_args"] = {k: v for k, v in args.items() if k not in ssl_args.keys()}
-        ssl_args = {k: v for k, v in ssl_args.items() if v is not None}
+        connection["connect_args"] = args
 
     engine = sa.create_engine(
         sa.engine.URL.create(
