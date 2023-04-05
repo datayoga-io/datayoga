@@ -59,6 +59,25 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
+
+        try:
+            # try to process all records together
+            return await self._run(data)
+        except Exception as e:
+            if len(data) == 1:
+                return BlockResult(rejected=[Result(Status.REJECTED, payload=data[0], message=str(e))])
+
+            # if there's an error, try to run each record separately
+            block_result = BlockResult()
+            for record in data:
+                try:
+                    block_result.extend(await self._run([record]))
+                except Exception as e:
+                    block_result.rejected.append(Result(Status.REJECTED, payload=record, message=str(e)))
+
+            return block_result
+
+    async def _run(self, data: List[Dict[str, Any]]) -> BlockResult:
         rejected_records: List[Result] = []
 
         if self.opcode_field:
