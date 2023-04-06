@@ -2,36 +2,4 @@ global:
   scrape_interval: 5s
   evaluation_interval: 5s
 
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
-  external_labels:
-    monitor: "prometheus-stack-monitor"
-
 scrape_configs:
-  # scrape OSS Redis Exporter
-  - job_name: redis-exporter
-    static_configs:
-      - targets: ["redis-exporter:9121"]
-    metric_relabel_configs:
-      - source_labels: [key]
-        regex: ".+operation=([^,}]+).+"
-        target_label: "operation"
-        replacement: "${1}"
-      - source_labels: [key]
-        regex: ".+data_source=([^,]+).+"
-        target_label: "data_source"
-        replacement: "${1}"
-      - source_labels: [key]
-        regex: ".+status=([^,]+).+"
-        target_label: "status"
-        replacement: "${1}"
-      - source_labels: [key]
-        regex: "([^{]+){.+"
-        target_label: "metric_name"
-        replacement: "${1}"
-      - source_labels: [__name__, metric_name]
-        regex: "redis_script_values;(.*)"
-        target_label: __name__
-        replacement: "${1}"
-      - action: labeldrop
-        regex: "metric_name|key"

@@ -3,7 +3,7 @@ apiVersion: 1
 providers:
   - name: "Prometheus"
     orgId: 1
-    folder: "RDI Monitoring"
+    folder: "DataYoga Monitoring"
     type: file
     disableDeletion: false
     editable: true
