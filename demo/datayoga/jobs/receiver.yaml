@@ -1,0 +1,24 @@
+input:
+  uses: parquet.read
+  with:
+    file: sample.parquet
+steps:
+
+  - uses: map
+    with:
+      expression:
+        data: json_parse(data)
+      language: jmespath
+
+  - uses: map
+    with:
+      expression:
+        id : data.id
+        name : data.name
+      language: jmespath
+
+  - uses: relational.write
+    with:
+      connection: postgresql
+      schema: public
+      table: data

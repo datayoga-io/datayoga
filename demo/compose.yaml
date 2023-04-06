@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+
+  datayoga:
+    platform: linux/amd64
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    container_name: datayoga
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+    networks:
+      - service
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=datayoga
+    healthcheck:
+      test: "pg_isready -d postgres -U postgres"
+      interval: 3s
+      timeout: 5s
+      retries: 5
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    networks:
+      - service
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    volumes:
+      - ./pgadmin/postgres-servers.json:/pgadmin4/servers.json:ro
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@datayoga.io
+      - PGADMIN_DEFAULT_PASSWORD=datayoga
+      - PGADMIN_DISABLE_POSTFIX=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="<h4>Please use <code>admin@datayoga.io</code> and <code>datayoga</code> to login and <code>postgres</code> to connect to the database.</h4>"
+    networks:
+      - service
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - service
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin@datayoga.io
+      - GF_SECURITY_ADMIN_PASSWORD=datayoga
+    networks:
+      - service
+    depends_on:
+      prometheus:
+        condition: service_healthy
+
+
+networks:
+  service:
+    name: service
