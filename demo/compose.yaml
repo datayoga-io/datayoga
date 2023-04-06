@@ -9,9 +9,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: datayoga
     depends_on:
-      postgresql:
-        condition: service_healthy
-      prometheus:
+      postgres:
         condition: service_healthy
     networks:
       - service
@@ -47,7 +45,7 @@ services:
     networks:
       - service
     depends_on:
-      postgresql:
+      postgres:
         condition: service_healthy
 
   prometheus:
@@ -68,9 +66,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=datayoga
     networks:
       - service
-    depends_on:
-      prometheus:
-        condition: service_healthy
 
 
 networks:
