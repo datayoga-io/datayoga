@@ -23,7 +23,7 @@ class BlockResult:
     filtered: List[Result] = field(default_factory=list)
     rejected: List[Result] = field(default_factory=list)
 
-    def extend(self, other):
+    def extend(self, other: 'BlockResult'):
         self.processed.extend(other.processed)
         self.filtered.extend(other.filtered)
         self.rejected.extend(other.rejected)
