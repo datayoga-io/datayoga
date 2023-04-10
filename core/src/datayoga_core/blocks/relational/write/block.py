@@ -65,7 +65,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             return await self._run(data)
         except Exception as e:
             if len(data) == 1:
-                return BlockResult(rejected=[Result(Status.REJECTED, payload=data[0], message=str(e))])
+                return BlockResult(rejected=[Result(Status.REJECTED, payload=data[0], message=f"{e}")])
 
             # if there's an error, try to run each record separately
             block_result = BlockResult()
@@ -73,7 +73,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 try:
                     block_result.extend(await self._run([record]))
                 except Exception as e:
-                    block_result.rejected.append(Result(Status.REJECTED, payload=record, message=str(e)))
+                    block_result.rejected.append(Result(Status.REJECTED, payload=record, message=f"{e}"))
 
             return block_result
 
