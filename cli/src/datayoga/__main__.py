@@ -115,30 +115,12 @@ def run(
             "job_name": Path(job_file).stem
         })
 
-
         job = dy.compile(job_settings)
 
-        # print("=====")
-        # print(job)
-
-        # producer = job.producer
-        # logger.info(f"Producing from {producer.__module__}")
+        producer = job.producer
+        logger.info(f"Producing from {producer.__module__}")
         job.init(context)
-
-
-        # asyncio.run(job.run())
-
-        data = [
-            {'__$$msg_id': '0', 'id': '1x', 'data': 'fuck1'},
-            {'__$$msg_id': '0', 'id': '1x', 'data': 'fuck1'},
-            {'__$$msg_id': '0', 'id': '1x', 'data': 'fuck1'},
-            {'__$$msg_id': '0', 'id': '1x', 'data': 'fuck1'},
-            {'__$$msg_id': '0', 'id': '1', 'data': 'fuck1'},
-            {'__$$msg_id': '1', 'id': '2', 'data': 'fuck2'}
-        ]
-
-        print(job.transform(data))
-
+        asyncio.run(job.run())
     except jsonschema.exceptions.ValidationError as schema_error:
         # print a validation message with the source lines
         cli_helpers.pprint_yaml_validation_error(job_file, schema_error, logger)
