@@ -17,18 +17,18 @@ class Block(DyProducer):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-    def produce(self) -> Generator[Message, None, None]:
+    def produce(self) -> Generator[List[Message], None, None]:
         if select.select([sys.stdin, ], [], [], 0.0)[0]:
             # piped data exists
             for data in sys.stdin:
                 for record in self.get_records(data):
-                    yield self.get_message(record)
+                    yield [self.get_message(record)]
         else:
             # interactive mode
             print("Enter data to process:")
             data = input()
             for record in self.get_records(data):
-                yield self.get_message(record)
+                yield [self.get_message(record)]
 
     @staticmethod
     def get_records(data: str) -> List[Dict[str, Any]]:

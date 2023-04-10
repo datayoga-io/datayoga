@@ -13,7 +13,7 @@ class Message:
 class Producer(Block):
 
     @abstractmethod
-    def produce(self) -> Generator[Message, None, None]:
+    def produce(self) -> Generator[List[Message], None, None]:
         """Produces data
 
         Returns:

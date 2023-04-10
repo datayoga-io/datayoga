@@ -2,7 +2,7 @@ import logging
 import os
 from abc import ABCMeta
 from csv import DictReader
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
@@ -25,11 +25,11 @@ class Block(DyProducer, metaclass=ABCMeta):
         logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)
 
-    def produce(self) -> Generator[Message, None, None]:
+    def produce(self) -> Generator[List[Message], None, None]:
         logger.debug("Reading CSV")
 
         with open(self.file, "r") as read_obj:
             records = list(DictReader(read_obj))
 
         for i, record in enumerate(records):
-            yield {self.MSG_ID_FIELD: str(i), **record}
+            yield [{self.MSG_ID_FIELD: str(i), **record}]

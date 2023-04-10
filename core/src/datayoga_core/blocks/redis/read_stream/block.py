@@ -30,7 +30,7 @@ class Block(DyProducer):
             logger.info(f"Creating a new {self.consumer_group} consumer group associated with the {self.stream}")
             self.redis_client.xgroup_create(self.stream, self.consumer_group, 0)
 
-    def produce(self) -> Generator[Message, None, None]:
+    def produce(self) -> Generator[List[Message], None, None]:
         logger.debug(f"Running {self.get_block_name()}")
 
         read_pending = True
@@ -44,7 +44,7 @@ class Block(DyProducer):
                 for key, value in stream[1]:
                     payload = orjson.loads(value[next(iter(value))])
                     payload[self.MSG_ID_FIELD] = key
-                    yield payload
+                    yield [payload]
 
             # Quit after consuming pending current messages in case of snapshot
             if self.snapshot and not read_pending:

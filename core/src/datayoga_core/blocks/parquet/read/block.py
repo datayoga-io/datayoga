@@ -1,7 +1,7 @@
 import logging
 import os
 from abc import ABCMeta
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
@@ -24,7 +24,7 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         logger.debug(f"file: {self.file}")
 
-    def produce(self) -> Generator[Message, None, None]:
+    def produce(self) -> Generator[List[Message], None, None]:
         logger.debug("Reading parquet")
 
         pf = ParquetFile(self.file)
@@ -32,5 +32,5 @@ class Block(DyProducer, metaclass=ABCMeta):
         count = 0
         for df in pf.iter_row_groups():
             for _, data in df.iterrows():
-                yield {self.MSG_ID_FIELD: str(count), **data.to_dict()}
+                yield [{self.MSG_ID_FIELD: str(count), **data.to_dict()}]
                 count += 1
