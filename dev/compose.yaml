@@ -13,3 +13,28 @@ services:
       - ../core:/opt/core
       - ./work:/opt/work
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - service
+
+  mysql:
+    container_name: mysql
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=mydb
+      - MYSQL_USER=mydb
+      - MYSQL_PASSWORD=123aBc123
+      - MYSQL_ROOT_PASSWORD=123aBc123
+    healthcheck:
+      test: "mysqladmin ping -u root --password=123aBc123 -h localhost"
+      interval: 3s
+      timeout: 5s
+      retries: 5
+    networks:
+      - service
+
+networks:
+  service:
+    external: true
+    name: service

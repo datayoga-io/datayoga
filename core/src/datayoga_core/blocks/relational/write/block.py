@@ -63,6 +63,9 @@ class Block(DyBlock, metaclass=ABCMeta):
         try:
             # try to process all records together
             return await self._run(data)
+        except ConnectionError as e:
+            # connection errors are thrown back to the caller to handle
+            raise e
         except Exception as e:
             if len(data) == 1:
                 return BlockResult(rejected=[Result(Status.REJECTED, payload=data[0], message=f"{e}")])
@@ -72,6 +75,9 @@ class Block(DyBlock, metaclass=ABCMeta):
             for record in data:
                 try:
                     block_result.extend(await self._run([record]))
+                except ConnectionError as e:
+                    # connection errors are thrown back to the caller to handle
+                    raise e
                 except Exception as e:
                     block_result.rejected.append(Result(Status.REJECTED, payload=record, message=f"{e}"))
 
