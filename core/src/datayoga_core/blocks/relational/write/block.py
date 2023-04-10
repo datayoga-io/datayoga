@@ -38,10 +38,6 @@ class Block(DyBlock, metaclass=ABCMeta):
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = self.engine.connect()
 
-        if self.db_type in (relational_utils.DbType.SQLSERVER, relational_utils.DbType.ORACLE):
-            # MERGE statement requires this
-            self.connection = self.connection.execution_options(autocommit=True)
-
         if self.opcode_field:
             self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
             self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
