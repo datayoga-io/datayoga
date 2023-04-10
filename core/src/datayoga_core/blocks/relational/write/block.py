@@ -22,7 +22,8 @@ class Block(DyBlock, metaclass=ABCMeta):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context)
+        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context,
+                                                                autocommit=False)
 
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
@@ -60,6 +61,9 @@ class Block(DyBlock, metaclass=ABCMeta):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
 
+        block_result = BlockResult()
+        self.connection.begin()
+
         try:
             # try to process all records together
             return await self._run(data)
@@ -71,7 +75,6 @@ class Block(DyBlock, metaclass=ABCMeta):
                 return BlockResult(rejected=[Result(Status.REJECTED, payload=data[0], message=f"{e}")])
 
             # if there's an error, try to run each record separately
-            block_result = BlockResult()
             for record in data:
                 try:
                     block_result.extend(await self._run([record]))
@@ -81,7 +84,8 @@ class Block(DyBlock, metaclass=ABCMeta):
                 except Exception as e:
                     block_result.rejected.append(Result(Status.REJECTED, payload=record, message=f"{e}"))
 
-            return block_result
+        self.connection.commit()
+        return block_result
 
     async def _run(self, data: List[Dict[str, Any]]) -> BlockResult:
         rejected_records: List[Result] = []
