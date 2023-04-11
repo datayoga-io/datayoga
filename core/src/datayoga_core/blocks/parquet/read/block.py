@@ -1,7 +1,7 @@
 import logging
 import os
 from abc import ABCMeta
-from typing import Generator, List, Optional
+from typing import AsyncGenerator, List, Optional
 
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
@@ -24,7 +24,7 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         logger.debug(f"file: {self.file}")
 
-    def produce(self) -> Generator[List[Message], None, None]:
+    async def produce(self) -> AsyncGenerator[List[Message], None]:
         logger.debug("Reading parquet")
 
         pf = ParquetFile(self.file)

@@ -1,5 +1,5 @@
 import logging
-from typing import Generator, List, Optional
+from typing import AsyncGenerator, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
 import orjson
@@ -30,7 +30,7 @@ class Block(DyProducer):
             logger.info(f"Creating a new {self.consumer_group} consumer group associated with the {self.stream}")
             self.redis_client.xgroup_create(self.stream, self.consumer_group, 0)
 
-    def produce(self) -> Generator[List[Message], None, None]:
+    async def produce(self) -> AsyncGenerator[List[Message], None]:
         logger.debug(f"Running {self.get_block_name()}")
 
         read_pending = True

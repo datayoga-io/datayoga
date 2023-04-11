@@ -2,7 +2,7 @@ import logging
 import select
 import sys
 import uuid
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 import orjson
 from datayoga_core.context import Context
@@ -17,7 +17,7 @@ class Block(DyProducer):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-    def produce(self) -> Generator[List[Message], None, None]:
+    async def produce(self) -> AsyncGenerator[List[Message], None]:
         if select.select([sys.stdin, ], [], [], 0.0)[0]:
             # piped data exists
             for data in sys.stdin:

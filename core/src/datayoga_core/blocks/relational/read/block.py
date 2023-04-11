@@ -1,5 +1,5 @@
 import logging
-from typing import Generator, List, Optional
+from typing import AsyncGenerator, List, Optional
 
 import sqlalchemy as sa
 from datayoga_core import utils
@@ -32,7 +32,7 @@ class Block(DyProducer):
         logger.debug(f"Connecting to {self.db_type}")
         self.connection = self.engine.connect()
 
-    def produce(self) -> Generator[List[Message], None, None]:
+    async def produce(self) -> AsyncGenerator[List[Message], None]:
         result = self.connection.execution_options(stream_results=True).execute(self.tbl.select())
 
         while True:

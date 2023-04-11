@@ -126,7 +126,7 @@ class Job:
         return result
 
     async def run(self):
-        for records in self.producer.produce():
+        async for records in self.producer.produce():
             logger.debug(f"Retrieved records:\n\t{records}")
             await self.root.process(records)
 

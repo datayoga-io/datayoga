@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Dict, Generator, List
+from typing import Any, AsyncGenerator, Dict, Generator, List
 
 from .block import Block
 
@@ -13,7 +13,7 @@ class Message:
 class Producer(Block):
 
     @abstractmethod
-    def produce(self) -> Generator[List[Message], None, None]:
+    def produce(self) -> AsyncGenerator[List[Message], None]:
         """Produces data
 
         Returns:
