@@ -13,11 +13,11 @@ Read data from CSV
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**file**|`string`|Filename. Can contain a regexp or glob expression<br/>|yes|
-|[**fields**](#fields)<br/>(List of columns to use)|`string[]`|List of columns to use for extract<br/>Default: <br/>|no|
+|[**fields**](#fields)<br/>(List of columns to use)|`string[]`|List of columns to use for extract<br/>|no|
+|**skip**|`number`|Number of lines to skip<br/>Default: `0`<br/>|no|
 |**delimiter**|`string`|Delimiter to use for splitting the csv records<br/>Default: `","`<br/>|no|
-|**batch\_size**|`number`|Number of records to read per batch<br/>Default: `"1000"`<br/>|no|
-|**use\_header**|`boolean`|Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified<br/>Default: `true`<br/>|no|
-|**quotechar**|`string`|A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '<br/>Default: `","`<br/>|no|
+|**batch\_size**|`number`|Number of records to read per batch<br/>Default: `1000`<br/>|no|
+|**quotechar**|`string`|A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '<br/>Default: `"\""`<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
