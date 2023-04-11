@@ -43,8 +43,8 @@ class Block(DyProducer, metaclass=ABCMeta):
                     next(reader)
 
             while True:
-                records = islice(reader, self.batch_size)
-                records = [{self.MSG_ID_FIELD: str(next(counter)), **record} for record in records]
+                sliced = islice(reader, self.batch_size)
+                records = [{self.MSG_ID_FIELD: str(next(counter)), **record} for record in sliced]
 
                 logger.debug(f"Producing {len(records)} records")
 
