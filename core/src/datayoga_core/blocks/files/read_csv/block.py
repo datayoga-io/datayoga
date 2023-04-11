@@ -1,7 +1,9 @@
 import logging
 import os
 from abc import ABCMeta
+from contextlib import suppress
 from csv import DictReader
+from itertools import count, islice
 from typing import AsyncGenerator, List, Optional
 
 from datayoga_core.context import Context
@@ -24,12 +26,29 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         logger.debug(f"file: {self.file}")
         self.batch_size = self.properties.get("batch_size", 1000)
+        self.fields = self.properties.get("fields")
+        self.skip = self.properties.get("skip", 0)
+        self.delimiter = self.properties.get("delimiter", ",")
+        self.quotechar = self.properties.get("quotechar", "\"")
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
         logger.debug("Reading CSV")
 
         with open(self.file, "r") as read_obj:
-            records = list(DictReader(read_obj))
+            reader = DictReader(read_obj, fieldnames=self.fields, delimiter=self.delimiter, quotechar=self.quotechar)
+            counter = iter(count())
 
-        for i, record in enumerate(records):
-            yield [{self.MSG_ID_FIELD: str(i), **record}]
+            for _ in range(self.skip):
+                with suppress(StopIteration):
+                    next(reader)
+
+            while True:
+                records = islice(reader, self.batch_size)
+                records = [{self.MSG_ID_FIELD: str(next(counter)), **record} for record in records]
+
+                logger.debug(f"Producing {len(records)} records")
+
+                if not records:
+                    return
+
+                yield records

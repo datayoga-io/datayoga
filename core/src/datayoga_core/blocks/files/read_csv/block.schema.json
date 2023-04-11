@@ -11,7 +11,7 @@
       "type": "array",
       "title": "List of columns to use",
       "description": "List of columns to use for extract",
-      "default": [],
+      "default": null,
       "examples": [["fname", "lname"]],
       "additionalItems": true,
       "items": {
@@ -19,6 +19,11 @@
         "description": "field name",
         "examples": ["fname"]
       }
+    },
+    "skip": {
+      "description": "Number of lines to skip",
+      "type": "number",
+      "default": 0
     },
     "delimiter": {
       "description": "Delimiter to use for splitting the csv records",
@@ -28,17 +33,12 @@
     "batch_size": {
       "description": "Number of records to read per batch",
       "type": "number",
-      "default": "1000"
-    },
-    "use_header": {
-      "description": "Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified",
-      "type": "boolean",
-      "default": true
+      "default": 1000
     },
     "quotechar": {
       "description": "A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '",
       "type": "string",
-      "default": ","
+      "default": "\""
     }
   },
   "additionalProperties": false,
