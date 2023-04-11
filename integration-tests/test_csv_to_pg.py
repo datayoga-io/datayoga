@@ -14,9 +14,9 @@ SCHEMA = "hr"
     "job_name",
     [
         # normal test
-        ("tests.csv_to_pg",),
+        "tests.csv_to_pg",
         # test with invalid data in the batch
-        ("tests.csv_to_pg_batch_with_invalid",),
+        "tests.csv_to_pg_batch_with_invalid",
     ]
 )
 def test_csv_to_pg(job_name: str):
