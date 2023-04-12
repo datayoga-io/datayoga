@@ -1,0 +1,21 @@
+#!/usr/local/bin/python
+
+import sys
+import os
+
+from datayoga.__main__ import main
+
+if os.environ.get("REMOTE_DEBUG", '').lower() in ("pycharm", "idea"):
+    try:
+        import pydevd_pycharm
+    except ImportError:
+        print("pydevd_pycharm not found. Please install it.")
+        sys.exit(-1)
+
+    port = int(os.environ.get("REMOTE_DEBUG_PORT", 12345))
+    host = os.environ.get("REMOTE_DEBUG_HOST", "host.docker.internal")
+
+    pydevd_pycharm.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -3,15 +3,6 @@ FROM python:3.8
 RUN apt-get update
 RUN pip install poetry
 
-RUN echo "#!/usr/local/bin/python" >> /usr/local/bin/datayoga && \
-    echo "import sys" >> /usr/local/bin/datayoga && \
-    echo "from datayoga.__main__ import main" >> /usr/local/bin/datayoga && \
-    echo "if __name__ == '__main__':" >> /usr/local/bin/datayoga && \
-    echo "    sys.exit(main())" >> /usr/local/bin/datayoga && \
-    echo "" >> /usr/local/bin/datayoga && \
-    chmod +x /usr/local/bin/datayoga
-
-
 RUN mkdir -p /opt/install/cli
 RUN mkdir -p /opt/install/core
 COPY ./cli/pyproject.toml /opt/install/cli/pyproject.toml
@@ -19,6 +10,7 @@ COPY ./cli/poetry.lock /opt/install/cli/poetry.lock
 COPY ./core/pyproject.toml /opt/install/core/pyproject.toml
 COPY ./core/poetry.lock /opt/install/core/poetry.lock
 COPY ./dev/requirements.txt /opt/install/requirements.txt
+COPY ./dev/datayoga /usr/local/bin/datayoga
 
 WORKDIR /opt/install/cli
 RUN poetry export -n --without-hashes | grep -v "datayoga" > requirements.txt && \
