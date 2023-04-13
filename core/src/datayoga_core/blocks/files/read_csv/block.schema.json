@@ -7,6 +7,11 @@
       "description": "Filename. Can contain a regexp or glob expression",
       "type": "string"
     },
+    "encoding": {
+      "description": "Encoding to use for reading the file",
+      "type": "string",
+      "default": "utf-8"
+    },
     "fields": {
       "type": "array",
       "title": "List of columns to use",
