@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any, Dict, List, Optional
+
 
 @unique
 class Status(str, Enum):
@@ -21,6 +24,11 @@ class BlockResult:
     processed: List[Result] = field(default_factory=list)
     filtered: List[Result] = field(default_factory=list)
     rejected: List[Result] = field(default_factory=list)
+
+    def extend(self, other: BlockResult):
+        self.processed.extend(other.processed)
+        self.filtered.extend(other.filtered)
+        self.rejected.extend(other.rejected)
 
     # allow unpacking
     def __iter__(self):

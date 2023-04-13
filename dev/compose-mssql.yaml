@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+
+  mssql:
+    platform: linux/amd64
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password123
+    ports:
+      - "1433:1433"
+    restart: unless-stopped
+    networks:
+      - service
+
+networks:
+  service:
+    external: true
