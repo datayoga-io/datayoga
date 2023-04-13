@@ -1,7 +1,6 @@
 import logging
 from contextlib import suppress
 
-import pytest
 from common import db_utils
 from common.utils import run_job
 
