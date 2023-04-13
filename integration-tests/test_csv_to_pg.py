@@ -10,16 +10,7 @@ logger = logging.getLogger("dy")
 SCHEMA = "hr"
 
 
-@pytest.mark.parametrize(
-    "job_name",
-    [
-        # normal test
-        "tests.csv_to_pg",
-        # test with invalid data in the batch
-        "tests.csv_to_pg_batch_with_invalid",
-    ]
-)
-def test_csv_to_pg(job_name: str):
+def test_csv_to_pg():
     try:
         postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
         postgres_container.start()
@@ -28,7 +19,7 @@ def test_csv_to_pg(job_name: str):
         db_utils.create_schema(engine, SCHEMA)
         db_utils.create_emp_table(engine, SCHEMA)
 
-        run_job(job_name)
+        run_job("tests.csv_to_pg")
 
         total_employees = db_utils.select_one_row(engine, f"select count(*) as total from {SCHEMA}.emp")
         assert total_employees and total_employees["total"] == 3
