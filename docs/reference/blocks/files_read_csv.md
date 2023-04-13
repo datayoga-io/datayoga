@@ -13,6 +13,7 @@ Read data from CSV
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**file**|`string`|Filename. Can contain a regexp or glob expression<br/>|yes|
+|**encoding**|`string`|Encoding to use for reading the file<br/>Default: `"utf-8"`<br/>|no|
 |[**fields**](#fields)<br/>(List of columns to use)|`string[]`|List of columns to use for extract<br/>Minimal Length: `1`<br/>|no|
 |**skip**|`number`|Number of lines to skip<br/>Default: `0`<br/>Minimum: `0`<br/>|no|
 |**delimiter**|`string`|Delimiter to use for splitting the csv records<br/>Default: `","`<br/>Minimal Length: `1`<br/>Maximal Length: `1`<br/>|no|
