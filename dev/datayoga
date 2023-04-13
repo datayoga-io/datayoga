@@ -5,7 +5,7 @@ import os
 
 from datayoga.__main__ import main
 
-if os.environ.get("REMOTE_DEBUG", '').lower() in ("pycharm", "idea"):
+if os.environ.get("REMOTE_DEBUG", "").lower() in ("pycharm", "idea"):
     try:
         import pydevd_pycharm
     except ImportError:
@@ -17,5 +17,5 @@ if os.environ.get("REMOTE_DEBUG", '').lower() in ("pycharm", "idea"):
 
     pydevd_pycharm.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

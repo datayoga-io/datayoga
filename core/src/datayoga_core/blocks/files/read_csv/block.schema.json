@@ -13,6 +13,7 @@
       "description": "List of columns to use for extract",
       "default": null,
       "examples": [["fname", "lname"]],
+      "minLength": 1,
       "additionalItems": true,
       "items": {
         "type": "string",
@@ -23,21 +24,27 @@
     "skip": {
       "description": "Number of lines to skip",
       "type": "number",
+      "minimum": 0,
       "default": 0
     },
     "delimiter": {
       "description": "Delimiter to use for splitting the csv records",
       "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
       "default": ","
     },
     "batch_size": {
       "description": "Number of records to read per batch",
       "type": "number",
+      "minimum": 1,
       "default": 1000
     },
     "quotechar": {
       "description": "A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '",
       "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
       "default": "\""
     }
   },
