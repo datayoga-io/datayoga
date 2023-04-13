@@ -48,6 +48,7 @@ class Block(DyProducer, metaclass=ABCMeta):
                 records = [{self.MSG_ID_FIELD: f"{next(counter)}", **record} for record in sliced]
 
                 if not records:
+                    logger.debug(f"Done reading {self.file}")
                     return
 
                 logger.debug(f"Producing {len(records)} records")
