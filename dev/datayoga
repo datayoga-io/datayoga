@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
-import sys
 import os
+import sys
 
 from datayoga.__main__ import main
 
