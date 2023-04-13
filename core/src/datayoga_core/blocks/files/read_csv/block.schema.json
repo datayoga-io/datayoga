@@ -7,12 +7,18 @@
       "description": "Filename. Can contain a regexp or glob expression",
       "type": "string"
     },
+    "encoding": {
+      "description": "Encoding to use for reading the file",
+      "type": "string",
+      "default": "utf-8"
+    },
     "fields": {
       "type": "array",
       "title": "List of columns to use",
       "description": "List of columns to use for extract",
-      "default": [],
+      "default": null,
       "examples": [["fname", "lname"]],
+      "minLength": 1,
       "additionalItems": true,
       "items": {
         "type": "string",
@@ -20,25 +26,31 @@
         "examples": ["fname"]
       }
     },
+    "skip": {
+      "description": "Number of lines to skip",
+      "type": "number",
+      "minimum": 0,
+      "default": 0
+    },
     "delimiter": {
       "description": "Delimiter to use for splitting the csv records",
       "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
       "default": ","
     },
     "batch_size": {
       "description": "Number of records to read per batch",
       "type": "number",
-      "default": "1000"
-    },
-    "use_header": {
-      "description": "Determines whether or not to use the first line as the header containing column names. If `false`, field names must be specified",
-      "type": "boolean",
-      "default": true
+      "minimum": 1,
+      "default": 1000
     },
     "quotechar": {
       "description": "A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '",
       "type": "string",
-      "default": ","
+      "minLength": 1,
+      "maxLength": 1,
+      "default": "\""
     }
   },
   "additionalProperties": false,
