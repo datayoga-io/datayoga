@@ -1,0 +1,18 @@
+{
+  "title": "http.receiver",
+  "description": "Receives HTTP requests and process the data.",
+  "type": "object",
+  "properties": {
+    "port": {
+      "description": "Port to listen",
+      "type": "integer",
+      "default": 8080
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "port": 8080
+    }
+  ]
+}
