@@ -2,15 +2,15 @@ version: "3.9"
 
 services:
 
-  mssql:
+  oracle:
     platform: linux/amd64
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: mssql
+    image: "container-registry.oracle.com/database/express:21.3.0-xe"
+    container_name: oracle
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Password123
+      - ORACLE_PWD=Password123
     ports:
-      - "1433:1433"
+      - "1521:1521"
+      - "5500:5500"
     restart: unless-stopped
     networks:
       - service
