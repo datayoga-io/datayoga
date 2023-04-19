@@ -1,5 +1,6 @@
 import logging
 from abc import ABCMeta
+from contextlib import suppress
 from typing import Any, Dict, List, Optional
 
 import sqlalchemy as sa
@@ -22,44 +23,72 @@ class Block(DyBlock, metaclass=ABCMeta):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context)
+        self.context = context
+        self.engine = None
+        self.setup_engine()
 
-        self.schema = self.properties.get("schema")
-        self.table = self.properties.get("table")
-        self.opcode_field = self.properties.get("opcode_field")
-        self.load_strategy = self.properties.get("load_strategy")
-        self.keys = self.properties.get("keys")
-        self.mapping = self.properties.get("mapping")
-        self.foreach = self.properties.get("foreach")
+    def setup_engine(self):
+        if self.engine:
+            return
 
-        self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
+        try:
+            engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
 
-        logger.debug(f"Connecting to {self.db_type}")
-        self.connection = self.engine.connect()
+            self.schema = self.properties.get("schema")
+            self.table = self.properties.get("table")
+            self.opcode_field = self.properties.get("opcode_field")
+            self.load_strategy = self.properties.get("load_strategy")
+            self.keys = self.properties.get("keys")
+            self.mapping = self.properties.get("mapping")
+            self.foreach = self.properties.get("foreach")
+            tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
 
-        if self.db_type in (relational_utils.DbType.SQLSERVER, relational_utils.DbType.ORACLE):
-            # MERGE statement requires this
-            self.connection = self.connection.execution_options(autocommit=True)
+            logger.debug(f"Connecting to {self.db_type}")
+            connection = engine.connect()
 
-        if self.opcode_field:
-            self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
-            self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
+            if self.opcode_field:
+                self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
+                self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
 
-            self.columns = self.business_key_columns + [x for x in self.mapping_columns
-                                                        if x not in self.business_key_columns]
+                self.columns = self.business_key_columns + [x for x in self.mapping_columns
+                                                            if x not in self.business_key_columns]
 
-            for column in self.columns:
-                if not column in self.tbl.columns:
-                    raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
+                for column in self.columns:
+                    if not column in tbl.columns:
+                        raise ValueError(f"{column} column does not exist in {tbl.fullname} table")
 
-            self.delete_stmt = self.tbl.delete().where(
-                sa.and_(*[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+                self.delete_stmt = tbl.delete().where(
+                    sa.and_(
+                        *[(tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
 
-            self.upsert_stmt = self.generate_upsert_stmt()
+                self.upsert_stmt = self.generate_upsert_stmt()
+
+            self.engine = engine
+            self.connection = connection
+            self.tbl = tbl
+        except OperationalError as e:
+            raise ConnectionError(e)
+
+    def dispose_engine(self):
+        with suppress(Exception):
+            self.connection.close()
+        with suppress(Exception):
+            self.engine.dispose()
+
+        self.business_key_columns = None
+        self.mapping_columns = None
+        self.columns = None
+        self.delete_stmt = None
+        self.upsert_stmt = None
+        self.tbl = None
+        self.connection = None
+        self.engine = None
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         rejected_records: List[Result] = []
+
+        self.setup_engine()
 
         if self.opcode_field:
             opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
@@ -141,6 +170,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 statement = text(statement)
             return self.connection.execute(statement, records)
         except OperationalError as e:
+            self.dispose_engine()
             raise ConnectionError(e)
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
@@ -164,5 +194,4 @@ class Block(DyBlock, metaclass=ABCMeta):
                 self.execute(self.delete_stmt, records_to_delete)
 
     def stop(self):
-        self.connection.close()
-        self.engine.dispose()
+        self.dispose_engine()
