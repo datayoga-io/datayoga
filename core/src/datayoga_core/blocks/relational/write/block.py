@@ -12,7 +12,7 @@ from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
 from sqlalchemy.engine import CursorResult
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, PendingRollbackError, DatabaseError, NoSuchTableError
 from sqlalchemy.sql.expression import ColumnCollection
 
 logger = logging.getLogger("dy")
@@ -67,9 +67,18 @@ class Block(DyBlock, metaclass=ABCMeta):
 
                 self.upsert_stmt = self.generate_upsert_stmt()
 
+            self.engine = engine
+            self.connection = connection
+            self.tbl = tbl
+
         except OperationalError as e:
             self.dispose_engine()
             raise ConnectionError(e)
+        except DatabaseError as e:
+            # Handling specific OracleDB errors: Network failure and Database restart
+            if self.db_type == relational_utils.DbType.ORACLE:
+                self.hande_oracle_database_error(e)
+            raise
 
     def dispose_engine(self):
         with suppress(Exception):
@@ -171,7 +180,26 @@ class Block(DyBlock, metaclass=ABCMeta):
             if type(statement) == str:
                 statement = text(statement)
             return self.connection.execute(statement, records)
-        except OperationalError as e:
+        except (OperationalError, PendingRollbackError) as e:
+            if self.db_type == relational_utils.DbType.SQLSERVER:
+                self.handle_mssql_operational_error(e)
+
+            self.dispose_engine()
+            raise ConnectionError(e)
+        except DatabaseError as e:
+            if self.db_type == relational_utils.DbType.ORACLE:
+                self.hande_oracle_database_error(e)
+
+            raise
+
+    def handle_mssql_operational_error(self, e):
+        """Handling specific MSSQL cases: Conversion failed(245) and Truncated data(2628)"""
+        if e.orig.args[0] in (245, 2628):
+            raise
+
+    def hande_oracle_database_error(self, e):
+        """Handling specific OracleDB cases: Network failure(DPY-4011) and Database restart(ORA-01089)"""
+        if "DPY-4011" in str(e) or "ORA-01089" in str(e):
             self.dispose_engine()
             raise ConnectionError(e)
 
