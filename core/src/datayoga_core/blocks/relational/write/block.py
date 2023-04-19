@@ -46,6 +46,10 @@ class Block(DyBlock, metaclass=ABCMeta):
             logger.debug(f"Connecting to {self.db_type}")
             connection = engine.connect()
 
+            self.engine = engine
+            self.connection = connection
+            self.tbl = tbl
+
             if self.opcode_field:
                 self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
                 self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
@@ -63,10 +67,8 @@ class Block(DyBlock, metaclass=ABCMeta):
 
                 self.upsert_stmt = self.generate_upsert_stmt()
 
-            self.engine = engine
-            self.connection = connection
-            self.tbl = tbl
         except OperationalError as e:
+            self.dispose_engine()
             raise ConnectionError(e)
 
     def dispose_engine(self):
