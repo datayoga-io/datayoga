@@ -34,10 +34,10 @@ class Block(DyBlock, metaclass=ABCMeta):
             return
 
         try:
-            engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
+            self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
 
             logger.debug(f"Connecting to {self.db_type}")
-            connection = engine.connect()
+            self.connection = self.engine.connect()
 
             self.schema = self.properties.get("schema")
             self.table = self.properties.get("table")
@@ -46,11 +46,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             self.keys = self.properties.get("keys")
             self.mapping = self.properties.get("mapping")
             self.foreach = self.properties.get("foreach")
-            tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
-
-            self.engine = engine
-            self.connection = connection
-            self.tbl = tbl
+            self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
             if self.opcode_field:
                 self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
@@ -60,12 +56,12 @@ class Block(DyBlock, metaclass=ABCMeta):
                                                             if x not in self.business_key_columns]
 
                 for column in self.columns:
-                    if not column in tbl.columns:
-                        raise ValueError(f"{column} column does not exist in {tbl.fullname} table")
+                    if not column in self.tbl.columns:
+                        raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
-                self.delete_stmt = tbl.delete().where(
+                self.delete_stmt = self.tbl.delete().where(
                     sa.and_(
-                        *[(tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+                        *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
 
                 self.upsert_stmt = self.generate_upsert_stmt()
 
