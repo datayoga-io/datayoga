@@ -168,7 +168,7 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
         try:
-            if type(statement) == str:
+            if isinstance(statement, str):
                 statement = text(statement)
             return self.connection.execute(statement, records)
         except OperationalError as e:
