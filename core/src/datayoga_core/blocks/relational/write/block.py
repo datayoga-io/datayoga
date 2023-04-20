@@ -19,6 +19,8 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyBlock, metaclass=ABCMeta):
+    _engine_fields = ("business_key_columns", "mapping_columns", "columns",
+                      "delete_stmt", "upsert_stmt", "tbl", "connection", "engine")
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
@@ -32,7 +34,10 @@ class Block(DyBlock, metaclass=ABCMeta):
             return
 
         try:
-            engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
+            self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
+
+            logger.debug(f"Connecting to {self.db_type}")
+            self.connection = self.engine.connect()
 
             self.schema = self.properties.get("schema")
             self.table = self.properties.get("table")
@@ -41,14 +46,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             self.keys = self.properties.get("keys")
             self.mapping = self.properties.get("mapping")
             self.foreach = self.properties.get("foreach")
-            tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
-
-            logger.debug(f"Connecting to {self.db_type}")
-            connection = engine.connect()
-
-            self.engine = engine
-            self.connection = connection
-            self.tbl = tbl
+            self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
             if self.opcode_field:
                 self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
@@ -58,12 +56,12 @@ class Block(DyBlock, metaclass=ABCMeta):
                                                             if x not in self.business_key_columns]
 
                 for column in self.columns:
-                    if not column in tbl.columns:
-                        raise ValueError(f"{column} column does not exist in {tbl.fullname} table")
+                    if not column in self.tbl.columns:
+                        raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
-                self.delete_stmt = tbl.delete().where(
+                self.delete_stmt = self.tbl.delete().where(
                     sa.and_(
-                        *[(tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+                        *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
 
                 self.upsert_stmt = self.generate_upsert_stmt()
 
@@ -86,14 +84,8 @@ class Block(DyBlock, metaclass=ABCMeta):
         with suppress(Exception):
             self.engine.dispose()
 
-        self.business_key_columns = None
-        self.mapping_columns = None
-        self.columns = None
-        self.delete_stmt = None
-        self.upsert_stmt = None
-        self.tbl = None
-        self.connection = None
-        self.engine = None
+        for attr in self._engine_fields:
+            setattr(self, attr, None)
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
@@ -177,7 +169,7 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
         try:
-            if type(statement) == str:
+            if isinstance(statement, str):
                 statement = text(statement)
             return self.connection.execute(statement, records)
         except (OperationalError, PendingRollbackError) as e:
