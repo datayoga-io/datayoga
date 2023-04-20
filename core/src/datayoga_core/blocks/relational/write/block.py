@@ -19,6 +19,8 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyBlock, metaclass=ABCMeta):
+    _engine_fields = ("business_key_columns", "mapping_columns", "columns",
+                      "delete_stmt", "upsert_stmt", "tbl", "connection", "engine")
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
@@ -34,6 +36,9 @@ class Block(DyBlock, metaclass=ABCMeta):
         try:
             engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
 
+            logger.debug(f"Connecting to {self.db_type}")
+            connection = engine.connect()
+
             self.schema = self.properties.get("schema")
             self.table = self.properties.get("table")
             self.opcode_field = self.properties.get("opcode_field")
@@ -42,9 +47,6 @@ class Block(DyBlock, metaclass=ABCMeta):
             self.mapping = self.properties.get("mapping")
             self.foreach = self.properties.get("foreach")
             tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=engine)
-
-            logger.debug(f"Connecting to {self.db_type}")
-            connection = engine.connect()
 
             self.engine = engine
             self.connection = connection
@@ -77,14 +79,8 @@ class Block(DyBlock, metaclass=ABCMeta):
         with suppress(Exception):
             self.engine.dispose()
 
-        self.business_key_columns = None
-        self.mapping_columns = None
-        self.columns = None
-        self.delete_stmt = None
-        self.upsert_stmt = None
-        self.tbl = None
-        self.connection = None
-        self.engine = None
+        for attr in self._engine_fields:
+            setattr(self, attr, None)
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
