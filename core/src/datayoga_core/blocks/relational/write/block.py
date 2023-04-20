@@ -56,7 +56,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                                                             if x not in self.business_key_columns]
 
                 for column in self.columns:
-                    if not column in self.tbl.columns:
+                    if column not in self.tbl.columns:
                         raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
                 self.delete_stmt = self.tbl.delete().where(
@@ -64,10 +64,6 @@ class Block(DyBlock, metaclass=ABCMeta):
                         *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
 
                 self.upsert_stmt = self.generate_upsert_stmt()
-
-            self.engine = engine
-            self.connection = connection
-            self.tbl = tbl
 
         except OperationalError as e:
             self.dispose_engine()
@@ -96,7 +92,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         if self.opcode_field:
             opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
             # reject any records with unknown or missing Opcode
-            for opcode in set(opcode_groups.keys())-{o.value for o in OpCode}:
+            for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}:
                 rejected_records.extend([
                     Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
                     for record in opcode_groups[opcode]
