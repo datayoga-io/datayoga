@@ -12,7 +12,7 @@ from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
 from sqlalchemy.engine import CursorResult
-from sqlalchemy.exc import OperationalError, PendingRollbackError, DatabaseError, NoSuchTableError
+from sqlalchemy.exc import DatabaseError, OperationalError, PendingRollbackError
 from sqlalchemy.sql.expression import ColumnCollection
 
 logger = logging.getLogger("dy")
@@ -38,6 +38,11 @@ class Block(DyBlock, metaclass=ABCMeta):
 
             logger.debug(f"Connecting to {self.db_type}")
             self.connection = self.engine.connect()
+
+            # Disable the new MySQL 8.0.17+ default behavior of requiring an alias for ON DUPLICATE KEY UPDATE
+            # This behavior is not supported by pymysql driver
+            if self.db_type == relational_utils.DbType.MYSQL:
+                self.engine.dialect._requires_alias_for_on_duplicate_key = False
 
             self.schema = self.properties.get("schema")
             self.table = self.properties.get("table")
