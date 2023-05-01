@@ -12,7 +12,7 @@ from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
 from sqlalchemy.engine import CursorResult
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DatabaseError, OperationalError, PendingRollbackError
 from sqlalchemy.sql.expression import ColumnCollection
 
 logger = logging.getLogger("dy")
@@ -39,6 +39,11 @@ class Block(DyBlock, metaclass=ABCMeta):
             logger.debug(f"Connecting to {self.db_type}")
             self.connection = self.engine.connect()
 
+            # Disable the new MySQL 8.0.17+ default behavior of requiring an alias for ON DUPLICATE KEY UPDATE
+            # This behavior is not supported by pymysql driver
+            if self.engine.driver == "pymysql":
+                self.engine.dialect._requires_alias_for_on_duplicate_key = False
+
             self.schema = self.properties.get("schema")
             self.table = self.properties.get("table")
             self.opcode_field = self.properties.get("opcode_field")
@@ -56,7 +61,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                                                             if x not in self.business_key_columns]
 
                 for column in self.columns:
-                    if not column in self.tbl.columns:
+                    if column not in self.tbl.columns:
                         raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
                 self.delete_stmt = self.tbl.delete().where(
@@ -68,6 +73,11 @@ class Block(DyBlock, metaclass=ABCMeta):
         except OperationalError as e:
             self.dispose_engine()
             raise ConnectionError(e)
+        except DatabaseError as e:
+            # Handling specific OracleDB errors: Network failure and Database restart
+            if self.db_type == relational_utils.DbType.ORACLE:
+                self.hande_oracle_database_error(e)
+            raise
 
     def dispose_engine(self):
         with suppress(Exception):
@@ -87,7 +97,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         if self.opcode_field:
             opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
             # reject any records with unknown or missing Opcode
-            for opcode in set(opcode_groups.keys())-{o.value for o in OpCode}:
+            for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}:
                 rejected_records.extend([
                     Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
                     for record in opcode_groups[opcode]
@@ -163,7 +173,26 @@ class Block(DyBlock, metaclass=ABCMeta):
             if isinstance(statement, str):
                 statement = text(statement)
             return self.connection.execute(statement, records)
-        except OperationalError as e:
+        except (OperationalError, PendingRollbackError) as e:
+            if self.db_type == relational_utils.DbType.SQLSERVER:
+                self.handle_mssql_operational_error(e)
+
+            self.dispose_engine()
+            raise ConnectionError(e)
+        except DatabaseError as e:
+            if self.db_type == relational_utils.DbType.ORACLE:
+                self.hande_oracle_database_error(e)
+
+            raise
+
+    def handle_mssql_operational_error(self, e):
+        """Handling specific MSSQL cases: Conversion failed (245) and Truncated data (2628)"""
+        if e.orig.args[0] in (245, 2628):
+            raise
+
+    def hande_oracle_database_error(self, e):
+        """Handling specific OracleDB cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
+        if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
             self.dispose_engine()
             raise ConnectionError(e)
 
