@@ -41,7 +41,7 @@ class Block(DyBlock, metaclass=ABCMeta):
 
             # Disable the new MySQL 8.0.17+ default behavior of requiring an alias for ON DUPLICATE KEY UPDATE
             # This behavior is not supported by pymysql driver
-            if self.db_type == relational_utils.DbType.MYSQL:
+            if self.engine.driver == "pymysql":
                 self.engine.dialect._requires_alias_for_on_duplicate_key = False
 
             self.schema = self.properties.get("schema")
@@ -186,13 +186,13 @@ class Block(DyBlock, metaclass=ABCMeta):
             raise
 
     def handle_mssql_operational_error(self, e):
-        """Handling specific MSSQL cases: Conversion failed(245) and Truncated data(2628)"""
+        """Handling specific MSSQL cases: Conversion failed (245) and Truncated data (2628)"""
         if e.orig.args[0] in (245, 2628):
             raise
 
     def hande_oracle_database_error(self, e):
-        """Handling specific OracleDB cases: Network failure(DPY-4011) and Database restart(ORA-01089)"""
-        if "DPY-4011" in str(e) or "ORA-01089" in str(e):
+        """Handling specific OracleDB cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
+        if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
             self.dispose_engine()
             raise ConnectionError(e)
 
