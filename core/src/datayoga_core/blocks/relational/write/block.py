@@ -1,5 +1,6 @@
 import logging
 from abc import ABCMeta
+from contextlib import suppress
 from typing import Any, Dict, List, Optional
 
 import sqlalchemy as sa
@@ -11,60 +12,92 @@ from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
 from sqlalchemy.engine import CursorResult
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DatabaseError, OperationalError, PendingRollbackError
 from sqlalchemy.sql.expression import ColumnCollection
 
 logger = logging.getLogger("dy")
 
 
 class Block(DyBlock, metaclass=ABCMeta):
+    _engine_fields = ("business_key_columns", "mapping_columns", "columns",
+                      "delete_stmt", "upsert_stmt", "tbl", "connection", "engine")
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), context)
+        self.context = context
+        self.engine = None
+        self.setup_engine()
 
-        self.schema = self.properties.get("schema")
-        self.table = self.properties.get("table")
-        self.opcode_field = self.properties.get("opcode_field")
-        self.load_strategy = self.properties.get("load_strategy")
-        self.keys = self.properties.get("keys")
-        self.mapping = self.properties.get("mapping")
-        self.foreach = self.properties.get("foreach")
+    def setup_engine(self):
+        if self.engine:
+            return
 
-        self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
+        try:
+            self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
 
-        logger.debug(f"Connecting to {self.db_type}")
-        self.connection = self.engine.connect()
+            logger.debug(f"Connecting to {self.db_type}")
+            self.connection = self.engine.connect()
 
-        if self.db_type in (relational_utils.DbType.SQLSERVER, relational_utils.DbType.ORACLE):
-            # MERGE statement requires this
-            self.connection = self.connection.execution_options(autocommit=True)
+            # Disable the new MySQL 8.0.17+ default behavior of requiring an alias for ON DUPLICATE KEY UPDATE
+            # This behavior is not supported by pymysql driver
+            if self.engine.driver == "pymysql":
+                self.engine.dialect._requires_alias_for_on_duplicate_key = False
 
-        if self.opcode_field:
-            self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
-            self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
+            self.schema = self.properties.get("schema")
+            self.table = self.properties.get("table")
+            self.opcode_field = self.properties.get("opcode_field")
+            self.load_strategy = self.properties.get("load_strategy")
+            self.keys = self.properties.get("keys")
+            self.mapping = self.properties.get("mapping")
+            self.foreach = self.properties.get("foreach")
+            self.tbl = sa.Table(self.table, sa.MetaData(schema=self.schema), autoload_with=self.engine)
 
-            self.columns = self.business_key_columns + [x for x in self.mapping_columns
-                                                        if x not in self.business_key_columns]
+            if self.opcode_field:
+                self.business_key_columns = [column["column"] for column in write_utils.get_column_mapping(self.keys)]
+                self.mapping_columns = [column["column"] for column in write_utils.get_column_mapping(self.mapping)]
 
-            for column in self.columns:
-                if not column in self.tbl.columns:
-                    raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
+                self.columns = self.business_key_columns + [x for x in self.mapping_columns
+                                                            if x not in self.business_key_columns]
 
-            self.delete_stmt = self.tbl.delete().where(
-                sa.and_(*[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+                for column in self.columns:
+                    if column not in self.tbl.columns:
+                        raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
-            self.upsert_stmt = self.generate_upsert_stmt()
+                self.delete_stmt = self.tbl.delete().where(
+                    sa.and_(
+                        *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+
+                self.upsert_stmt = self.generate_upsert_stmt()
+
+        except OperationalError as e:
+            self.dispose_engine()
+            raise ConnectionError(e)
+        except DatabaseError as e:
+            # Handling specific OracleDB errors: Network failure and Database restart
+            if self.db_type == relational_utils.DbType.ORACLE:
+                self.hande_oracle_database_error(e)
+            raise
+
+    def dispose_engine(self):
+        with suppress(Exception):
+            self.connection.close()
+        with suppress(Exception):
+            self.engine.dispose()
+
+        for attr in self._engine_fields:
+            setattr(self, attr, None)
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         rejected_records: List[Result] = []
 
+        self.setup_engine()
+
         if self.opcode_field:
             opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
             # reject any records with unknown or missing Opcode
-            for opcode in set(opcode_groups.keys())-{o.value for o in OpCode}:
+            for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}:
                 rejected_records.extend([
                     Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
                     for record in opcode_groups[opcode]
@@ -137,10 +170,30 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
         try:
-            if type(statement) == str:
+            if isinstance(statement, str):
                 statement = text(statement)
             return self.connection.execute(statement, records)
-        except OperationalError as e:
+        except (OperationalError, PendingRollbackError) as e:
+            if self.db_type == relational_utils.DbType.SQLSERVER:
+                self.handle_mssql_operational_error(e)
+
+            self.dispose_engine()
+            raise ConnectionError(e)
+        except DatabaseError as e:
+            if self.db_type == relational_utils.DbType.ORACLE:
+                self.hande_oracle_database_error(e)
+
+            raise
+
+    def handle_mssql_operational_error(self, e):
+        """Handling specific MSSQL cases: Conversion failed (245) and Truncated data (2628)"""
+        if e.orig.args[0] in (245, 2628):
+            raise
+
+    def hande_oracle_database_error(self, e):
+        """Handling specific OracleDB cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
+        if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
+            self.dispose_engine()
             raise ConnectionError(e)
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
@@ -164,5 +217,4 @@ class Block(DyBlock, metaclass=ABCMeta):
                 self.execute(self.delete_stmt, records_to_delete)
 
     def stop(self):
-        self.connection.close()
-        self.engine.dispose()
+        self.dispose_engine()
