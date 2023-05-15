@@ -2103,6 +2103,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 
 [extras]
 cassandra = ["cassandra-driver"]
+http = ["aiohttp"]
 mysql = ["PyMySQL", "SQLAlchemy"]
 oracle = ["SQLAlchemy", "oracledb"]
 parquet = ["fastparquet"]
@@ -2114,4 +2115,4 @@ test = ["PyMySQL", "SQLAlchemy", "cassandra-driver", "fastparquet", "mock", "ora
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "12433e8690c7a5ea435f8f39a63bd0ae8322dc5f235ef98df522363386785427"
+content-hash = "b32312043561667eac79861be3f07c950f12fae7df9a2c75b9a0c6d624cc8a9f"
