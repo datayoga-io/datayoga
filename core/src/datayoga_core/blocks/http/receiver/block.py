@@ -15,6 +15,7 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyProducer, metaclass=ABCMeta):
+    port: int
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
@@ -23,9 +24,10 @@ class Block(DyProducer, metaclass=ABCMeta):
     async def produce(self) -> AsyncGenerator[List[Message], None]:
         q = Queue(maxsize=1000)
 
-        async def handler(request: BaseRequest):
+        async def handler(request: BaseRequest) -> Response:
             try:
                 q.put_nowait(orjson.loads(await request.read()))
+                return Response(status=200)
             except Exception:  # noqa
                 logger.exception("Got exception while parsing request:")
                 return Response(status=500, text="Server error.")
@@ -33,7 +35,8 @@ class Block(DyProducer, metaclass=ABCMeta):
         runner = ServerRunner(Server(handler))
         await runner.setup()
         srv = TCPSite(runner, "0.0.0.0", self.port)
-        logger.debug(f"Listening on {self.port}")
+        await srv.start()
+        logger.info(f"Listening on 0.0.0.0:{self.port}...")
 
         try:
             counter = iter(count())
@@ -44,7 +47,7 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         finally:
             with suppress(Exception):
-                await srv.stop()  # noqa
+                await srv.stop()
 
     def stop(self):
         """
