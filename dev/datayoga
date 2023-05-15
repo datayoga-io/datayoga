@@ -17,5 +17,17 @@ if os.environ.get("REMOTE_DEBUG", "").lower() in ("pycharm", "idea"):
 
     pydevd_pycharm.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
 
+
 if __name__ == "__main__":
-    sys.exit(main())
+    if os.environ.get("PROFILE", "").lower() in ("true", "1"):
+        import cProfile as profile
+        from time import time
+        pr = profile.Profile()
+        pr.enable()
+        try:
+            main()
+        finally:
+            pr.dump_stats(f"{int(time())}.pstat")
+            pr.print_stats(sort="cumtime")
+    else:
+        sys.exit(main())

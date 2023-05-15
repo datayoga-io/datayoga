@@ -124,7 +124,7 @@ def setup_database(engine: Engine, schema_name: str):
 
 
 def check_results(engine: Engine, schema_name: str):
-    # the first record was supposed to be delete due to opcode=="d"
+    # the first record was supposed to be deleted due to opcode=="d"
     total_employees = db_utils.select_one_row(engine, f"select count(*) as total from {schema_name}.emp")
     assert total_employees and total_employees["total"] == 3
 
