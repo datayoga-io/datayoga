@@ -1,14 +1,6 @@
 input:
-  uses: parquet.read
-  with:
-    file: sample.parquet
+  uses: http.receiver
 steps:
-
-  - uses: map
-    with:
-      expression:
-        data: json_parse(data)
-      language: jmespath
 
   - uses: map
     with:

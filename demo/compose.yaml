@@ -8,6 +8,10 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     container_name: datayoga
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./datayoga/:/opt/datayoga/
     depends_on:
       postgres:
         condition: service_healthy
@@ -18,7 +22,9 @@ services:
     image: postgres
     container_name: postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_DB=mydb
       - POSTGRES_USER=postgres
@@ -35,13 +41,24 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
+    ports:
+      - "8081:80"
     volumes:
-      - ./pgadmin/postgres-servers.json:/pgadmin4/servers.json:ro
+      - ./pgadmin/postgres-servers.json:/pgadmin4/servers.json
+      - ./pgadmin/pgpass:/pgadmin4/pgpass
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@datayoga.io
       - PGADMIN_DEFAULT_PASSWORD=datayoga
       - PGADMIN_DISABLE_POSTFIX=True
-      - PGADMIN_CONFIG_LOGIN_BANNER="<h4>Please use <code>admin@datayoga.io</code> and <code>datayoga</code> to login and <code>postgres</code> to connect to the database.</h4>"
+      - PGADMIN_CONFIG_LOGIN_BANNER="<h4>Please use <code>admin@datayoga.io</code> and <code>datayoga</code> to login.</h4>"
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        cp -f /pgadmin4/pgpass /var/lib/pgadmin/
+        chmod 0600 /var/lib/pgadmin/pgpass
+        exec /entrypoint.sh
     networks:
       - service
     depends_on:
@@ -51,6 +68,8 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    ports:
+      - "8082:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
@@ -59,14 +78,15 @@ services:
   grafana:
     image: grafana/grafana
     container_name: grafana
+    ports:
+      - "8083:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning/
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
     environment:
       - GF_SECURITY_ADMIN_USER=admin@datayoga.io
       - GF_SECURITY_ADMIN_PASSWORD=datayoga
     networks:
       - service
-
 
 networks:
   service:

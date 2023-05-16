@@ -1,5 +1,7 @@
 FROM python:3.11
 
-RUN pip install datayoga[mysql]
+RUN pip install datayoga[pgsql]
+
+WORKDIR /opt/datayoga
 
 CMD ["datayoga", "run", "receiver"]
