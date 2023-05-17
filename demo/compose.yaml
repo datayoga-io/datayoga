@@ -6,7 +6,7 @@ services:
     platform: linux/amd64
     build:
       context: ./
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.datayoga
     container_name: datayoga
     ports:
       - "8080:8080"
@@ -15,6 +15,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - service
+
+  generator:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.generator
+    container_name: generator
+    volumes:
+      - ./generator/:/opt/generator/
     networks:
       - service
 
