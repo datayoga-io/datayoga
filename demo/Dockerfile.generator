@@ -6,4 +6,6 @@ WORKDIR /opt/generator
 
 RUN pip install -r requirements.txt
 
+STOPSIGNAL SIGINT
+
 CMD ["python", "generator.py"]
