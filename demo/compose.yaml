@@ -10,6 +10,7 @@ services:
     container_name: datayoga
     ports:
       - "8080:8080"
+      - "8081:9090"
     volumes:
       - ./datayoga/:/opt/datayoga/
     depends_on:
@@ -52,7 +53,7 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin
     ports:
-      - "8081:80"
+      - "8082:80"
     volumes:
       - ./pgadmin/postgres-servers.json:/pgadmin4/servers.json
       - ./pgadmin/pgpass:/pgadmin4/pgpass
@@ -79,7 +80,7 @@ services:
     image: prom/prometheus
     container_name: prometheus
     ports:
-      - "8082:9090"
+      - "8083:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
@@ -89,7 +90,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "8083:3000"
+      - "8084:3000"
     volumes:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     environment:

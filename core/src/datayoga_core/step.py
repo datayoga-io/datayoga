@@ -5,6 +5,7 @@ import logging
 from asyncio import Task
 from typing import Any, Callable, Dict, List, Optional
 
+from datayoga_core import prom
 from datayoga_core.block import Block
 from datayoga_core.context import Context
 from datayoga_core.result import Result, Status
@@ -62,6 +63,10 @@ class Step:
             logger.debug(f"{self.id}-{worker_id} processing {[i[Block.MSG_ID_FIELD] for i in entry]}")
             try:
                 processed_entries, filtered_entries, rejected_entries = await self.block.run(entry)
+
+                prom.processed_entries.labels(step=self.id).inc(len(processed_entries))
+                prom.filtered_records.labels(step=self.id).inc(len(filtered_entries))
+                prom.rejected_records.labels(step=self.id).inc(len(rejected_entries))
 
                 # handle filtered. anything not processed or rejected
                 logger.debug(
