@@ -17,7 +17,8 @@ def test_http_to_redis():
         redis_container.start()
         program = run_job("tests.http_to_redis", background=True)
 
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "data"), "r") as f:
+        file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "data", "employees.json")
+        with open(file_name, "r") as f:
             for record in json.load(f):
                 requests.post("http://localhost:8080", data=json.dumps(record))
 
