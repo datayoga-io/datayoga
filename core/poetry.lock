@@ -2139,7 +2139,7 @@ parquet = ["fastparquet"]
 pg = ["SQLAlchemy", "psycopg2-binary"]
 redis = ["redis"]
 sqlserver = ["SQLAlchemy", "pymssql"]
-test = ["PyMySQL", "SQLAlchemy", "cassandra-driver", "fastparquet", "mock", "oracledb", "psycopg2-binary", "pymssql", "pytest", "pytest-asyncio", "pytest-describe", "pytest-mock", "pytest-timeout", "redis", "requests-mock", "testcontainers"]
+test = ["PyMySQL", "SQLAlchemy", "cassandra-driver", "fastparquet", "aiohttp", "mock", "oracledb", "psycopg2-binary", "pymssql", "pytest", "pytest-asyncio", "pytest-describe", "pytest-mock", "pytest-timeout", "redis", "requests-mock", "testcontainers"]
 
 [metadata]
 lock-version = "2.0"
