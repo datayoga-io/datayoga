@@ -17,6 +17,7 @@ def test_http_to_redis():
 
     try:
         redis_container.start()
+        run_job("tests.http_to_redis")
         program = run_job("tests.http_to_redis", background=True)
 
         for i in range(30):
