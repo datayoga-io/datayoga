@@ -19,7 +19,7 @@ def test_http_to_redis():
         redis_container.start()
         program = run_job("tests.http_to_redis", background=True)
 
-        for i in range(10):
+        for i in range(30):
             with suppress(requests.exceptions.ConnectionError):
                 requests.post(DY_URL)
                 break
