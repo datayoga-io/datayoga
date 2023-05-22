@@ -23,7 +23,7 @@ cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
 orjson = "^3.8.7"
-python = "^3.8"
+python = "^3.7"
 PyYAML = "^6.0"
 
 mock = { version = "^4.0.3", optional = true }

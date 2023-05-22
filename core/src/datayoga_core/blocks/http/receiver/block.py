@@ -6,7 +6,7 @@ from itertools import count
 from typing import AsyncGenerator, List, Optional
 
 import orjson
-from aiohttp.web import BaseRequest, Response, Server, ServerRunner, TCPSite
+from aiohttp.web import BaseRequest, Response, Server, ServerRunner, TCPSite, HTTPOk, HTTPInternalServerError
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer
@@ -19,18 +19,18 @@ class Block(DyProducer, metaclass=ABCMeta):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
-        self.port = int(self.properties.get("encoding", 8080))
+        self.port = int(self.properties.get("port", 8080))
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
-        q = Queue(maxsize=1000)
+        queue = Queue(maxsize=1000)
 
         async def handler(request: BaseRequest) -> Response:
             try:
-                q.put_nowait(orjson.loads(await request.read()))
-                return Response(status=200)
+                queue.put_nowait(orjson.loads(await request.read()))
+                return HTTPOk()
             except Exception:  # noqa
                 logger.exception("Got exception while parsing request:")
-                return Response(status=500, text="Server error.")
+                return HTTPInternalServerError()
 
         runner = ServerRunner(Server(handler))
         await runner.setup()
@@ -42,15 +42,9 @@ class Block(DyProducer, metaclass=ABCMeta):
             counter = iter(count())
 
             while True:
-                data = await q.get()
+                data = await queue.get()
                 yield [{self.MSG_ID_FIELD: f"{next(counter)}", **data}]
 
         finally:
             with suppress(Exception):
                 await srv.stop()
-
-    def stop(self):
-        """
-        Cleans the block connections and state
-        """
-        pass
