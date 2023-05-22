@@ -18,7 +18,7 @@ def test_http_to_redis():
         redis_container.start()
         program = run_job("tests.http_to_redis", background=True)
 
-        sleep(3)
+        sleep(5)
 
         file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "data", "employees.json")
         with open(file_name, "r") as f:
