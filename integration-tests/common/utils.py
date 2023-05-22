@@ -29,12 +29,13 @@ def execute_program(command: str, background: bool = False) -> Optional[Popen]:
     kill_program(process, None)
 
 
-def kill_program(process: Popen, sig: Optional[int] = signal.CTRL_C_EVENT, igmore_errors: bool = False):
+def kill_program(process: Popen, sig: Optional[int] = signal.SIGINT, ignore_errors: bool = False):
     """Kills a process and logs its output.
 
     Args:
         process (Popen): process to kill.
         sig (Optional[int]): signal to send to the process.
+        ignore_errors (bool): whether to ignore errors.
 
     Raises:
         ValueError: When the return code is not 0.
@@ -48,7 +49,7 @@ def kill_program(process: Popen, sig: Optional[int] = signal.CTRL_C_EVENT, igmor
 
     process.communicate()
 
-    if not igmore_errors:
+    if not ignore_errors:
         if process.returncode != 0:
             raise ValueError(f"command failed")
 
