@@ -32,6 +32,8 @@ def test_http_to_redis():
             for record in json.load(f):
                 requests.post(DY_URL, data=json.dumps(record))
 
+        sleep(2)
+
         redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
 
         assert len(redis_client.keys()) == 3
