@@ -9,6 +9,7 @@ from common import redis_utils
 from common.utils import wait_program, run_job
 
 REDIS_PORT = 12554
+DY_URL = "http://localhost:8080"
 
 
 def test_http_to_redis():
@@ -18,12 +19,18 @@ def test_http_to_redis():
         redis_container.start()
         program = run_job("tests.http_to_redis", background=True)
 
-        sleep(5)
+        for i in range(10):
+            with suppress(requests.exceptions.ConnectionError):
+                requests.post(DY_URL)
+                break
+            sleep(0.5)
+        else:
+            raise ValueError("Can't wait any longer for the process to be ready!")
 
         file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "data", "employees.json")
         with open(file_name, "r") as f:
             for record in json.load(f):
-                requests.post("http://localhost:8080", data=json.dumps(record))
+                requests.post(DY_URL, data=json.dumps(record))
 
         redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
 
