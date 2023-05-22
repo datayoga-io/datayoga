@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "fname": "john",
+    "lname": "doe",
+    "credit_card": "1234-1234-1234-1234",
+    "country_code": 972,
+    "country_name": "israel",
+    "gender": "M"
+  },
+  {
+    "id": 2,
+    "fname": "jane",
+    "lname": "doe",
+    "credit_card": "1000-2000-3000-4000",
+    "country_code": 972,
+    "country_name": "israel",
+    "gender": "F"
+  },
+  {
+    "id": 3,
+    "fname": "bill",
+    "lname": "adams",
+    "credit_card": "9999-8888-7777-666",
+    "country_code": 1,
+    "country_name": "usa",
+    "gender": "M"
+  }
+]

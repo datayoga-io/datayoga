@@ -25,6 +25,7 @@ class Block(DyProducer, metaclass=ABCMeta):
             self.file = os.path.join(context.properties.get("data_path"), csv_file)
 
         logger.debug(f"file: {self.file}")
+
         self.encoding = self.properties.get("encoding", "utf-8")
         self.batch_size = self.properties.get("batch_size", 1000)
         self.fields = self.properties.get("fields")
