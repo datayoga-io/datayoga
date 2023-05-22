@@ -19,18 +19,19 @@ def execute_program(command: str, background: bool = False) -> Optional[Popen]:
     Raises:
         ValueError: When the return code is not 0.
     """
-    process = Popen(command, stdin=PIPE, stdout=PIPE, shell=True, universal_newlines=True)
+    process = Popen(command, stdin=PIPE, stdout=PIPE, shell=True, universal_newlines=True, preexec_fn=os.setsid)
 
     logger.info(f"Executing {command}...")
 
     if background:
         return process
 
-    kill_program(process, None)
+    wait_program(process, None)
 
 
-def kill_program(process: Popen, sig: Optional[int] = signal.SIGINT, ignore_errors: bool = False):
-    """Kills a process and logs its output.
+def wait_program(process: Popen, sig: Optional[int] = signal.SIGTERM, ignore_errors: bool = False):
+    """Waits a child program to finish and logs its output.
+    Sends a signal to the process if it set
 
     Args:
         process (Popen): process to kill.
@@ -40,14 +41,16 @@ def kill_program(process: Popen, sig: Optional[int] = signal.SIGINT, ignore_erro
     Raises:
         ValueError: When the return code is not 0.
     """
+
     if sig:
-        process.send_signal(sig)
+        os.killpg(os.getpgid(process.pid), sig)
+        process.wait()
+    else:
+        while process.poll() is None:
+            logger.info(process.stdout.readline().rstrip())
+            time.sleep(0.2)
 
-    while process.poll() is None:
-        logger.info(process.stdout.readline().rstrip())
-        time.sleep(0.2)
-
-    process.communicate()
+        process.communicate()
 
     if not ignore_errors:
         if process.returncode != 0:

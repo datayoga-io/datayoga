@@ -1,11 +1,12 @@
 import json
 import os
 from contextlib import suppress
+from time import sleep
 
 import requests
 
 from common import redis_utils
-from common.utils import kill_program, run_job
+from common.utils import wait_program, run_job
 
 REDIS_PORT = 12554
 
@@ -16,6 +17,8 @@ def test_http_to_redis():
     try:
         redis_container.start()
         program = run_job("tests.http_to_redis", background=True)
+
+        sleep(3)
 
         file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "data", "employees.json")
         with open(file_name, "r") as f:
@@ -48,4 +51,4 @@ def test_http_to_redis():
         with suppress(Exception):
             redis_container.stop()
         with suppress(Exception):
-            kill_program(program, ignore_errors=True)  # noqa
+            wait_program(program, ignore_errors=True)  # noqa
