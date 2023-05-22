@@ -16,10 +16,12 @@ logger = logging.getLogger("dy")
 
 class Block(DyProducer, metaclass=ABCMeta):
     port: int
+    host: str
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.port = int(self.properties.get("port", 8080))
+        self.host = self.properties.get("host", "0.0.0.0")
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
         queue = Queue(maxsize=1000)
@@ -34,9 +36,9 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         runner = ServerRunner(Server(handler))
         await runner.setup()
-        srv = TCPSite(runner, "0.0.0.0", self.port)
+        srv = TCPSite(runner, self.host, self.port)
         await srv.start()
-        logger.info(f"Listening on 0.0.0.0:{self.port}...")
+        logger.info(f"Listening on {self.host}:{self.port}...")
 
         try:
             counter = iter(count())
