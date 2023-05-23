@@ -12,13 +12,14 @@ Receives HTTP requests and process the data.
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**port**|`integer`|Port to listen<br/>Default: `8080`<br/>||
 |**host**|`string`|Host to listen<br/>Default: `"0.0.0.0"`<br/>||
+|**port**|`integer`|Port to listen<br/>Default: `8080`<br/>||
 
 **Additional Properties:** not allowed  
 **Example**
 
 ```yaml
+host: localhost
 port: 8080
 
 ```
