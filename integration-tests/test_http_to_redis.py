@@ -4,9 +4,8 @@ from contextlib import suppress
 from time import sleep
 
 import requests
-
 from common import redis_utils
-from common.utils import wait_program, run_job
+from common.utils import run_job, wait_program
 
 REDIS_PORT = 12554
 DY_URL = "http://localhost:8080"
@@ -19,7 +18,7 @@ def test_http_to_redis():
         redis_container.start()
         program = run_job("tests.http_to_redis", background=True)
 
-        for i in range(30):
+        for _ in range(30):
             with suppress(requests.exceptions.ConnectionError):
                 requests.post(DY_URL)
                 break
@@ -28,7 +27,7 @@ def test_http_to_redis():
             raise ValueError("Can't wait any longer for the process to be ready!")
 
         file_name = os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "data", "employees.json")
-        with open(file_name, "r") as f:
+        with open(file_name, "r", encoding="utf8") as f:
             for record in json.load(f):
                 requests.post(DY_URL, data=json.dumps(record))
 

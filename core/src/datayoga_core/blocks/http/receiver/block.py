@@ -6,7 +6,8 @@ from itertools import count
 from typing import AsyncGenerator, List, Optional
 
 import orjson
-from aiohttp.web import BaseRequest, Response, Server, ServerRunner, TCPSite, HTTPOk, HTTPInternalServerError
+from aiohttp.web import (BaseRequest, HTTPInternalServerError, HTTPOk,
+                         Response, Server, ServerRunner, TCPSite)
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer

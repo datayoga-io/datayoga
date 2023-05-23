@@ -8,7 +8,7 @@ steps:
     with:
       field: full_name
       language: jmespath
-      expression: concat([capitalize(fname), ' ' , capitalize(lname)])
+      expression: concat([capitalize(fname), ' ', capitalize(lname)])
   - uses: map
     with:
       expression:
