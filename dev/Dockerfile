@@ -11,6 +11,7 @@ COPY ./core/pyproject.toml /opt/install/core/pyproject.toml
 COPY ./core/poetry.lock /opt/install/core/poetry.lock
 COPY ./dev/requirements.txt /opt/install/requirements.txt
 COPY ./dev/datayoga /usr/local/bin/datayoga
+COPY ./dev/datayoga /usr/local/bin/dy
 
 WORKDIR /opt/install/cli
 RUN poetry export -n --without-hashes | grep -v "datayoga" > requirements.txt && \

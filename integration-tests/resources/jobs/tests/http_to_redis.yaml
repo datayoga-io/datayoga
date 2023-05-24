@@ -1,9 +1,8 @@
 input:
-  uses: redis.read_stream
+  uses: http.receiver
   with:
-    connection: cache
-    stream_name: emp
-    snapshot: true
+    host: localhost
+    port: 8080
 steps:
   - uses: add_field
     with:
@@ -14,21 +13,16 @@ steps:
     with:
       expression:
         {
-          _id: _id,
+          id: id,
           full_name: full_name,
           country: country_code || ' - ' || UPPER(country_name),
           gender: gender
         }
       language: sql
-  - uses: cassandra.write
+  - uses: redis.write
     with:
-      connection: cassandra
-      keyspace: hr
-      table: emp
-      opcode_field: __$$opcode
-      keys:
-        - id: _id
-      mapping:
-        - full_name
-        - country
-        - gender
+      connection: cache
+      command: HSET
+      key:
+        expression: id
+        language: jmespath

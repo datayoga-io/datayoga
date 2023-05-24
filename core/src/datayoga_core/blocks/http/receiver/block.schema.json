@@ -1,0 +1,24 @@
+{
+  "title": "http.receiver",
+  "description": "Receives HTTP requests and process the data.",
+  "type": "object",
+  "properties": {
+    "host": {
+      "description": "Host to listen",
+      "type": "string",
+      "default": "0.0.0.0"
+    },
+    "port": {
+      "description": "Port to listen",
+      "type": "integer",
+      "default": 8080
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "host": "localhost",
+      "port": 8080
+    }
+  ]
+}

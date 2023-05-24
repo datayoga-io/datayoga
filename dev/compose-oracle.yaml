@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+
+  oracle:
+    platform: linux/amd64
+    image: "container-registry.oracle.com/database/express:21.3.0-xe"
+    container_name: oracle
+    environment:
+      - ORACLE_PWD=Password123
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    restart: unless-stopped
+    networks:
+      - service
+
+networks:
+  service:
+    external: true
