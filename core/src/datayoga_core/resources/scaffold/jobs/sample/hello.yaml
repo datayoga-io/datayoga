@@ -8,7 +8,7 @@ steps:
       fields:
         - field: full_name
           language: jmespath
-          expression: concat([capitalize(fname), ' ' , capitalize(lname)])
+          expression: concat([capitalize(fname), ' ', capitalize(lname)])
         - field: greeting
           language: sql
           expression: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
