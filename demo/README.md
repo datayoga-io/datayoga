@@ -2,7 +2,7 @@
 
 ## Overview
 
-The demo compose file starts the Datayoga http.receiver service configured to write incoming records into PostgreSQL database. 
+The demo compose file starts the Datayoga `http.receiver` job configured to write incoming records into PostgreSQL database. 
 Generator service is used to generate random records and send them to the receiver.
 
 The demo also starts the exporter, prometheus, and grafana services.
