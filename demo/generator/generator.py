@@ -42,9 +42,14 @@ def run():
         counter = count()
         fake_data = fake_data_generator()
         while True:
-            if send_request(next(fake_data)):
-                if (iteration := next(counter)) % 100 == 0:
-                    print(f"Sent {iteration} requests so far...", file=stderr)
+            if not send_request(next(fake_data)):
+                print("Failed to send request!", file=stderr)
+                time.sleep(1)
+                continue
+
+            if (iteration := next(counter)) % 100 == 0:
+                print(f"Sent {iteration} requests so far...", file=stderr)
+
             time.sleep(randrange(3, 50) / 1000)
     except KeyboardInterrupt:
         print("Exiting...", file=stderr)
