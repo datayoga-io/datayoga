@@ -1,7 +1,7 @@
 create table data
 (
     id    bigint not null,
-    fname varchar(30),
-    lname varchar(30),
-    email varchar(30)
+    fname varchar(60),
+    lname varchar(60),
+    email varchar(120)
 );
