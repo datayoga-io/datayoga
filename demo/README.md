@@ -22,14 +22,14 @@ docker-compose up
 ### Main services
 
 * PostgreSQL admin: http://localhost:8082/
-* Grafana dashboard: http://localhost:8084/
+* Grafana dashboard: http://localhost:8084/ Username: `admin@datayoga.io` Password: `datayoga`
 
 ### Additional services
 
 * Datayoga receiver: http://localhost:8080/
 * Datayoga exporter: http://localhost:8081/
 * Prometheus dashboard: http://localhost:8083/
-* Postgres database: localhost:5432
+* Postgres database: localhost:5432 Username: `postgres` Password: `datayoga`
 
 ## Stop the Demo
 
