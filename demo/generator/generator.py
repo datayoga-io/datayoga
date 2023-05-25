@@ -41,6 +41,7 @@ def run():
     try:
         counter = count()
         fake_data = fake_data_generator()
+
         while True:
             if not send_request(next(fake_data)):
                 print("Failed to send request!", file=stderr)
