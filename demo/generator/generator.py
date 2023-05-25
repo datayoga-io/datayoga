@@ -22,7 +22,8 @@ def fake_data_generator():
             "id": next(counter),
             "first_name": fname,
             "last_name": lname,
-            "email": email
+            "email": email,
+            "active": fake.boolean(chance_of_getting_true=(int(time.time() / 100) % 30) + 70),
         }
 
 
