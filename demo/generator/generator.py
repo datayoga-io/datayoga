@@ -1,31 +1,32 @@
 import time
 from contextlib import suppress
+from itertools import count
 from random import randrange
 from sys import stderr
 
-from faker import Faker
 import httpx
+from faker import Faker
 
 TARGET = "http://datayoga:8080/"
 
 fake = Faker()
 
 
-def gen_fake_data():
-    fname = fake.first_name()
-    lname = fake.last_name()
-    email = f"{fname.lower()}.{lname.lower()}@{fake.free_email_domain()}"
+def fake_data_generator():
+    counter = count()
+    while True:
+        fname = fake.first_name()
+        lname = fake.last_name()
+        email = f"{fname.lower()}.{lname.lower()}@{fake.free_email_domain()}"
+        yield {
+            "id": next(counter),
+            "first_name": fname,
+            "last_name": lname,
+            "email": email
+        }
 
-    return {
-        "first_name": fname,
-        "last_name": lname,
-        "email": email
-    }
 
-
-def send_request(target: str = TARGET):
-    data = gen_fake_data()
-
+def send_request(data: dict, target: str = TARGET):
     with suppress(Exception):
         httpx.post(target, json=data)
         return True
@@ -38,12 +39,12 @@ def run():
     print("Press Ctrl+C to stop.", file=stderr)
 
     try:
-        cnt = 0
+        counter = count()
+        fake_data = fake_data_generator()
         while True:
-            if send_request():
-                cnt += 1
-                if cnt % 100 == 0:
-                    print(f"Sent {cnt} requests so far...", file=stderr)
+            if send_request(next(fake_data)):
+                if (iteration := next(counter)) % 100 == 0:
+                    print(f"Sent {iteration} requests so far...", file=stderr)
             time.sleep(randrange(3, 50) / 1000)
     except KeyboardInterrupt:
         print("Exiting...", file=stderr)
