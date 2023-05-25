@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import asyncio
 import logging
 import os
@@ -6,14 +7,15 @@ import shutil
 import sys
 from os import path
 from pathlib import Path
+from typing import Optional
 
 import click
 import datayoga_core as dy
+import datayoga_core.prom as prom
 import jsonschema
+from datayoga import cli_helpers
 from datayoga_core import utils
 from pkg_resources import DistributionNotFound, get_distribution
-
-from datayoga import cli_helpers
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
@@ -81,10 +83,12 @@ def validate(
 @cli.command(name="run", help="Runs a job", context_settings=CONTEXT_SETTINGS)
 @click.argument("job_name")
 @click.option('--dir', 'directory', help="DataYoga directory", default=".", show_default=True)
+@click.option('--exporter', help="Enables prometheus exporter on specified port", type=int, )
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def run(
     job_name: str,
     directory: str,
+    exporter: Optional[int],
     loglevel: str
 ):
     set_logging_level(loglevel)
@@ -116,6 +120,10 @@ def run(
         })
 
         job = dy.compile(job_settings)
+
+        if exporter:
+            prom.start(exporter)
+            logger.info(f"Prometheus exporter started on port {exporter}")
 
         producer = job.producer
         logger.info(f"Producing from {producer.__module__}")
