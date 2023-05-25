@@ -1,12 +1,19 @@
 input:
+
   uses: http.receiver
+  with:
+    host: 0.0.0.0
+    port: 8080
+
 steps:
 
   - uses: map
     with:
       expression:
-        id : data.id
-        name : data.name
+        id: id
+        fname: first_name
+        lname: last_name
+        email: email
       language: jmespath
 
   - uses: relational.write

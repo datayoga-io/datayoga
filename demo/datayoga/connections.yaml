@@ -1,6 +1,6 @@
 postgresql:
   type: postgresql
-  host: postgresql
+  host: postgres
   port: 5432
   database: mydb
   user: postgres
