@@ -11,9 +11,8 @@ from typing import Optional
 
 import click
 import datayoga_core as dy
-import datayoga_core.prom as prom
 import jsonschema
-from datayoga_core import utils
+from datayoga_core import prometheus, utils
 from pkg_resources import DistributionNotFound, get_distribution
 
 from datayoga import cli_helpers
@@ -123,7 +122,7 @@ def run(
         job = dy.compile(job_settings)
 
         if exporter_port:
-            prom.start(exporter_port)
+            prometheus.start(exporter_port)
             logger.info(f"Prometheus exporter started on port {exporter_port}")
 
         producer = job.producer
