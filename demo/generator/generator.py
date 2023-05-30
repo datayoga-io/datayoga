@@ -13,6 +13,7 @@ fake = Faker()
 
 
 def fake_data_generator():
+    """Generates fake data."""
     counter = count()
     while True:
         fname = fake.first_name()
@@ -28,6 +29,7 @@ def fake_data_generator():
 
 
 def send_request(data: dict, target: str = TARGET):
+    """Sends a POST request to the target with given data."""
     with suppress(Exception):
         httpx.post(target, json=data)
         return True
@@ -36,6 +38,7 @@ def send_request(data: dict, target: str = TARGET):
 
 
 def run():
+    """Runs the generator. The generator will send fake data to the target until it is interrupted."""
     print(f"Sending fake data to {TARGET}", file=stderr)
     print("Press Ctrl+C to stop.", file=stderr)
 
@@ -59,5 +62,5 @@ def run():
     print("Bye!", file=stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
