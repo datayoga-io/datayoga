@@ -13,9 +13,10 @@ import click
 import datayoga_core as dy
 import datayoga_core.prom as prom
 import jsonschema
-from datayoga import cli_helpers
 from datayoga_core import utils
 from pkg_resources import DistributionNotFound, get_distribution
+
+from datayoga import cli_helpers
 
 CONTEXT_SETTINGS = dict(max_content_width=120)
 LOG_LEVEL_OPTION = [click.option(
