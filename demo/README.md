@@ -2,9 +2,9 @@
 
 ## Overview
 
-![metrics](screenshot.png)
+![dashboard](dashboard.png)
 
-The demo compose file starts the Datayoga `http.receiver` job configured to write incoming 
+The demo compose file starts the Datayoga `http.receiver` job configured to write incoming
 records into a [PostgreSQL](https://www.postgresql.org) database.
 A generator service is used to generate random records and send them to the receiver.
 
@@ -15,7 +15,8 @@ Grafana has the example dashboard that shows the number of records received and 
 ## Starting the Demo
 
 Run the following command to start the demo:
-```bash 
+
+```bash
 docker-compose up
 ```
 
