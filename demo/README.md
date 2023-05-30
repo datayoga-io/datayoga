@@ -2,6 +2,8 @@
 
 ## Overview
 
+![metrics](screenshot.png)
+
 The demo compose file starts the Datayoga `http.receiver` job configured to write incoming 
 records into a [PostgreSQL](https://www.postgresql.org) database.
 A generator service is used to generate random records and send them to the receiver.
