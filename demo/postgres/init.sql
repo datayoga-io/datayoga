@@ -1,7 +1,7 @@
-create table data
+CREATE TABLE DATA
 (
-    id    bigint not null,
-    fname varchar(60),
-    lname varchar(60),
-    email varchar(120)
+    id    BIGINT NOT NULL,
+    fname VARCHAR(60),
+    lname VARCHAR(60),
+    email VARCHAR(120)
 );
