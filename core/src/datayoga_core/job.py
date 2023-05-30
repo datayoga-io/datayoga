@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
-from datayoga_core import blocks, prom, utils
+from datayoga_core import blocks, prometheus, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
 from datayoga_core.producer import Producer
@@ -127,7 +127,7 @@ class Job:
 
     async def run(self):
         async for records in self.producer.produce():
-            prom.incoming_records.inc(len(records))
+            prometheus.incoming_records.inc(len(records))
 
             logger.debug(f"Retrieved records:\n\t{records}")
             await self.root.process(records)
