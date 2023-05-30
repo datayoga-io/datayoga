@@ -84,12 +84,12 @@ def validate(
 @cli.command(name="run", help="Runs a job", context_settings=CONTEXT_SETTINGS)
 @click.argument("job_name")
 @click.option('--dir', 'directory', help="DataYoga directory", default=".", show_default=True)
-@click.option('--exporter', help="Enables prometheus exporter on specified port", type=int, )
+@click.option('--exporter-port', help="Enables Prometheus exporter on specified port", type=int)
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def run(
     job_name: str,
     directory: str,
-    exporter: Optional[int],
+    exporter_port: Optional[int],
     loglevel: str
 ):
     set_logging_level(loglevel)
@@ -122,9 +122,9 @@ def run(
 
         job = dy.compile(job_settings)
 
-        if exporter:
-            prom.start(exporter)
-            logger.info(f"Prometheus exporter started on port {exporter}")
+        if exporter_port:
+            prom.start(exporter_port)
+            logger.info(f"Prometheus exporter started on port {exporter_port}")
 
         producer = job.producer
         logger.info(f"Producing from {producer.__module__}")
