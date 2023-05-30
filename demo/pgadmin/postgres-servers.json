@@ -5,7 +5,7 @@
       "Group": "Servers",
       "Host": "postgres",
       "Port": 5432,
-      "MaintenanceDB": "mydb",
+      "MaintenanceDB": "demo",
       "Username": "postgres",
       "SSLMode": "prefer",
       "PassFile": "../../pgpass"

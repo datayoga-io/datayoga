@@ -2,6 +2,6 @@ postgresql:
   type: postgresql
   host: postgres
   port: 5432
-  database: mydb
+  database: demo
   user: postgres
   password: datayoga
