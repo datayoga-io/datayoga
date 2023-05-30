@@ -2,36 +2,36 @@
 
 ## Overview
 
-The demo compose file starts the Datayoga `http.receiver` job configured to write incoming records into PostgreSQL database. 
-Generator service is used to generate random records and send them to the receiver.
+The demo compose file starts the Datayoga `http.receiver` job configured to write incoming 
+records into a [PostgreSQL](https://www.postgresql.org) database.
+A generator service is used to generate random records and send them to the receiver.
 
-The demo also starts the exporter, prometheus, and grafana services.
+The demo also starts the exporter, [Prometheus](https://prometheus.io), and [Grafana](https://grafana.com) services.
 
-Grafana have the example dashboard that shows the number of records received and processed by the receiver.
+Grafana has the example dashboard that shows the number of records received and processed by the receiver.
 
-## Start the Demo
+## Starting the Demo
 
 Run the following command to start the demo:
-
 ```bash 
 docker-compose up
 ```
 
 ## Access
 
-### Main services
+### Main Services
 
-* PostgreSQL admin: http://localhost:8082/
-* Grafana dashboard: http://localhost:8084/ Username: `admin@datayoga.io` Password: `datayoga`
+- PostgreSQL admin: http://localhost:8082/
+- Grafana dashboard: http://localhost:8084/ (Username: `admin@datayoga.io` Password: `datayoga`)
 
-### Additional services
+### Additional Services
 
-* Datayoga receiver: http://localhost:8080/
-* Datayoga exporter: http://localhost:8081/
-* Prometheus dashboard: http://localhost:8083/
-* Postgres database: localhost:5432 Username: `postgres` Password: `datayoga`
+- Datayoga receiver: http://localhost:8080/
+- Datayoga exporter: http://localhost:8081/
+- Prometheus dashboard: http://localhost:8083/
+- PostgreSQL database: localhost:5432 (Username: `postgres` Password: `datayoga`)
 
-## Stop the Demo
+## Stopping the Demo
 
 Run the following command to stop the demo:
 
