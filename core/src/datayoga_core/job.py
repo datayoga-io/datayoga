@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
 from xmlrpc.client import boolean
 
 import jsonschema
-from datayoga_core import blocks, utils, prom
+from datayoga_core import blocks, prom, utils
 from datayoga_core.block import Block
 from datayoga_core.context import Context
 from datayoga_core.producer import Producer

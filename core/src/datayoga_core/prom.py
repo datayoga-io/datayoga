@@ -8,4 +8,6 @@ filtered_records = Counter('filtered_records', 'Number of filtered records', ('s
 
 
 def start(port: int):
+    """Starts the prometheus metrics exporter on selected port."""
+
     start_http_server(port)
