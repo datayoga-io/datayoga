@@ -1,0 +1,7 @@
+FROM python:3.11
+
+RUN pip install datayoga[pg,http]
+
+WORKDIR /opt/datayoga
+
+CMD ["datayoga", "run", "receiver", "--exporter-port", "9090"]

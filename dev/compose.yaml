@@ -15,6 +15,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8080:8080"
+      - "9090:9090"
     restart: unless-stopped
     networks:
       - service

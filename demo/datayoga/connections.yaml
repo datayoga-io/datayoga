@@ -1,0 +1,7 @@
+postgresql:
+  type: postgresql
+  host: postgres
+  port: 5432
+  database: demo
+  user: postgres
+  password: datayoga

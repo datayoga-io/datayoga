@@ -1,0 +1,104 @@
+version: "3.9"
+
+services:
+
+  datayoga:
+    platform: linux/amd64
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.datayoga
+    container_name: datayoga
+    ports:
+      - "8080:8080"
+      - "8081:9090"
+    volumes:
+      - ./datayoga/:/opt/datayoga/
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - service
+
+  generator:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.generator
+    container_name: generator
+    volumes:
+      - ./generator/:/opt/generator/
+    networks:
+      - service
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=demo
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=datayoga
+    healthcheck:
+      test: "pg_isready -d postgres -U postgres"
+      interval: 3s
+      timeout: 5s
+      retries: 5
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    networks:
+      - service
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    ports:
+      - "8082:80"
+    volumes:
+      - ./pgadmin/postgres-servers.json:/pgadmin4/servers.json
+      - ./pgadmin/pgpass:/pgadmin4/pgpass
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@datayoga.io
+      - PGADMIN_DEFAULT_PASSWORD=datayoga
+      - PGADMIN_DISABLE_POSTFIX=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="<h4>Please use <code>admin@datayoga.io</code> and <code>datayoga</code> to login.</h4>"
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        cp -f /pgadmin4/pgpass /var/lib/pgadmin/
+        chmod 0600 /var/lib/pgadmin/pgpass
+        exec /entrypoint.sh
+    networks:
+      - service
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "8083:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - service
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "8084:3000"
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin@datayoga.io
+      - GF_SECURITY_ADMIN_PASSWORD=datayoga
+    networks:
+      - service
+
+networks:
+  service:
+    name: service

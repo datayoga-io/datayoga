@@ -1241,6 +1241,21 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "prometheus-client"
+version = "0.16.0"
+description = "Python client for the Prometheus monitoring system."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "prometheus_client-0.16.0-py3-none-any.whl", hash = "sha256:0836af6eb2c8f4fed712b2f279f6c0a8bbab29f9f4aa15276b91c7cb0d1616ab"},
+    {file = "prometheus_client-0.16.0.tar.gz", hash = "sha256:a03e35b359f14dd1630898543e2120addfdeacd1a6069c1367ae90fd93ad3f48"},
+]
+
+[package.extras]
+twisted = ["twisted"]
+
+[[package]]
 name = "psycopg2-binary"
 version = "2.9.5"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
@@ -2115,4 +2130,4 @@ test = ["PyMySQL", "SQLAlchemy", "aiohttp", "cassandra-driver", "fastparquet", "
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "cc46c314c3d26e70c2d3374769679ce7575ad3b18c26e41fb7f5f02657351e1b"
+content-hash = "f0ce94373531d9652ea96a0bdd9e69a5fab53fc6d55328328a640ce6951196ea"
