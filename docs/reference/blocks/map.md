@@ -31,6 +31,18 @@ language: sql
 
 ```
 
+**Example**
+
+```yaml
+expression: >-
+  {"CustomerId": "customer_id", "FirstName": "first_name", "LastName":
+  "last_name", "Company": "company", "Location": {"Street": "address", "City":
+  "city", "State": "state", "Country": "country", "PostalCode": "postal_code"},
+  "Phone": "phone", "Fax": "fax", "Email": "email"}
+language: jmespath
+
+```
+
 <a name="expression"></a>
 ## expression: object,string
 
