@@ -10,6 +10,7 @@ SCHEMA = "hr"
 
 REDIS_PORT = 12554
 
+
 def test_pg_to_redis():
     try:
         postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")

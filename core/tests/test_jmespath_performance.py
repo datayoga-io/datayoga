@@ -32,7 +32,7 @@ def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int
 
     # perform the remainder. e.g. 10 cycles on 4 batch size, add 2 more
     if (cycles % batch_size > 0):
-        results = expr.search_bulk([record]*(cycles%batch_size))
+        results = expr.search_bulk([record]*(cycles % batch_size))
 
     end = time.time()
 
@@ -43,4 +43,4 @@ def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int
     logging.getLogger("dy").disabled = False
     actual_ops_per_sec = cycles/(end-start)
     logging.debug(f"ops per sec: {actual_ops_per_sec}")
-    assert actual_ops_per_sec>expected_ops_per_sec
+    assert actual_ops_per_sec > expected_ops_per_sec

@@ -41,6 +41,7 @@ class ExceptionBlock(Block):
 class EchoBlock(Block):
     def init(self):
         pass
+
     def validate(self):
         return True
 
@@ -62,7 +63,7 @@ async def test_step_continuous_in_order():
     await root.stop()
     assert results_block.run.call_args_list == [mock.call.run([i]) for i in messages]
     assert producer_mock.ack.call_args_list == [mock.call.ack(
-        [i[Block.MSG_ID_FIELD]], [Result(status=Status.SUCCESS,payload=i)]) for i in messages]
+        [i[Block.MSG_ID_FIELD]], [Result(status=Status.SUCCESS, payload=i)]) for i in messages]
 
 
 @pytest.mark.asyncio
@@ -146,6 +147,7 @@ async def test_acks_exception():
     assert producer_mock.ack.call_args_list == [mock.call.ack(
         [i[Block.MSG_ID_FIELD]], [Result(Status.REJECTED, "Error in step A: ValueError()")]) for i in messages]
 
+
 @pytest.mark.asyncio
 async def test_step_buffer_by_size():
     results_block = mock.Mock(wraps=EchoBlock())
@@ -164,10 +166,11 @@ async def test_step_buffer_by_size():
     await root.stop()
     producer_mock.assert_has_calls([
         mock.call.ack(
-            [i[Block.MSG_ID_FIELD]  for i in messages],
+            [i[Block.MSG_ID_FIELD] for i in messages],
             [Result(status=Status.SUCCESS, payload=i) for i in messages]
         )
     ])
+
 
 @pytest.mark.asyncio
 async def test_step_buffer_by_timeout():
