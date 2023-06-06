@@ -22,6 +22,7 @@ def test_stdin_to_stdout(tmpdir):
 
     os.remove(output_file)
 
+
 def test_stdin_to_stdout_filtered(tmpdir):
     tested_data = '{"id": 121, "fname": "joe121", "lname": "allen", "country_code": "US", "country_name": "united states", "gender": "M"}'
     tested_data2 = '{"id": 122, "fname": "shmoe", "lname": "allen", "country_code": "US", "country_name": "united states", "gender": "M"}'
@@ -34,7 +35,7 @@ def test_stdin_to_stdout_filtered(tmpdir):
     result = [json.loads(str(item)) for item in contents.strip().split('\n')]
 
     assert result == [
-        {"id": 121,"full_name": "Joe121 Allen", "country": "US - UNITED STATES", "gender": "M"},
-        {"id": 123,"full_name": "Joe123 Allen", "country": "US - UNITED STATES", "gender": "M"},
+        {"id": 121, "full_name": "Joe121 Allen", "country": "US - UNITED STATES", "gender": "M"},
+        {"id": 123, "full_name": "Joe123 Allen", "country": "US - UNITED STATES", "gender": "M"},
     ]
     os.remove(output_file)

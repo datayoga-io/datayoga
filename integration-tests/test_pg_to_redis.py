@@ -30,23 +30,23 @@ def test_pg_to_redis():
         assert len(redis_client.keys()) == 3
 
         first_employee = redis_client.hgetall("1")
-        assert first_employee== {"id":"1",
-                                "full_name":"John Doe",
-                                "country": "972 - ISRAEL",
-                                "gender": "M"}
+        assert first_employee == {"id": "1",
+                                  "full_name": "John Doe",
+                                  "country": "972 - ISRAEL",
+                                  "gender": "M"}
 
         second_employee = redis_client.hgetall("10")
-        assert second_employee== {"id":"10",
-                                "full_name":"john doe",
-                                "country": "972 - ISRAEL",
-                                "gender": "M"}
+        assert second_employee == {"id": "10",
+                                   "full_name": "john doe",
+                                   "country": "972 - ISRAEL",
+                                   "gender": "M"}
 
         third_employee = redis_client.hgetall("12")
-        assert third_employee== {"id":"12",
-                                "full_name":"steve steve",
-                                "country": "972 - ISRAEL",
-                                "gender": "M",
-                                "address": "main street"}
+        assert third_employee == {"id": "12",
+                                  "full_name": "steve steve",
+                                  "country": "972 - ISRAEL",
+                                  "gender": "M",
+                                  "address": "main street"}
     finally:
         with suppress(Exception):
             redis_container.stop()  # noqa

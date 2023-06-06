@@ -12,8 +12,7 @@ REDIS_PORT = 12554
 
 
 @pytest.fixture(scope="module")
-def
-():
+def prepare_db():
     # pseudo code
     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()
@@ -23,8 +22,9 @@ def
     # cleanup
     redis_container.stop()
 
+
 @pytest.mark.xfail
-def test_redis_read_pending_messages(tmpdir,prepare_db):
+def test_redis_read_pending_messages(tmpdir, prepare_db):
 
     redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
     redis_client.xadd("emp", {"message": json.dumps({"id": 1, "fname": "john", "lname": "doe"})})

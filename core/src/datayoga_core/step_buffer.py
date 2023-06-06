@@ -10,7 +10,7 @@ class StepBuffer(Step):
     def __init__(self, step_id: str, min_buffer_size=4, max_buffer_size=4, flush_ms=1000):
         super().__init__(step_id, None)
         self.min_buffer_size = min_buffer_size
-        self.max_buffer_size = max(max_buffer_size,min_buffer_size)
+        self.max_buffer_size = max(max_buffer_size, min_buffer_size)
         self.buffer = []
         self.flush_ms = flush_ms
         self.timer = None
@@ -50,6 +50,6 @@ class StepBuffer(Step):
                 if self.next_step:
                     # process downstream
                     logging.debug(f"sending to next step")
-                    await self.next_step.process([self.buffer.pop(0) for _ in range(min(len(self.buffer),self.max_buffer_size))])
+                    await self.next_step.process([self.buffer.pop(0) for _ in range(min(len(self.buffer), self.max_buffer_size))])
         finally:
             self.concurrency_lock.release()
