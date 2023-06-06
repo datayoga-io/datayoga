@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-
   datayoga:
     platform: linux/amd64
     build:
@@ -45,7 +44,7 @@ services:
       interval: 3s
       timeout: 5s
       retries: 5
-    command: [ "postgres", "-c", "wal_level=logical" ]
+    command: ["postgres", "-c", "wal_level=logical"]
     networks:
       - service
 
