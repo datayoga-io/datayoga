@@ -13,7 +13,8 @@ REDIS_PORT = 12554
 
 
 @pytest.fixture(scope="module")
-def prepare_db():
+def
+():
     # pseudo code
     redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
     redis_container.start()

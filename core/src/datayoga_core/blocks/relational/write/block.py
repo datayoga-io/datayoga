@@ -12,7 +12,8 @@ from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
 from sqlalchemy.engine import CursorResult
-from sqlalchemy.exc import DatabaseError, OperationalError, PendingRollbackError
+from sqlalchemy.exc import (DatabaseError, OperationalError,
+                            PendingRollbackError)
 from sqlalchemy.sql.expression import ColumnCollection
 
 logger = logging.getLogger("dy")
