@@ -9,7 +9,7 @@ from datayoga_core import expression
                          [(100, 100000, 20),
                           (1000, 100000, 20),
                           (10000, 100000, 20)])
-def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int):
+def test_jmespath_benchmark(batch_size: int, expected_ops_per_sec: int, fields: int):
     """A rough sanity benchmark to test the ballpark figures of the expression language
 
     Args:
