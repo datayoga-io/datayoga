@@ -3,7 +3,6 @@ import logging
 import os
 
 import pytest
-
 from common import redis_utils
 from common.utils import run_job
 
