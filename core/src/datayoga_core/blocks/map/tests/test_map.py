@@ -53,8 +53,7 @@ async def test_map_field_double_nested_expression_jmespath():
 
 @pytest.mark.asyncio
 async def test_map_field_nested_expression_jmespath_object():
-    block = Block(properties={"language": "jmespath",
-                              "expression": {"new_field": "`hello`", "name" : "details.fname"}})
+    block = Block(properties={"language": "jmespath", "expression": {"new_field": "`hello`", "name": "details.fname"}})
     block.init()
     assert await block.run([{"details": {"fname": "john", "lname": "doe"}}]) == utils.all_success([
         {"new_field": "hello", "name": "john"}]
@@ -63,8 +62,8 @@ async def test_map_field_nested_expression_jmespath_object():
 
 @pytest.mark.asyncio
 async def test_map_field_double_nested_expression_jmespath_object():
-    block = Block(properties={"language": "jmespath",
-                              "expression": {"new_field": "`hello`", "name" : "details.name.fname"}})
+    block = Block(properties={"language": "jmespath", "expression": {
+                  "new_field": "`hello`", "name": "details.name.fname"}})
     block.init()
     assert await block.run([{"details": {"name": {"fname": "john", "lname": "doe"}, "country": "israel"}}]) == utils.all_success([
         {"new_field": "hello", "name": "john"}]

@@ -39,7 +39,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             dict_as_list = sum(filter(
                 lambda i: i[1] is not None and not i[0].startswith(Block.INTERNAL_FIELD_PREFIX),
                 record.items()
-            ),())
+            ), ())
             pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
 
         try:

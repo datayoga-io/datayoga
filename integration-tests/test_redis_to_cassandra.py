@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-
 from common import cassandra_utils, redis_utils
 from common.utils import run_job
 
@@ -37,15 +36,18 @@ def prepare_db():
     redis_container.stop()
     cassandra_container.stop()
 
+
 def test_total_records(prepare_db):
     session = cassandra_utils.get_cassandra_session(["localhost"])
     total_employees = session.execute(f"select count(*) as total from {TABLE}").one()
     assert total_employees.total == 3
 
+
 def test_filtered_record(prepare_db):
     session = cassandra_utils.get_cassandra_session(["localhost"])
     first_employee = session.execute(f"select * from {TABLE} where id = 1").one()
     assert first_employee is None
+
 
 def test_records(prepare_db):
     session = cassandra_utils.get_cassandra_session(["localhost"])
@@ -61,4 +63,3 @@ def test_records(prepare_db):
     assert second_employee.country == "972 - ISRAEL"
     assert second_employee.gender == "M"
     assert second_employee.address == "main street"
-

@@ -1,0 +1,54 @@
+name: check-code-formatting
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  formatting-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade autopep8 isort
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install prettier
+        run: npm install --global prettier
+
+      - name: Check Python Import Sorting using isort
+        run: |
+          isort_diff_file="isort_diff.txt"
+          diff=$(find . -name '*.py' -exec isort --check --diff {} + | tee "${isort_diff_file}")
+          if [[ -s "${isort_diff_file}" ]]; then
+              cat "${isort_diff_file}"
+              echo "Import sorting issues found. Please run isort to fix the issues."
+              exit 1
+          fi
+
+      - name: Check Python Formatting using autopep8
+        run: |
+          autopep8_diff_file="autopep8_diff.txt"
+          diff=$(find . -name '*.py' -exec autopep8 --diff --max-line-length 120 --experimental {} + | tee "${autopep8_diff_file}")
+          if [[ -s "${autopep8_diff_file}" ]]; then
+              cat "${autopep8_diff_file}"
+              echo "Formatting issues found. Please run autopep8 to fix the issues."
+              exit 1
+          fi
+
+      - name: Check Other Files Formatting using prettier
+        run: prettier --check --config dev/.prettierrc.json .

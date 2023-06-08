@@ -6,4 +6,4 @@ scrape_configs:
   - job_name: datayoga
     static_configs:
       - targets:
-        - datayoga:9090
+          - datayoga:9090

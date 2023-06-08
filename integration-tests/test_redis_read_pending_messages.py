@@ -3,7 +3,6 @@ import logging
 import os
 
 import pytest
-
 from common import redis_utils
 from common.utils import run_job
 
@@ -23,8 +22,9 @@ def prepare_db():
     # cleanup
     redis_container.stop()
 
+
 @pytest.mark.xfail
-def test_redis_read_pending_messages(tmpdir,prepare_db):
+def test_redis_read_pending_messages(tmpdir, prepare_db):
 
     redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
     redis_client.xadd("emp", {"message": json.dumps({"id": 1, "fname": "john", "lname": "doe"})})

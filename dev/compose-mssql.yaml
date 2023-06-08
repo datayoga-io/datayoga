@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-
   mssql:
     platform: linux/amd64
     image: mcr.microsoft.com/mssql/server:2019-latest

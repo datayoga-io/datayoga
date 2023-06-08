@@ -32,14 +32,15 @@ async def test_filter_sql_multiple():
         ]
     )) == (
         [
-            result.Result(status=result.Status.SUCCESS,payload={"fname": "john", "lname": "doe", "age": 25}),
-            result.Result(status=result.Status.SUCCESS,payload={"fname": "john3", "lname": "doe3", "age": 22})
+            result.Result(status=result.Status.SUCCESS, payload={"fname": "john", "lname": "doe", "age": 25}),
+            result.Result(status=result.Status.SUCCESS, payload={"fname": "john3", "lname": "doe3", "age": 22})
         ],
         [
-            result.Result(status=result.Status.FILTERED,payload={"fname": "john2", "lname": "doe2", "age": 15})
+            result.Result(status=result.Status.FILTERED, payload={"fname": "john2", "lname": "doe2", "age": 15})
         ],
         []
     )
+
 
 @pytest.mark.asyncio
 async def test_filter_jmespath_multiple():
@@ -58,14 +59,15 @@ async def test_filter_jmespath_multiple():
         ]
     )) == (
         [
-            result.Result(status=result.Status.SUCCESS,payload={"fname": "john", "lname": "doe", "age": 25}),
-            result.Result(status=result.Status.SUCCESS,payload={"fname": "john3", "lname": "doe3", "age": 22})
+            result.Result(status=result.Status.SUCCESS, payload={"fname": "john", "lname": "doe", "age": 25}),
+            result.Result(status=result.Status.SUCCESS, payload={"fname": "john3", "lname": "doe3", "age": 22})
         ],
         [
-            result.Result(status=result.Status.FILTERED,payload={"fname": "john2", "lname": "doe2", "age": 15})
+            result.Result(status=result.Status.FILTERED, payload={"fname": "john2", "lname": "doe2", "age": 15})
         ],
         []
     )
+
 
 @pytest.mark.asyncio
 async def test_filter_sql_not():
@@ -76,7 +78,7 @@ async def test_filter_sql_not():
         }
     )
     block.init()
-    assert tuple(await block.run([{"fname": "john", "lname": "doe", "age": 15}])) == ([], [result.Result(status=result.Status.FILTERED,payload={"fname": "john", "lname": "doe", "age": 15})],[])
+    assert tuple(await block.run([{"fname": "john", "lname": "doe", "age": 15}])) == ([], [result.Result(status=result.Status.FILTERED, payload={"fname": "john", "lname": "doe", "age": 15})], [])
 
 
 @pytest.mark.asyncio
@@ -108,15 +110,14 @@ async def test_filter_jmespath_multiple_nested():
         ]
     )) == (
         [
-            result.Result(status=result.Status.SUCCESS,payload={"fname": "john", "lname": "doe", "age": {"years": 25, "months": 5}}),
-            result.Result(status=result.Status.SUCCESS,payload={"fname": "john3", "lname": "doe3", "age": {"years": 22, "months": 2}})
+            result.Result(status=result.Status.SUCCESS, payload={"fname": "john", "lname": "doe", "age": {"years": 25, "months": 5}}),
+            result.Result(status=result.Status.SUCCESS, payload={"fname": "john3", "lname": "doe3", "age": {"years": 22, "months": 2}})
         ],
         [
-            result.Result(status=result.Status.FILTERED,payload={"fname": "john2", "lname": "doe2", "age": {"years": 15, "months": 1}})
+            result.Result(status=result.Status.FILTERED, payload={"fname": "john2", "lname": "doe2", "age": {"years": 15, "months": 1}})
         ],
         []
     )
-
 
 
 @pytest.mark.asyncio
@@ -128,4 +129,4 @@ async def test_filter_jmespath_not():
         }
     )
     block.init()
-    assert tuple(await block.run([{"fname": "john", "lname": "doe", "age": 15}])) == ([], [result.Result(status=result.Status.FILTERED,payload={"fname": "john", "lname": "doe", "age": 15})],[])
+    assert tuple(await block.run([{"fname": "john", "lname": "doe", "age": 15}])) == ([], [result.Result(status=result.Status.FILTERED, payload={"fname": "john", "lname": "doe", "age": 15})], [])

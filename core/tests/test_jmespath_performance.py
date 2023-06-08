@@ -9,7 +9,7 @@ from datayoga_core import expression
                          [(100, 100000, 20),
                           (1000, 100000, 20),
                           (10000, 100000, 20)])
-def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int):
+def test_jmespath_benchmark(batch_size: int, expected_ops_per_sec: int, fields: int):
     """A rough sanity benchmark to test the ballpark figures of the expression language
 
     Args:
@@ -28,11 +28,11 @@ def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int
     record = {f"field{i}": field_value for i in range(fields)}
     for _ in range(cycles//batch_size):
         results = expr.search_bulk([record]*batch_size)
-        assert len(results)==batch_size
+        assert len(results) == batch_size
 
     # perform the remainder. e.g. 10 cycles on 4 batch size, add 2 more
-    if (cycles%batch_size>0):
-        results = expr.search_bulk([record]*(cycles%batch_size))
+    if (cycles % batch_size > 0):
+        results = expr.search_bulk([record]*(cycles % batch_size))
 
     end = time.time()
 
@@ -43,4 +43,4 @@ def test_jmespath_benchmark(batch_size:int, expected_ops_per_sec:int, fields:int
     logging.getLogger("dy").disabled = False
     actual_ops_per_sec = cycles/(end-start)
     logging.debug(f"ops per sec: {actual_ops_per_sec}")
-    assert actual_ops_per_sec>expected_ops_per_sec
+    assert actual_ops_per_sec > expected_ops_per_sec

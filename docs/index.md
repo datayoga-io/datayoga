@@ -82,7 +82,7 @@ steps:
       expression:
         {
           greeting: greeting,
-          details: { id: id, first_name: fname, last_name: lname },
+          details: { id: id, first_name: fname, last_name: lname }
         }
       language: jmespath
   - uses: std.write

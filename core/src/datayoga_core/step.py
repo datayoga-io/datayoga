@@ -73,7 +73,8 @@ class Step:
                     f"filtered entries: {filtered_entries}, processed entries: {processed_entries}, rejected entries: {rejected_entries}")
                 if filtered_entries:
                     # ack the filtered entries
-                    self.done([row.payload[Block.MSG_ID_FIELD] for row in filtered_entries], [Result(Status.FILTERED)] * len(filtered_entries))
+                    self.done([row.payload[Block.MSG_ID_FIELD] for row in filtered_entries],
+                              [Result(Status.FILTERED)] * len(filtered_entries))
 
                 # handle rejected
                 if rejected_entries:
