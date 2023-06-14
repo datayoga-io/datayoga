@@ -56,6 +56,11 @@ jobs:
               "./docs/reference/blocks/${block_package}${doc_name}"
           done
 
+      # applies prettier to the generated markdown
+      - name: Prettier
+        run: |
+          prettier --config -w dev/.prettierrc.json ./docs/reference
+
       - name: Push to repo
         run: |
           git config user.name github-actions
