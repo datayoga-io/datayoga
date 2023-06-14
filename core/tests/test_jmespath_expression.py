@@ -246,3 +246,9 @@ def test_jmespath_filter_tombstone():
 def test_jmespath_json_parse():
     expression.compile("json_parse(data)")
     assert expression.search({"data": """{"greeting": "hello world!"}"""}) == {"greeting": "hello world!"}
+
+
+def test_jmespath_base64_decode():
+    expression.compile("base64_decode(data)")
+    assert expression.search({"data": "SGVsbG8gV29ybGQh"}) == "Hello World!"
+    assert expression.search({"data": "X19kZWJleml1bV91bmF2YWlsYWJsZV92YWx1ZQ=="}) == "__debezium_unavailable_value"

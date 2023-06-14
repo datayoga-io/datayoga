@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import re
 import string
@@ -138,3 +139,8 @@ class JmespathCustomFunctions(functions.Functions):
     def _func_json_parse(self, data: str) -> Any:
         """Returns parsed object from the given json string."""
         return orjson.loads(data)
+
+    @functions.signature({"types": ["string"]})
+    def _func_base64_decode(self, data: str) -> str:
+        """Returns decoded string from the given base64 encoded string."""
+        return base64.b64decode(data).decode()
