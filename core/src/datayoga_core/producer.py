@@ -13,7 +13,7 @@ class Message:
 class Producer(Block):
 
     @abstractmethod
-    def produce(self) -> AsyncGenerator[List[Message], None]:
+    async def produce(self) -> AsyncGenerator[List[Message], None]:
         """Produces data
 
         Returns:
