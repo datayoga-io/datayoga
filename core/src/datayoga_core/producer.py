@@ -17,7 +17,7 @@ class Producer(Block):
         """Produces data
 
         Returns:
-            AsyncGenerator[List[Message], None]: Produced data
+            AsyncGenerator[List[Message], None]: A generator of message batches.
         """
         raise NotImplementedError
 
