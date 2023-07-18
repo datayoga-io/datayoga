@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, AsyncGenerator, Dict, Generator, List
+from typing import Any, AsyncGenerator, Dict, List
 
 from .block import Block
 
@@ -17,7 +17,7 @@ class Producer(Block):
         """Produces data
 
         Returns:
-            Generator[Message]: Produced data
+            AsyncGenerator[List[Message], None]: A generator of message batches.
         """
         raise NotImplementedError
 

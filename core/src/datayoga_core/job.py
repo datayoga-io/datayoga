@@ -9,7 +9,6 @@ from contextlib import suppress
 from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from xmlrpc.client import boolean
 
 import jsonschema
 from datayoga_core import blocks, prometheus, utils
@@ -74,16 +73,17 @@ class Job:
 
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]], deepcopy: boolean = True) -> JobResult:
+    def transform(self, data: List[Dict[str, Any]], deepcopy: bool = True) -> JobResult:
         """
         Transforms data
 
         Args:
-            data (List[Dict[str, Any]]): Data
-            deepcopy: if True, performs a deepcopy before modifying records. otherwise, modifies in place. can affect performance.
+            data (List[Dict[str, Any]]): Data.
+            deepcopy (bool): If set to True, performs a deepcopy before modifying records;
+                             otherwise, it modifies them in place. This can affect performance.
 
         Returns:
-            JobResult: Job result
+            JobResult: Job result.
         """
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
@@ -122,6 +122,50 @@ class Job:
             with suppress(NotImplementedError):
                 # for pyodide. doesn't implement loop.close, ignore
                 loop.close()
+
+        return result
+
+    async def async_transform(self, data: List[Dict[str, Any]], deepcopy: bool = True) -> JobResult:
+        """
+        Transforms data (async version).
+
+        Args:
+            data (List[Dict[str, Any]]): Data.
+            deepcopy (bool): If set to True, performs a deepcopy before modifying records;
+                             otherwise, it modifies them in place. This can affect performance.
+
+        Returns:
+            JobResult: Job result.
+        """
+        if not self.initialized:
+            logger.debug("job has not been initialized yet, initializing...")
+            self.init()
+        # use marshal. faster than deepcopy
+        transformed_data = marshal.loads(marshal.dumps(data)) if deepcopy else data
+
+        result = JobResult()
+
+        for step in self.steps:
+            try:
+                if len(transformed_data) == 0:
+                    # in case all records have been filtered, stop sending
+                    break
+                processed, filtered, rejected = await step.block.run(transformed_data)
+                result.filtered.extend(filtered)
+                result.rejected.extend(rejected)
+                transformed_data = [result.payload for result in processed]
+            except ConnectionError as e:
+                # connection errors are thrown back to the caller to handle
+                raise e
+            except Exception as e:
+                # other exceptions are rejected
+                logger.error(f"Error while transforming data: {e}")
+                result.rejected.extend(
+                    [Result(Status.REJECTED, payload=row, message=f"{e}") for row in transformed_data])
+                return result
+
+        # the processed records are those that make it to the end
+        result.processed = [Result(Status.SUCCESS, payload=row) for row in transformed_data]
 
         return result
 
