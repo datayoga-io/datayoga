@@ -9,7 +9,6 @@ from contextlib import suppress
 from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from xmlrpc.client import boolean
 
 import jsonschema
 from datayoga_core import blocks, prometheus, utils
@@ -74,16 +73,17 @@ class Job:
 
         self.initialized = True
 
-    def transform(self, data: List[Dict[str, Any]], deepcopy: boolean = True) -> JobResult:
+    def transform(self, data: List[Dict[str, Any]], deepcopy: bool = True) -> JobResult:
         """
         Transforms data
 
         Args:
-            data (List[Dict[str, Any]]): Data
-            deepcopy: if True, performs a deepcopy before modifying records. otherwise, modifies in place. can affect performance.
+            data (List[Dict[str, Any]]): Data.
+            deepcopy (bool): If set to True, performs a deepcopy before modifying records;
+                             otherwise, it modifies them in place. This can affect performance.
 
         Returns:
-            JobResult: Job result
+            JobResult: Job result.
         """
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
@@ -125,16 +125,17 @@ class Job:
 
         return result
 
-    async def async_transform(self, data: List[Dict[str, Any]], deepcopy: boolean = True) -> JobResult:
+    async def async_transform(self, data: List[Dict[str, Any]], deepcopy: bool = True) -> JobResult:
         """
-        Transforms data(async version)
+        Transforms data (async version).
 
         Args:
-            data (List[Dict[str, Any]]): Data
-            deepcopy: if True, performs a deepcopy before modifying records. otherwise, modifies in place. can affect performance.
+            data (List[Dict[str, Any]]): Data.
+            deepcopy (bool): If set to True, performs a deepcopy before modifying records;
+                             otherwise, it modifies them in place. This can affect performance.
 
         Returns:
-            JobResult: Job result
+            JobResult: Job result.
         """
         if not self.initialized:
             logger.debug("job has not been initialized yet, initializing...")
