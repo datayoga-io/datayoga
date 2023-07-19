@@ -159,4 +159,11 @@ class JmespathCustomFunctions(functions.Functions):
         if entries is None:
             return None
 
-        return {entry["key"]: entry["value"] for entry in entries}
+        result = {}
+        for entry in entries:
+            if isinstance(entry, dict):
+                key = entry.get("key")
+                if key is not None:
+                    result[key] = entry.get("value")
+
+        return result
