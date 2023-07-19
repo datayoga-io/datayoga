@@ -15,19 +15,19 @@ class JmespathCustomFunctions(functions.Functions):
 
     @functions.signature({"types": ["string", "null"]})
     def _func_capitalize(self, arg):
-        return string.capwords(str(arg)) if arg is not None else None
+        return string.capwords(f"{arg}") if arg is not None else None
 
     @functions.signature({"types": ["array"]})
     def _func_concat(self, elements):
-        return ''.join([str(x) for x in elements])
+        return "".join([f"{x}" for x in elements])
 
     @functions.signature({"types": ["string", "null"]})
     def _func_lower(self, element):
-        return str(element).lower() if element is not None else None
+        return f"{element}".lower() if element is not None else None
 
     @functions.signature({"types": ["string", "null"]})
     def _func_upper(self, element):
-        return str(element).upper() if element is not None else None
+        return f"{element}".upper() if element is not None else None
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["string"]}, {"types": ["string"]})
     def _func_replace(self, element, old_value, new_value):
@@ -36,23 +36,23 @@ class JmespathCustomFunctions(functions.Functions):
 
         # Unexpected behavior when `old_value` is an empty string in Python's builtin replace
         # https://bugs.python.org/issue28029
-        return str(element).replace(old_value, new_value) if old_value != "" else str(element)
+        return f"{element}".replace(old_value, new_value) if old_value != "" else f"{element}"
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["number"]})
     def _func_right(self, element, amount):
-        return str(element)[-amount:] if element is not None else None
+        return f"{element}"[-amount:] if element is not None else None
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["number"]})
     def _func_left(self, element, amount):
-        return str(element)[:amount] if element is not None else None
+        return f"{element}"[:amount] if element is not None else None
 
     @functions.signature({"types": ["string", "null"]}, {"types": ["number"]}, {"types": ["number"]})
     def _func_mid(self, element, offset, amount):
-        return str(element)[offset:offset+amount] if element is not None else None
+        return f"{element}"[offset:offset+amount] if element is not None else None
 
     @functions.signature({"types": ["string", "null"], "variadic": True})
     def _func_split(self, element, delimiter=","):
-        return str(element).split(delimiter) if element is not None else None
+        return f"{element}".split(delimiter) if element is not None else None
 
     @functions.signature()
     def _func_uuid(self):
@@ -144,3 +144,19 @@ class JmespathCustomFunctions(functions.Functions):
     def _func_base64_decode(self, data: str) -> str:
         """Returns decoded string from the given base64 encoded string."""
         return base64.b64decode(data).decode()
+
+    @functions.signature({"types": ["object", "null"]})
+    def _func_to_entries(self, obj):
+        """Takes an object and returns an array of {key: key, value: value}."""
+        if obj is None:
+            return None
+
+        return [{"key": key, "value": value} for key, value in obj.items()]
+
+    @functions.signature({"types": ["array", "null"]})
+    def _func_from_entries(self, entries):
+        """Takes an array of {key: key, value: value} and returns an object."""
+        if entries is None:
+            return None
+
+        return {entry["key"]: entry["value"] for entry in entries}

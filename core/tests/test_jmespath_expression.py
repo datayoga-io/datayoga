@@ -252,3 +252,71 @@ def test_jmespath_base64_decode():
     expression.compile("base64_decode(data)")
     assert expression.search({"data": "SGVsbG8gV29ybGQh"}) == "Hello World!"
     assert expression.search({"data": "X19kZWJleml1bV91bmF2YWlsYWJsZV92YWx1ZQ=="}) == "__debezium_unavailable_value"
+
+
+def test_jmespath_to_entries():
+    """Test the `to_entries` custom function."""
+    expression.compile("to_entries(obj)")
+
+    data = {"name": "John", "age": 30, "city": "New York"}
+    expected_result = [
+        {"key": "name", "value": "John"},
+        {"key": "age", "value": 30},
+        {"key": "city", "value": "New York"},
+    ]
+
+    assert expression.search({"obj": data}) == expected_result
+
+    # Test with an empty object
+    assert expression.search({"obj": {}}) == []
+
+    # Test with a None value
+    assert expression.search({"obj": None}) is None
+
+
+def test_jmespath_from_entries():
+    """Test the `from_entries` custom function."""
+    expression.compile("from_entries(entries)")
+
+    entries = [
+        {"key": "name", "value": "John"},
+        {"key": "age", "value": 30},
+        {"key": "city", "value": "New York"},
+    ]
+
+    expected_result = {"name": "John", "age": 30, "city": "New York"}
+
+    assert expression.search({"entries": entries}) == expected_result
+
+    # Test with an empty array
+    assert expression.search({"entries": []}) == {}
+
+    # Test with a None value
+    assert expression.search({"entries": None}) is None
+
+
+def test_jmespath_remove_null_values_from_entries():
+    """Test the expression to remove null values from entries."""
+    expression.compile("to_entries(@)[?value!=null] | from_entries(@)")
+
+    data = {
+        "name": "John",
+        "age": 30,
+        "city": None,
+        "country": "USA",
+        "email": None,
+    }
+
+    expected_result = {
+        "name": "John",
+        "age": 30,
+        "country": "USA",
+    }
+
+    assert expression.search(data) == expected_result
+
+    # Test with an empty object
+    assert expression.search({}) == {}
+
+    # Test with a None value
+    assert expression.search(None) is None
