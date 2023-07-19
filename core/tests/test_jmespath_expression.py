@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
 from datayoga_core.expression import JMESPathExpression
 
 expression = JMESPathExpression()
@@ -295,22 +296,49 @@ def test_jmespath_from_entries():
     assert expression.search({"entries": None}) is None
 
 
-def test_jmespath_remove_null_values_from_entries():
+@pytest.mark.parametrize("jmespath_expression",
+                         ["to_entries(@)[?value!=null] | from_entries(@)", "filter_entries(@, `value!=null`)"])
+def test_jmespath_remove_null_values_from_entries(jmespath_expression: str):
     """Test the expression to remove null values from entries."""
-    expression.compile("to_entries(@)[?value!=null] | from_entries(@)")
+    expression.compile(jmespath_expression)
 
     data = {
         "name": "John",
         "age": 30,
         "city": None,
         "country": "USA",
-        "email": None,
+        "email": None
     }
 
     expected_result = {
         "name": "John",
         "age": 30,
+        "country": "USA"
+    }
+
+    assert expression.search(data) == expected_result
+
+    # Test with an empty object
+    assert expression.search({}) == {}
+
+    # Test with a None value
+    assert expression.search(None) is None
+
+
+def test_jmespath_filter_entries():
+    expression.compile("filter_entries(@, `key == 'name' || key == 'age'`)")
+    data = {
+        "name": "John",
+        "age": 30,
+        "city": None,
         "country": "USA",
+        "email": None,
+        "score": 15
+    }
+
+    expected_result = {
+        "name": "John",
+        "age": 30
     }
 
     assert expression.search(data) == expected_result

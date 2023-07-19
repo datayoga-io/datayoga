@@ -3,9 +3,10 @@ import hashlib
 import re
 import string
 from datetime import datetime, timezone
-from typing import Any, Iterable, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 from uuid import uuid4
 
+import jmespath
 import orjson
 from jmespath import functions
 
@@ -146,16 +147,32 @@ class JmespathCustomFunctions(functions.Functions):
         return base64.b64decode(data).decode()
 
     @functions.signature({"types": ["object", "null"]})
-    def _func_to_entries(self, obj):
-        """Takes an object and returns an array of {key: key, value: value}."""
+    def _func_to_entries(self, obj: Optional[Dict[str, Any]]) -> Optional[List[Dict[str, Any]]]:
+        """
+        Takes an object and returns an array of {key: key, value: value}.
+
+        Args:
+            obj (Optional[Dict[str, Any]]): The object to convert to entries.
+
+        Returns:
+            Optional[List[Dict[str, Any]]]: The array of {key: key, value: value} entries.
+        """
         if obj is None:
             return None
 
         return [{"key": key, "value": value} for key, value in obj.items()]
 
     @functions.signature({"types": ["array", "null"]})
-    def _func_from_entries(self, entries):
-        """Takes an array of {key: key, value: value} and returns an object."""
+    def _func_from_entries(self, entries: Optional[List[Dict[str, Any]]]) -> Optional[Dict[str, Any]]:
+        """
+        Takes an array of {key: key, value: value} and returns an object.
+
+        Args:
+            entries (Optional[List[Dict[str, Any]]])): The list of entries to convert to an object.
+
+        Returns:
+           Optional[Dict[str, Any]]: The object created from the array of entries.
+        """
         if entries is None:
             return None
 
@@ -167,3 +184,29 @@ class JmespathCustomFunctions(functions.Functions):
                     result[key] = entry.get("value")
 
         return result
+
+    @functions.signature({"types": ["object", "null"]}, {"types": ["string"]})
+    def _func_filter_entries(self, entries: Optional[Dict[str, Any]],
+                             predicate: str) -> Optional[Dict[str, Any]]:
+        """
+        Filters entries based on the given predicate.
+
+        Args:
+            entries (Optional[Dict[str, Any]]): The dictionary (object) of entries to filter.
+            predicate (str): The JMESPath predicate to use for filtering.
+
+        Returns:
+            Optional[Dict[str, Any]]: The filtered dictionary (object) of entries.
+        """
+        if entries is None:
+            return None
+
+        # Compile the predicate expression
+        compiled_predicate = jmespath.compile(predicate)
+
+        # Apply the predicate to filter entries
+        filtered_entries = {
+            key: value for key, value in entries.items() if compiled_predicate.search({"key": key, "value": value})
+        }
+
+        return filtered_entries
