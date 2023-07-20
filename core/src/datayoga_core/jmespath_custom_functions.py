@@ -201,12 +201,19 @@ class JmespathCustomFunctions(functions.Functions):
         if entries is None:
             return None
 
+        # Register custom functions
+        jmespath_options = jmespath.Options(custom_functions=JmespathCustomFunctions())
+
         # Compile the predicate expression
         compiled_predicate = jmespath.compile(predicate)
 
         # Apply the predicate to filter entries
-        filtered_entries = {
-            key: value for key, value in entries.items() if compiled_predicate.search({"key": key, "value": value})
-        }
+        filtered_entries = {}
+        for key, value in entries.items():
+            try:
+                if compiled_predicate.search({"key": key, "value": value}, options=jmespath_options):
+                    filtered_entries[key] = value
+            except Exception:
+                pass
 
         return filtered_entries

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 
 import pytest
 from datayoga_core.expression import JMESPathExpression
@@ -325,20 +326,21 @@ def test_jmespath_remove_null_values_from_entries(jmespath_expression: str):
     assert expression.search(None) is None
 
 
-def test_jmespath_filter_entries():
-    expression.compile("filter_entries(@, `key == 'name' || key == 'age'`)")
+@pytest.mark.parametrize("jmespath_expression, expected_result", [
+    ("filter_entries(@, `key == 'name' || key == 'age'`)", {"name": "John", "age": 30}),
+    ("filter_entries(@, `in(value, \\`[15, 30]\\`)`)", {"age": 30, "score": 15}),
+    ("filter_entries(@, `value > \\`20\\``)", {"age": 30}),
+    ("filter_entries(@, `starts_with(key, \\`country\\`)`)", {"country_code": 1, "country": "USA"})
+])
+def test_jmespath_filter_entries(jmespath_expression: str, expected_result: Dict[str, Any]):
+    expression.compile(jmespath_expression)
     data = {
         "name": "John",
         "age": 30,
-        "city": None,
+        "country_code": 1,
         "country": "USA",
         "email": None,
         "score": 15
-    }
-
-    expected_result = {
-        "name": "John",
-        "age": 30
     }
 
     assert expression.search(data) == expected_result
