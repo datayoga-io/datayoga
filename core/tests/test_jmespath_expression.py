@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 
+import pytest
 from datayoga_core.expression import JMESPathExpression
 
 expression = JMESPathExpression()
@@ -252,3 +254,99 @@ def test_jmespath_base64_decode():
     expression.compile("base64_decode(data)")
     assert expression.search({"data": "SGVsbG8gV29ybGQh"}) == "Hello World!"
     assert expression.search({"data": "X19kZWJleml1bV91bmF2YWlsYWJsZV92YWx1ZQ=="}) == "__debezium_unavailable_value"
+
+
+def test_jmespath_to_entries():
+    """Test the `to_entries` custom function."""
+    expression.compile("to_entries(obj)")
+
+    data = {"name": "John", "age": 30, "city": "New York"}
+    expected_result = [
+        {"key": "name", "value": "John"},
+        {"key": "age", "value": 30},
+        {"key": "city", "value": "New York"},
+    ]
+
+    assert expression.search({"obj": data}) == expected_result
+
+    # Test with an empty object
+    assert expression.search({"obj": {}}) == []
+
+    # Test with a None value
+    assert expression.search({"obj": None}) is None
+
+
+def test_jmespath_from_entries():
+    """Test the `from_entries` custom function."""
+    expression.compile("from_entries(entries)")
+
+    entries = [
+        {"key": "name", "value": "John"},
+        {"key": "age", "value": 30},
+        {"key": "city", "value": "New York"},
+    ]
+
+    expected_result = {"name": "John", "age": 30, "city": "New York"}
+
+    assert expression.search({"entries": entries}) == expected_result
+
+    # Test with an empty array
+    assert expression.search({"entries": []}) == {}
+
+    # Test with a None value
+    assert expression.search({"entries": None}) is None
+
+
+@pytest.mark.parametrize("jmespath_expression",
+                         ["to_entries(@)[?value!=null] | from_entries(@)", "filter_entries(@, `value!=null`)"])
+def test_jmespath_remove_null_values_from_entries(jmespath_expression: str):
+    """Test the expression to remove null values from entries."""
+    expression.compile(jmespath_expression)
+
+    data = {
+        "name": "John",
+        "age": 30,
+        "city": None,
+        "country": "USA",
+        "email": None
+    }
+
+    expected_result = {
+        "name": "John",
+        "age": 30,
+        "country": "USA"
+    }
+
+    assert expression.search(data) == expected_result
+
+    # Test with an empty object
+    assert expression.search({}) == {}
+
+    # Test with a None value
+    assert expression.search(None) is None
+
+
+@pytest.mark.parametrize("jmespath_expression, expected_result", [
+    ("filter_entries(@, `key == 'name' || key == 'age'`)", {"name": "John", "age": 30}),
+    ("filter_entries(@, `in(value, \\`[15, 30]\\`)`)", {"age": 30, "score": 15}),
+    ("filter_entries(@, `value > \\`20\\``)", {"age": 30}),
+    ("filter_entries(@, `starts_with(key, \\`country\\`)`)", {"country_code": 1, "country": "USA"})
+])
+def test_jmespath_filter_entries(jmespath_expression: str, expected_result: Dict[str, Any]):
+    expression.compile(jmespath_expression)
+    data = {
+        "name": "John",
+        "age": 30,
+        "country_code": 1,
+        "country": "USA",
+        "email": None,
+        "score": 15
+    }
+
+    assert expression.search(data) == expected_result
+
+    # Test with an empty object
+    assert expression.search({}) == {}
+
+    # Test with a None value
+    assert expression.search(None) is None
