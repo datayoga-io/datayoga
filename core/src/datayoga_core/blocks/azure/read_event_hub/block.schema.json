@@ -1,0 +1,39 @@
+{
+  "title": "azure.read_event_hub",
+  "description": "Read from Azure Event Hub",
+  "type": "object",
+  "properties": {
+    "event_hub_connection_string": {
+      "type": "string",
+      "description": "The connection string for the Azure Event Hub namespace."
+    },
+    "event_hub_consumer_group_name": {
+      "type": "string",
+      "description": "The name of the consumer group to read events from."
+    },
+    "event_hub_name": {
+      "type": "string",
+      "description": "The name of the Azure Event Hub."
+    },
+    "checkpoint_store_connection_string": {
+      "type": "string",
+      "description": "The connection string for the Azure Storage account used as the checkpoint store."
+    },
+    "checkpoint_store_container_name": {
+      "type": "string",
+      "description": "The name of the container within the checkpoint store to store the checkpoints."
+    },
+    "batch_size": {
+      "type": "integer",
+      "description": "The maximum number of events to receive in each batch.",
+      "default": 300
+    }
+  },
+  "required": [
+    "event_hub_connection_string",
+    "event_hub_consumer_group_name",
+    "event_hub_name",
+    "checkpoint_store_connection_string",
+    "checkpoint_store_container_name"
+  ]
+}

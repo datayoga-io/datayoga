@@ -17,7 +17,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-certifi = "^2023.7.22"
+certifi = "^2022.12.7"
 pysqlite3-binary = { version = "^0.4.0", platform = "linux" }
 cryptography = ">=39.0.1"
 jmespath = "^1.0.0"
@@ -35,6 +35,9 @@ pytest-timeout = { version = "^2.1.0", optional = true }
 requests-mock = { version = "^1.9.3", optional = true }
 testcontainers = { version = "^3.7.0", optional = true }
 
+azure-eventhub = { version = "^5.11.2", optional= true }
+azure-eventhub-aio = { version = "^5.11.2", optional = true }
+azure-eventhub-checkpointstoreblob-aio = { version = "^1.1.4", optional = true }
 aiohttp = { version = "^3.8.4", optional = true }
 cassandra-driver = { version = "^3.25.0", optional = true }
 fastparquet = { version = "^2023.2.0", optional = true, platform = "python>=3.8" }
