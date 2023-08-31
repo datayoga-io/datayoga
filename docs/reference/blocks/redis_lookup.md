@@ -16,7 +16,7 @@ Write to a Redis data structure
 |**command**<br/>(Redis command)|`string`|Redis command<br/>Default: `"GET"`<br/>Enum: `"GET"`, `"HGETALL"`, `"SMEMBERS"`, `"ZRANGEBYSCORE"`, `"LRANGE"`, `"JSON.GET"`<br/>|no|
 |[**key**](#key)|`object`|Field to use as the Redis key<br/>|yes|
 |**field**<br/>(Target field)|`string`|The field to write the result to<br/>|yes|
-|**reject\_on\_error**|`bool`|Should reject a record on error or not in case if the key is of a different type<br/>Default: `true`<br/>|no|
+|**reject\_on\_error**|`boolean`|Should reject a record on error or not in case if the key is of a different type<br/>Default: `true`<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
