@@ -37,6 +37,7 @@ def test_redis_lookup():
         string_key = redis_client.get("list_key")
         assert string_key == "xxx"
 
+
         assert len(redis_client.keys()) == 11
     finally:
         redis_container.stop()
