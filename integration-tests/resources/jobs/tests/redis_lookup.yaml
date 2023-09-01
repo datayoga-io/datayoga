@@ -15,7 +15,7 @@ steps:
   - uses: redis.write
     with:
       connection: cache
-      command: SET
+      command: HSET
       key:
         expression: id
         language: jmespath

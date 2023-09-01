@@ -17,25 +17,25 @@ def test_redis_lookup():
         redis_client.zadd("sorted_set_key", mapping={"tv0": "10", "tv1": "20"})
         redis_client.lpush("list_key", "tv0", "tv1", "tv2")
 
-        run_job("tests.redis_lookup_string")
+        run_job("tests.redis_lookup")
 
-        string_key = redis_client.get("not_exist_key")
-        assert string_key == "xxx"
+        not_exist_val = redis_client.get("0")
+        assert not_exist_val["obj"] == "None"
 
-        string_key = redis_client.get("string_key")
-        assert string_key == "xxx"
+        string_val = redis_client.get("1")
+        assert string_val["obj"] == "test_string"
 
-        string_key = redis_client.get("hash_key")
-        assert string_key == "xxx"
+        hash_val = redis_client.get("2")
+        assert hash_val["obj"] == "{'tf0': 'tv0', 'tf1': 'tv1'}"
 
-        string_key = redis_client.get("set_key")
-        assert string_key == "xxx"
+        set_val = redis_client.get("3")
+        assert set_val["obj"] == "{'tv2', 'tv0', 'tv1'}"
 
-        string_key = redis_client.get("sorted_set_key")
-        assert string_key == "xxx"
+        sorted_set_val = redis_client.get("4")
+        assert sorted_set_val["obj"] == "[('tv0', 10.0), ('tv1', 20.0)]"
 
-        string_key = redis_client.get("list_key")
-        assert string_key == "xxx"
+        list_val = redis_client.get("5")
+        assert list_val["obj"] == "['tv0', 'tv1', 'tv2']"
 
         assert len(redis_client.keys()) == 11
     finally:

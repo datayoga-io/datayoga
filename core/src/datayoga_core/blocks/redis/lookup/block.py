@@ -22,14 +22,14 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.redis_client = redis_utils.get_client(
             connection.get("host"),
             connection.get("port"),
-            connection.get("password"))
+            connection.get("password")
+        )
 
-        self.command = self.properties.get("command", "GET")
         self.field = self.properties.get("field")
         self.reject_on_error = self.properties.get("reject_on_error", False)
 
-        key = self.properties["key"]
-        self.key_expression = expression.compile(key["language"], key["expression"])
+        cmd = self.properties["command"]
+        self.cmd_expressions = [expression.compile(cmd["language"], c) for c in cmd["elements"]]
 
         logger.info(f"Using Redis connection '{self.properties.get('connection')}'")
 
@@ -38,22 +38,11 @@ class Block(DyBlock, metaclass=ABCMeta):
         block_result = BlockResult()
 
         for record in data:
-            key = self.key_expression.search(record)
+            cmd = []
+            for e in (c.search(record) for c in self.cmd_expressions):
+                cmd.extend(e if isinstance(e, list) else [e])
 
-            if self.command == 'GET':
-                pipeline.get(key)
-            elif self.command == 'HGETALL':
-                pipeline.hgetall(key)
-            elif self.command == 'SMEMBERS':
-                pipeline.smembers(key)
-            elif self.command == 'ZRANGEBYSCORE':
-                pipeline.zrangebyscore(key, "-inf", "+inf", withscores=True)
-            elif self.command == 'LRANGE':
-                pipeline.lrange(key, 0, -1)
-            elif self.command == 'JSON.GET':
-                pipeline.execute_command("JSON.GET", key)
-            else:
-                raise ValueError("Invalid command")
+            pipeline.execute_command(*cmd)
 
         try:
             results = pipeline.execute(raise_on_error=False)
