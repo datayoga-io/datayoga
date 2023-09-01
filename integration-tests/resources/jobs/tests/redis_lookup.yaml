@@ -2,16 +2,25 @@ input:
   uses: files.read_csv
   with:
     file: lookup.csv
-    batch_size: 3
+    batch_size: 1
 steps:
   - uses: redis.lookup
     with:
       connection: cache
-      command: GET
-      key:
+      command:
+        elements:
+          - json_parse(cmd1)
+          - lfield
+          - json_parse(cmd2)
         language: jmespath
-        expression: lfield
       field: obj
+  - uses: map
+    with:
+      expression:
+        id: id
+        lfield: lfield
+        obj: concat([obj])
+      language: jmespath
   - uses: redis.write
     with:
       connection: cache
