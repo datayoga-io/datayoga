@@ -10,7 +10,7 @@ REDIS_PORT = 12554
     [("tests.redis_lookup_string", "0", "None"),
      ("tests.redis_lookup_string", "1", "test_string"),
      ("tests.redis_lookup_hash", "2", "{'tf0': 'tv0', 'tf1': 'tv1'}"),
-     ("tests.redis_lookup_set", "3", "{'tf0'}"),
+     ("tests.redis_lookup_set", "3", "{'tv0'}"),
      ("tests.redis_lookup_sorted_set", "4", "['tv0', '10', 'tv1', '20']"),
      ("tests.redis_lookup_list", "5", "['tv2', 'tv1', 'tv0']")])
 def test_redis_lookup(configuration, key, expected):
