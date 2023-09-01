@@ -29,7 +29,9 @@ def test_redis_lookup():
         assert hash_val["obj"] == "{'tf0': 'tv0', 'tf1': 'tv1'}"
 
         set_val = redis_client.hgetall("3")
-        assert set_val["obj"] == "{'tv2', 'tv0', 'tv1'}"
+        assert "tv0" in set_val["obj"]
+        assert "tv1" in set_val["obj"]
+        assert "tv2" in set_val["obj"]
 
         sorted_set_val = redis_client.hgetall("4")
         assert sorted_set_val["obj"] == "[('tv0', 10.0), ('tv1', 20.0)]"
