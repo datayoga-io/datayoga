@@ -7,10 +7,9 @@ steps:
   - uses: redis.lookup
     with:
       connection: cache
-      cmd: cmd
+      cmd: GET
       args:
         - lfield
-        - json_parse(args)
       language: jmespath
       field: obj
   - uses: map

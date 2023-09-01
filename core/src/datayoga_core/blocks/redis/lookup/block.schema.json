@@ -6,7 +6,7 @@
     "connection": { "title": "Connection name", "type": "string" },
     "cmd": {
       "title": "Redis command",
-      "description": "The expression produces the command to execute",
+      "description": "The command to execute",
       "type": "string"
     },
     "args": {

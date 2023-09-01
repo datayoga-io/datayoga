@@ -28,8 +28,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.field = self.properties.get("field")
         self.reject_on_error = self.properties.get("reject_on_error", False)
 
-        cmd = self.properties["cmd"]
-        self.cmd_expression = expression.compile(self.properties["language"], self.properties["cmd"])
+        self.cmd = self.properties["cmd"]
 
         args = self.properties["args"]
         self.args_expressions = [expression.compile(self.properties["language"], c) for c in args]
@@ -41,7 +40,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         block_result = BlockResult()
 
         for record in data:
-            params = [self.cmd_expression.search(record)]
+            params = [self.cmd]
             for e in (c.search(record) for c in self.args_expressions):
                 params.extend(e if isinstance(e, list) else [e])
 

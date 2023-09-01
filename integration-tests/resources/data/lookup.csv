@@ -1,7 +1,7 @@
-id,lfield,cmd,args
-0,not_exist_key,GET,[]
-1,string_key,GET,[]
-2,hash_key,HGETALL,[]
-3,set_key,SMEMBERS,[]
-4,sorted_set_key,ZRANGEBYSCORE,"[""-inf"", ""+inf"", ""WITHSCORES""]"
-5,list_key,LRANGE,"[0, -1]"
+id,lfield
+0,not_exist_key
+1,string_key
+2,hash_key
+3,set_key
+4,sorted_set_key
+5,list_key
