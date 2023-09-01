@@ -35,5 +35,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["connection", "cmd", "args", "language","field"]
+  "required": ["connection", "cmd", "args", "language", "field"]
 }
