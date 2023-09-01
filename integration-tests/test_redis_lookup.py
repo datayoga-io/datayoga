@@ -19,22 +19,22 @@ def test_redis_lookup():
 
         run_job("tests.redis_lookup")
 
-        not_exist_val = redis_client.get("0")
+        not_exist_val = redis_client.hgetall("0")
         assert not_exist_val["obj"] == "None"
 
-        string_val = redis_client.get("1")
+        string_val = redis_client.hgetall("1")
         assert string_val["obj"] == "test_string"
 
-        hash_val = redis_client.get("2")
+        hash_val = redis_client.hgetall("2")
         assert hash_val["obj"] == "{'tf0': 'tv0', 'tf1': 'tv1'}"
 
-        set_val = redis_client.get("3")
+        set_val = redis_client.hgetall("3")
         assert set_val["obj"] == "{'tv2', 'tv0', 'tv1'}"
 
-        sorted_set_val = redis_client.get("4")
+        sorted_set_val = redis_client.hgetall("4")
         assert sorted_set_val["obj"] == "[('tv0', 10.0), ('tv1', 20.0)]"
 
-        list_val = redis_client.get("5")
+        list_val = redis_client.hgetall("5")
         assert list_val["obj"] == "['tv0', 'tv1', 'tv2']"
 
         assert len(redis_client.keys()) == 11
