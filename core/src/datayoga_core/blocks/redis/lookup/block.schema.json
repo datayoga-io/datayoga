@@ -4,25 +4,23 @@
   "type": "object",
   "properties": {
     "connection": { "title": "Connection name", "type": "string" },
-    "command": {
+    "cmd": {
       "title": "Redis command",
-      "description": "Redis command expressions",
-      "type": "object",
-      "properties": {
-        "elements": {
-          "description": "The list of command's elements",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "language": {
-          "description": "Language",
-          "type": "string",
-          "enum": ["jmespath", "sql"]
-        }
-      },
-      "required": ["elements", "language"]
+      "description": "The expression produces the command to execute",
+      "type": "string"
+    },
+    "args": {
+      "title": "Redis command arguments",
+      "description": "The list of expressions produces arguments",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "enum": ["jmespath", "sql"]
     },
     "field": {
       "type": "string",
@@ -37,5 +35,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["connection", "command", "field"]
+  "required": ["connection", "cmd", "args", "language","field"]
 }

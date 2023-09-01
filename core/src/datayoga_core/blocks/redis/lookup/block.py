@@ -28,8 +28,11 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.field = self.properties.get("field")
         self.reject_on_error = self.properties.get("reject_on_error", False)
 
-        cmd = self.properties["command"]
-        self.cmd_expressions = [expression.compile(cmd["language"], c) for c in cmd["elements"]]
+        cmd = self.properties["cmd"]
+        self.cmd_expression = expression.compile(self.properties["language"], self.properties["cmd"])
+
+        args = self.properties["args"]
+        self.args_expressions = [expression.compile(self.properties["language"], c) for c in args]
 
         logger.info(f"Using Redis connection '{self.properties.get('connection')}'")
 
@@ -38,11 +41,11 @@ class Block(DyBlock, metaclass=ABCMeta):
         block_result = BlockResult()
 
         for record in data:
-            cmd = []
-            for e in (c.search(record) for c in self.cmd_expressions):
-                cmd.extend(e if isinstance(e, list) else [e])
+            params = [self.cmd_expression.search(record)]
+            for e in (c.search(record) for c in self.args_expressions):
+                params.extend(e if isinstance(e, list) else [e])
 
-            pipeline.execute_command(*cmd)
+            pipeline.execute_command(*params)
 
         try:
             results = pipeline.execute(raise_on_error=False)
