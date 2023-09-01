@@ -13,7 +13,7 @@ Write to a Redis data structure
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**connection**<br/>(Connection name)|`string`||yes|
-|**cmd**<br/>(Redis command)|`string`|The expression produces the command to execute<br/>|yes|
+|**cmd**<br/>(Redis command)|`string`|The command to execute<br/>|yes|
 |[**args**](#args)<br/>(Redis command arguments)|`string[]`|The list of expressions produces arguments<br/>|yes|
 |**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 |**field**<br/>(Target field)|`string`|The field to write the result to<br/>|yes|
