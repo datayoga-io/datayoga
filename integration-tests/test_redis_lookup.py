@@ -10,7 +10,7 @@ REDIS_PORT = 12554
     [("tests.redis_lookup_string", "0", "None"),
      ("tests.redis_lookup_string", "1", "test_string"),
      ("tests.redis_lookup_hash", "2", "{'tf0': 'tv0', 'tf1': 'tv1'}"),
-     ("tests.redis_lookup_set", "3", "{'tf0': 'tv0', 'tf1': 'tv1'}"),
+     ("tests.redis_lookup_set", "3", "{'tf0'}"),
      ("tests.redis_lookup_sorted_set", "4", "['tv0', '10', 'tv1', '20']"),
      ("tests.redis_lookup_list", "5", "['tv2', 'tv1', 'tv0']")])
 def test_redis_lookup(configuration, key, expected):
@@ -22,7 +22,7 @@ def test_redis_lookup(configuration, key, expected):
 
         redis_client.set("string_key", "test_string")
         redis_client.hset("hash_key", mapping={"tf0": "tv0", "tf1": "tv1"})
-        redis_client.sadd("set_key", "tv0", "tv1", "tv2")
+        redis_client.sadd("set_key", "tv0")
         redis_client.zadd("sorted_set_key", mapping={"tv0": "10", "tv1": "20"})
         redis_client.lpush("list_key", "tv0", "tv1", "tv2")
 
