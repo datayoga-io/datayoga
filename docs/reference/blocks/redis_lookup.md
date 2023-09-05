@@ -5,7 +5,7 @@ grand_parent: Reference
 
 # redis\.lookup
 
-Lookup data from redis by given command and key
+Lookup data from Redis using the given command and key
 
 
 **Properties**
