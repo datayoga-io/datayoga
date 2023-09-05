@@ -19,6 +19,7 @@ class Block(DyProducer):
         self.redis_client = redis_utils.get_client(
             connection.get("host"),
             connection.get("port"),
+            connection.get("username"),
             connection.get("password"))
 
         self.stream = self.properties["stream_name"]

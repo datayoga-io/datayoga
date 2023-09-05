@@ -22,14 +22,13 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.redis_client = redis_utils.get_client(
             connection.get("host"),
             connection.get("port"),
+            connection.get("username"),
             connection.get("password")
         )
 
         self.field = self.properties.get("field")
-        self.reject_on_error = self.properties.get("reject_on_error", False)
 
         self.cmd = self.properties["cmd"]
-
         args = self.properties["args"]
         self.args_expressions = [expression.compile(self.properties["language"], c) for c in args]
 
@@ -41,21 +40,19 @@ class Block(DyBlock, metaclass=ABCMeta):
 
         for record in data:
             params = [self.cmd]
-            for e in (c.search(record) for c in self.args_expressions):
-                params.extend(e if isinstance(e, list) else [e])
+            for expr in (c.search(record) for c in self.args_expressions):
+                params.extend(expr if isinstance(expr, list) else [expr])
 
             pipeline.execute_command(*params)
 
         try:
             results = pipeline.execute(raise_on_error=False)
             for record, result in zip(data, results):
-                exc = isinstance(result, Exception)
-                if exc and self.reject_on_error:
+                if isinstance(result, Exception):
                     block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
                 else:
-                    record[self.field] = None if exc else result
                     block_result.processed.append(Result(Status.SUCCESS, payload=record))
-        except redis.exceptions.ConnectionError as e:
-            raise ConnectionError(e)
+        except redis.exceptions.ConnectionError as expr:
+            raise ConnectionError(expr)
 
         return block_result

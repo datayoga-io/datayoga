@@ -1,6 +1,6 @@
 {
-  "title": "redis.write",
-  "description": "Write to a Redis data structure",
+  "title": "redis.lookup",
+  "description": "Lookup data from redis by given command and key",
   "type": "object",
   "properties": {
     "connection": { "title": "Connection name", "type": "string" },
@@ -26,12 +26,6 @@
       "type": "string",
       "title": "Target field",
       "description": "The field to write the result to"
-    },
-    "reject_on_error": {
-      "type": "boolean",
-      "default": false,
-      "title": "Reject on error",
-      "description": "Should reject a record on error or not in case if the key is of a different type"
     }
   },
   "additionalProperties": false,
