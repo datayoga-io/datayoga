@@ -13,8 +13,8 @@
       "minimum": 1,
       "maximum": 65535
     },
-    "username": {
-      "description": "Redis DB username",
+    "user": {
+      "description": "Redis DB user",
       "type": "string"
     },
     "password": {
@@ -25,7 +25,7 @@
   "additionalProperties": false,
   "required": ["type", "host", "port"],
   "dependentSchemas": {
-    "username": {
+    "user": {
       "required": ["password"]
     }
   },

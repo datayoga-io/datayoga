@@ -22,7 +22,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.redis_client = redis_utils.get_client(
             connection.get("host"),
             connection.get("port"),
-            connection.get("username"),
+            connection.get("user"),
             connection.get("password"))
 
         self.command = self.properties.get("command", "HSET")
