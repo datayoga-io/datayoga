@@ -1,15 +1,13 @@
 from common import redis_utils
 from common.utils import run_job
 
-REDIS_PORT = 12554
-
 
 def test_csv_to_redis():
-    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+    redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
     redis_container.start()
     run_job("tests.csv_to_redis")
 
-    redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
+    redis_client = redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT)
 
     assert len(redis_client.keys()) == 3
 

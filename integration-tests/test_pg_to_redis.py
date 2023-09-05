@@ -8,15 +8,13 @@ logger = logging.getLogger("dy")
 
 SCHEMA = "hr"
 
-REDIS_PORT = 12554
-
 
 def test_pg_to_redis():
     try:
         postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
         postgres_container.start()
 
-        redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
         engine = db_utils.get_engine(postgres_container)
@@ -26,7 +24,7 @@ def test_pg_to_redis():
 
         run_job("tests.pg_to_redis")
 
-        redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
+        redis_client = redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT)
 
         assert len(redis_client.keys()) == 3
 

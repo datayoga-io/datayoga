@@ -6,7 +6,7 @@ from common.utils import run_job
 
 logger = logging.getLogger("dy")
 
-REDIS_PORT = 12554
+
 KEYSPACE = "hr"
 TABLE = f"{KEYSPACE}.emp"
 
@@ -14,10 +14,10 @@ TABLE = f"{KEYSPACE}.emp"
 @pytest.fixture(scope="module")
 def prepare_db():
     # pseudo code
-    redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+    redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
     redis_container.start()
 
-    redis_client = redis_utils.get_redis_client("localhost", REDIS_PORT)
+    redis_client = redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT)
     redis_utils.add_to_emp_stream(redis_client)
 
     cassandra_container = cassandra_utils.get_cassandra_container()
