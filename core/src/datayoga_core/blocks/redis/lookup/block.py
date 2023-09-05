@@ -51,6 +51,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 if isinstance(result, Exception):
                     block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
                 else:
+                    record[self.field] = result
                     block_result.processed.append(Result(Status.SUCCESS, payload=record))
         except redis.exceptions.ConnectionError as expr:
             raise ConnectionError(expr)
