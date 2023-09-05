@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - service
+
+networks:
+  service:
+    external: true

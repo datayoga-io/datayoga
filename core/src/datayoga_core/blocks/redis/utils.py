@@ -4,11 +4,12 @@ import redis
 from redis import Redis
 
 
-def get_client(host: str, port: int, password: Optional[str] = None) -> Redis:
+def get_client(host: str, port: int, user: Optional[str] = None, password: Optional[str] = None) -> Redis:
     try:
         client = redis.Redis(
             host=host,
             port=port,
+            username=user,
             password=password,
             decode_responses=True,
             client_name="datayoga"

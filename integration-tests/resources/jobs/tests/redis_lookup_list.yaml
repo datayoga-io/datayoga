@@ -1,0 +1,30 @@
+input:
+  uses: files.read_csv
+  with:
+    file: lookup.csv
+    batch_size: 3
+steps:
+  - uses: redis.lookup
+    with:
+      connection: cache
+      cmd: LRANGE
+      args:
+        - lfield
+        - "`0`"
+        - "`-1`"
+      language: jmespath
+      field: obj
+  - uses: map
+    with:
+      expression:
+        id: id
+        lfield: lfield
+        obj: concat([obj])
+      language: jmespath
+  - uses: redis.write
+    with:
+      connection: cache
+      command: HSET
+      key:
+        expression: id
+        language: jmespath

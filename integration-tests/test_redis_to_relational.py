@@ -8,20 +8,18 @@ from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
 
-REDIS_PORT = 12554
-
 
 def test_redis_to_mysql():
     try:
         schema_name = "hr"
 
-        redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
         mysql_container = db_utils.get_mysql_container("root", "hr", "my_user", "my_pass")
         mysql_container.start()
 
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
         engine = db_utils.get_engine(mysql_container)
         db_utils.create_schema(engine, schema_name)
@@ -40,10 +38,10 @@ def test_redis_to_pg():
     try:
         schema_name = "hr"
 
-        redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
         postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
         postgres_container.start()
@@ -65,10 +63,10 @@ def test_redis_to_oracle():
     try:
         schema_name = "hr"
 
-        redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
         oracle_container = db_utils.get_oracle_container()
         oracle_container.start()
@@ -95,10 +93,10 @@ def test_redis_to_sqlserver():
     try:
         schema_name = "dbo"
 
-        redis_container = redis_utils.get_redis_oss_container(REDIS_PORT)
+        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", REDIS_PORT))
+        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
         sqlserver_container = db_utils.get_sqlserver_container("tempdb", "sa")
         sqlserver_container.start()

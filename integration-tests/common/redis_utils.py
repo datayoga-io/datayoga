@@ -5,6 +5,8 @@ import redis
 from redis import Redis
 from testcontainers.redis import RedisContainer
 
+REDIS_PORT = 12554
+
 
 def get_redis_client(host: str, port: int, password: Optional[str] = None) -> Redis:
     try:

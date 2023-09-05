@@ -1,0 +1,33 @@
+{
+  "title": "redis.lookup",
+  "description": "Lookup data from Redis using the given command and key",
+  "type": "object",
+  "properties": {
+    "connection": { "title": "Connection name", "type": "string" },
+    "cmd": {
+      "title": "Redis command",
+      "description": "The command to execute",
+      "type": "string"
+    },
+    "args": {
+      "title": "Redis command arguments",
+      "description": "The list of expressions produces arguments",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "language": {
+      "description": "Language",
+      "type": "string",
+      "enum": ["jmespath", "sql"]
+    },
+    "field": {
+      "type": "string",
+      "title": "Target field",
+      "description": "The field to write the result to"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["connection", "cmd", "args", "language", "field"]
+}

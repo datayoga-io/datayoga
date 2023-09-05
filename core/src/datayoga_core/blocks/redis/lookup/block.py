@@ -23,25 +23,27 @@ class Block(DyBlock, metaclass=ABCMeta):
             connection.get("host"),
             connection.get("port"),
             connection.get("user"),
-            connection.get("password"))
+            connection.get("password")
+        )
 
-        self.command = self.properties.get("command", "HSET")
+        self.field = self.properties.get("field")
 
-        key = self.properties["key"]
-        self.key_expression = expression.compile(key["language"], key["expression"])
+        self.cmd = self.properties["cmd"]
+        args = self.properties["args"]
+        self.args_expressions = [expression.compile(self.properties["language"], c) for c in args]
 
-        logger.info(f"Writing to Redis connection '{self.properties.get('connection')}'")
+        logger.info(f"Using Redis connection '{self.properties.get('connection')}'")
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         pipeline = self.redis_client.pipeline()
         block_result = BlockResult()
+
         for record in data:
-            # transform to a list, filtering out None, which Redis does not support
-            dict_as_list = sum(filter(
-                lambda i: i[1] is not None and not i[0].startswith(Block.INTERNAL_FIELD_PREFIX),
-                record.items()
-            ), ())
-            pipeline.execute_command(self.command, self.key_expression.search(record), *dict_as_list)
+            params = [self.cmd]
+            for expr in (c.search(record) for c in self.args_expressions):
+                params.extend(expr if isinstance(expr, list) else [expr])
+
+            pipeline.execute_command(*params)
 
         try:
             results = pipeline.execute(raise_on_error=False)
@@ -49,8 +51,9 @@ class Block(DyBlock, metaclass=ABCMeta):
                 if isinstance(result, Exception):
                     block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
                 else:
-                    block_result.rejected.append(Result(Status.SUCCESS, payload=record))
-        except redis.exceptions.ConnectionError as e:
-            raise ConnectionError(e)
+                    record[self.field] = result
+                    block_result.processed.append(Result(Status.SUCCESS, payload=record))
+        except redis.exceptions.ConnectionError as expr:
+            raise ConnectionError(expr)
 
         return block_result
