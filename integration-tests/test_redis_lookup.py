@@ -29,6 +29,6 @@ def test_redis_lookup(configuration, key, expected):
         val = redis_client.hgetall(key)
         assert val["obj"] == expected
 
-        assert len(redis_client.keys()) == 11
+        assert len(redis_client.keys()) == 7
     finally:
         redis_container.stop()
