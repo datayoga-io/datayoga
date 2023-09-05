@@ -1,6 +1,6 @@
 {
   "title": "redis.lookup",
-  "description": "Lookup data from redis by given command and key",
+  "description": "Lookup data from Redis using the given command and key",
   "type": "object",
   "properties": {
     "connection": { "title": "Connection name", "type": "string" },
