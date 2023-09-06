@@ -26,7 +26,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             connection.get("password")
         )
 
-        self.field_path = [utils.unescape_field(f) for f in utils.split_field(self.properties.get("field"))]
+        self.field_path = [utils.unescape_field(field) for field in utils.split_field(self.properties.get("field"))]
 
         self.cmd = self.properties["cmd"]
         args = self.properties["args"]
