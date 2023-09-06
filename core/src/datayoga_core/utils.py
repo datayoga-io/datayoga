@@ -79,11 +79,16 @@ def get_resource_path(relative_path: str) -> str:
         return path.join(os.path.dirname(__file__), "resources", relative_path)
 
 
-def split_field(field: str) -> List[str]:
-    return re.split(r"(?<!\\)\.", field)
+def split_field(field: str, *, __expression=re.compile(r"(?<!\\)\.")) -> List[str]:
+    r"""Splits a string by dots, similar to str.split(), but allows escaping a dot with a backslash.
+    Example:
+        a.b\.c.d => ["a", "b\\.c", "d"]
+    """
+    return __expression.split(field)
 
 
 def unescape_field(field: str) -> str:
+    r"""Replaces "\\." by "."."""
     return field.replace("\\.", ".")
 
 

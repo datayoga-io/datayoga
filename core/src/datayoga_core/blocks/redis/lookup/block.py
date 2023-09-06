@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
 import redis
-from datayoga_core import expression
+from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult, Result, Status
@@ -26,7 +26,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             connection.get("password")
         )
 
-        self.field = self.properties.get("field")
+        self.field_path = [utils.unescape_field(field) for field in utils.split_field(self.properties.get("field"))]
 
         self.cmd = self.properties["cmd"]
         args = self.properties["args"]
@@ -35,6 +35,8 @@ class Block(DyBlock, metaclass=ABCMeta):
         logger.info(f"Using Redis connection '{self.properties.get('connection')}'")
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
+        logger.debug(f"Running {self.get_block_name()}")
+
         pipeline = self.redis_client.pipeline()
         block_result = BlockResult()
 
@@ -50,9 +52,15 @@ class Block(DyBlock, metaclass=ABCMeta):
             for record, result in zip(data, results):
                 if isinstance(result, Exception):
                     block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
-                else:
-                    record[self.field] = result
-                    block_result.processed.append(Result(Status.SUCCESS, payload=record))
+                    continue
+
+                obj = record
+                for field in self.field_path[:-1]:
+                    obj = obj.setdefault(field, {})
+
+                obj[self.field_path[-1]] = result
+
+                block_result.processed.append(Result(Status.SUCCESS, payload=record))
         except redis.exceptions.ConnectionError as expr:
             raise ConnectionError(expr)
 
