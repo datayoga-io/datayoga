@@ -10,7 +10,8 @@ from common.utils import run_job
      ("tests.redis_lookup_hash", "2", "{'tf0': 'tv0', 'tf1': 'tv1'}"),
      ("tests.redis_lookup_set", "3", "{'tv0'}"),
      ("tests.redis_lookup_sorted_set", "4", "['tv0', '10', 'tv1', '20']"),
-     ("tests.redis_lookup_list", "5", "['tv2', 'tv1', 'tv0']")])
+     ("tests.redis_lookup_list", "5", "['tv2', 'tv1', 'tv0']"),
+     ("tests.redis_lookup_string_netsted", "6", "{'a': {'b': {'c.d': 'test_string'}}}")])
 def test_redis_lookup(configuration, key, expected):
     redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
     redis_container.start()
