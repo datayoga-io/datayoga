@@ -19,9 +19,10 @@ class Block(DyBlock, metaclass=ABCMeta):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         connection = get_connection_details(self.properties.get("connection"), context)
-        if self.properties.get("dry"):
-            self.redis_client = None
-        else:
+
+        # Dry mode is internal and used for validate the block without establishing a connection.
+        # This behavior should be implemented in a common way, see this issue: https://lnk.pw/eklj
+        if not self.properties.get("dry"):
             self.redis_client = redis_utils.get_client(
                 connection.get("host"),
                 connection.get("port"),
