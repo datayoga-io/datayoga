@@ -2,7 +2,9 @@ name: generate docs for jsonschema
 on:
   workflow_dispatch:
   pull_request:
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   generate-docs:
     runs-on: ubuntu-latest
@@ -50,7 +52,7 @@ jobs:
             block_package="$(dirname $(dirname ${dir}))"
             block_package="$(echo ${block_package} | cut -c2- | sed 's/\//_/g')"
             [ ! -z "${block_package}" ] && block_package="${block_package}_"
-           
+
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
               --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
               "./docs/reference/blocks/${block_package}${doc_name}"
