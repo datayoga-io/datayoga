@@ -111,7 +111,7 @@ async def test_add_multiple_fields():
 async def test_add_field_with_dot():
     """Test case for adding a field with a dot in the name using JMESPath expression."""
     block = Block({
-        "field": "name.full_name",
+        "field": "name\.full_name",
         "language": "jmespath",
         "expression": "[fname, lname] | join(' ', @)"
     })
