@@ -19,6 +19,7 @@ async def test_add_field():
         {"fname": "john", "lname": "doe", "full_name": "john doe"}
     ])
 
+
 @pytest.mark.asyncio
 async def test_add_nested_field():
     """Test case for adding a nested field using JMESPath expression."""
@@ -67,6 +68,7 @@ async def test_add_nested_field_parent_key_missing():
         }
     ])
 
+
 @pytest.mark.asyncio
 async def test_add_multiple_fields():
     """Test case for adding multiple fields using JMESPath expressions."""
@@ -103,6 +105,7 @@ async def test_add_multiple_fields():
             }
         }
     ])
+
 
 @pytest.mark.asyncio
 async def test_add_field_with_dot():
