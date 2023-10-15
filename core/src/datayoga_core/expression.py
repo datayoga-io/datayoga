@@ -150,13 +150,13 @@ class SQLExpression(Expression):
         self.conn.row_factory = sqlite3.Row
 
         if len(self._column_names) > 0:
-            columns_clause = ','.join(f"[column{i+1}] as `{'.'.join(col)}`" for i, col in enumerate(self._column_names))
+            columns_clause = ",".join(f"[column{i+1}] AS `{'.'.join(col)}`" for i, col in enumerate(self._column_names))
 
             # values in the form of (?,?), (?,?)
             values_clause_row = f"({','.join('?' * len(self._column_names))})"
-            values_clause = ','.join([values_clause_row] * len(data))
+            values_clause = ",".join([values_clause_row] * len(data))
 
-            subselect = f"select {columns_clause} from (values {values_clause})"
+            subselect = f"SELECT {columns_clause} FROM (VALUES {values_clause})"
 
             # bind the variables
             data_values = [get_nested_value(row, col) for row in data for col in self._column_names]
@@ -165,18 +165,18 @@ class SQLExpression(Expression):
             expressions_clause = ", ".join(
                 [f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
             # we don't use CTE because of compatibility with older SQLlite versions on Centos7
-            statement = f"select {expressions_clause} from ({subselect})"
+            statement = f"SELECT {expressions_clause} FROM ({subselect})"
 
             logger.debug(statement)
             cursor = self.conn.execute(statement, data_values)
             return [dict(x) for x in cursor.fetchall()]
-        else:
-            # a sepcial case where we are only selecting literals. e.g. select current_timstamp or 'x'
-            # no need to bind anything. just run it once and copy to all records
-            expressions_clause = ", ".join(
-                [f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
-            cursor = self.conn.execute(f"select {expressions_clause}")
-            return [dict(cursor.fetchone())] * len(data)
+
+        # a special case where we are only selecting literals. e.g. select current_timstamp or 'x'
+        # no need to bind anything. just run it once and copy to all records
+        expressions_clause = ", ".join(
+            [f"{expression} as `{column_name}`" for column_name, expression in expressions.items()])
+        cursor = self.conn.execute(f"select {expressions_clause}")
+        return [dict(cursor.fetchone())] * len(data)
 
 
 class JMESPathExpression(Expression):
