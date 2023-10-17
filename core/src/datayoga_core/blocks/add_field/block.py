@@ -24,8 +24,8 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
-        for field in self.fields:
-            expression_results = self.fields[field].search_bulk(data)
+        for field, expr in self.fields.items():
+            expression_results = expr.search_bulk(data)
             field_path = utils.split_field(field)
 
             for i, row in enumerate(data):
@@ -33,10 +33,8 @@ class Block(DyBlock, metaclass=ABCMeta):
                 # handle nested fields. in that case, the obj points at the nested entity
                 for key in field_path[:-1]:
                     key = utils.unescape_field(key)
-                    if key in obj:
-                        obj = obj[key]
-                    else:
-                        obj[key] = {}
+                    obj = obj.setdefault(key, {})  # Setdefault creates missing nested keys as dictionaries
+
                 # assign the new values
                 obj[utils.unescape_field(field_path[-1:][0])] = expression_results[i]
 
