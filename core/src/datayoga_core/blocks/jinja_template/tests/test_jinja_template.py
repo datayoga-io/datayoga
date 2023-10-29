@@ -18,6 +18,7 @@ async def test_jinja_template():
         {"fname": "john", "lname": "doe", "full_name": "john doe"}
     ])
 
+
 @pytest.mark.asyncio
 async def test_jinja_template_nested_field():
     """Test case for applying Jinja template to a nested field."""
@@ -32,6 +33,7 @@ async def test_jinja_template_nested_field():
     ]) == utils.all_success([
         {"name": {"fname": "john", "lname": "doe", "full_name": "john doe"}}
     ])
+
 
 @pytest.mark.asyncio
 async def test_jinja_template_with_dot():
@@ -48,6 +50,7 @@ async def test_jinja_template_with_dot():
         {"fname": "john", "lname": "doe", "name.full_name": "john doe"}
     ])
 
+
 @pytest.mark.asyncio
 async def test_jinja_template_missing_field():
     """Test cases for handling missing fields in Jinja template."""
@@ -58,13 +61,13 @@ async def test_jinja_template_missing_field():
     block.init()
 
     assert await block.run([
-        { "lname": "doe"},
-        { "fname": "john"},
-        { "fname": "john", "lname": "doe"},
+        {"lname": "doe"},
+        {"fname": "john"},
+        {"fname": "john", "lname": "doe"},
         {}
     ]) == utils.all_success([
-        { "lname": "doe", "greeting": "Hello  doe!"},
-        { "fname": "john", "greeting": "Hello JOHN !"},
-        { "fname": "john", "lname": "doe", "greeting": "Hello JOHN doe!"},
-        { "greeting": "Hello  !"}
+        {"lname": "doe", "greeting": "Hello  doe!"},
+        {"fname": "john", "greeting": "Hello JOHN !"},
+        {"fname": "john", "lname": "doe", "greeting": "Hello JOHN doe!"},
+        {"greeting": "Hello  !"}
     ])
