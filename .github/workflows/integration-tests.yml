@@ -23,7 +23,6 @@ jobs:
       - name: Build and Install CLI
         run: |
           cd cli
-          pip install --upgrade pip
           pip install poetry
           poetry build
           pip install dist/*.whl
