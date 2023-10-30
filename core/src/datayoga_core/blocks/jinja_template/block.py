@@ -19,6 +19,8 @@ class Block(DyBlock, metaclass=ABCMeta):
         self.template = jinja2.Template(self.properties["template"])
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
+        logger.debug(f"Running {self.get_block_name()}")
+
         block_result = BlockResult()
         field_path = utils.split_field(self.field)
 
