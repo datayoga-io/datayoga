@@ -1,0 +1,27 @@
+{
+  "title": "jinja_template",
+  "description": "Apply Jinja template to a field",
+  "type": "object",
+  "properties": {
+    "field": {
+      "description": "Field",
+      "type": "string"
+    },
+    "template": {
+      "description": "Jinja Template",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["field", "template"],
+  "examples": [
+    {
+      "field": "name.full_name",
+      "template": "{{ name.fname }} {{ name.lname }}"
+    },
+    {
+      "field": "name.fname_upper",
+      "template": "{{ name.fname | upper }}"
+    }
+  ]
+}
