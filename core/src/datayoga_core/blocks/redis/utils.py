@@ -25,8 +25,8 @@ def get_client(connection: Dict[str, Any]) -> Redis:
     Raises:
         ValueError: If connection to Redis fails.
     """
-    host=connection["host"]
-    port=connection["port"]
+    host = connection["host"]
+    port = connection["port"]
     key = connection.get("key")
     key_password = connection.get("key_password")
     cert = connection.get("cert")

@@ -18,7 +18,6 @@ class Block(DyProducer):
         connection = get_connection_details(self.properties.get("connection"), context)
         self.redis_client = redis_utils.get_client(connection)
 
-
         self.stream = self.properties["stream_name"]
         self.snapshot = self.properties.get("snapshot", False)
         self.consumer_group = f'datayoga_job_{context.properties.get("job_name", "") if context else ""}'
