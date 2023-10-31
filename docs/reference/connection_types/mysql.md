@@ -3,7 +3,7 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# MySQL Database Configuration
+# MySQL
 
 Schema for configuring MySQL database connection parameters
 

@@ -3,7 +3,7 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# Cassandra Database Configuration
+# Cassandra
 
 Schema for configuring Cassandra database connection parameters
 

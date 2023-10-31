@@ -3,7 +3,7 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# Redis Database Configuration
+# Redis
 
 Schema for configuring Redis database connection parameters
 
