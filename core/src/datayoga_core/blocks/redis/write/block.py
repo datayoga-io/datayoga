@@ -19,11 +19,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         connection = get_connection_details(self.properties.get("connection"), context)
-        self.redis_client = redis_utils.get_client(
-            connection.get("host"),
-            connection.get("port"),
-            connection.get("user"),
-            connection.get("password"))
+        self.redis_client = redis_utils.get_client(connection)
 
         self.command = self.properties.get("command", "HSET")
 

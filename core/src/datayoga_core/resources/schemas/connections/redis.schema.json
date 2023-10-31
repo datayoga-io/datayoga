@@ -20,14 +20,31 @@
     "password": {
       "description": "Redis DB password",
       "type": "string"
+    },
+    "key": {
+      "title": "Private key file to authenticate with",
+      "type": "string"
+    },
+    "key_password": {
+      "title": "Password for unlocking an encrypted private key",
+      "type": "string"
+    },
+    "cert": {
+      "title": "Client certificate file to authenticate with",
+      "type": "string"
+    },
+    "cacert": {
+      "title": "CA certificate file to verify with",
+      "type": "string"
     }
   },
   "additionalProperties": false,
   "required": ["type", "host", "port"],
-  "dependentSchemas": {
-    "user": {
-      "required": ["password"]
-    }
+  "dependentRequired": {
+    "key": ["cert"],
+    "cert": ["key"],
+    "key_password": ["key"],
+    "user": ["password"]
   },
   "examples": [
     {

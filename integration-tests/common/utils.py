@@ -57,13 +57,12 @@ def wait_program(process: Popen, sig: Optional[int] = signal.SIGTERM, ignore_err
             raise ValueError("command failed")
 
 
-def run_job(job: str, piped_from: Optional[str] = None, piped_to: Optional[str] = None,
+def run_job(job_name: str, piped_from: Optional[str] = None, piped_to: Optional[str] = None,
             background: bool = False) -> Optional[Popen]:
-    """
-    Runs a job using the `datayoga` command-line tool.
+    """Runs a job using the `datayoga` command-line tool.
 
     Args:
-        job (str): The name or identifier of the job to run.
+        job_name (str): The name or identifier of the job to run.
         piped_from (Optional[str], optional): The command or file to pipe input from. Defaults to None.
         piped_to (Optional[str], optional): The file to redirect output to. Defaults to None.
         background (bool, optional): If True, runs the job in the background. Defaults to False.
@@ -74,8 +73,8 @@ def run_job(job: str, piped_from: Optional[str] = None, piped_to: Optional[str] 
     piped_from_cmd = f"{piped_from} | " if piped_from else ""
     piped_to_cmd = f" > {piped_to}" if piped_to else ""
 
-    command = f'{piped_from_cmd}datayoga run {job} ' \
-              f'--dir {path.join(os.path.dirname(os.path.realpath(__file__)), "..", "resources")} ' \
+    command = f'{piped_from_cmd}datayoga run {job_name} ' \
+              f'--dir {path.join(path.dirname(path.realpath(__file__)), "..", "resources")} ' \
               f'--loglevel DEBUG{piped_to_cmd}'
 
     return execute_program(command, background=background)
