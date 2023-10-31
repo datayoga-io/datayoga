@@ -23,12 +23,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         # Dry mode is internal and used for validate the block without establishing a connection.
         # This behavior should be implemented in a common way, see this issue: https://lnk.pw/eklj
         if not self.properties.get("dry"):
-            self.redis_client = redis_utils.get_client(
-                connection.get("host"),
-                connection.get("port"),
-                connection.get("user"),
-                connection.get("password")
-            )
+            self.redis_client = redis_utils.get_client(connection)
 
         self.field_path = [utils.unescape_field(field) for field in utils.split_field(self.properties.get("field"))]
 
