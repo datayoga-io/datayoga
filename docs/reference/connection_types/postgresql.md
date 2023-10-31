@@ -3,7 +3,10 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# any
+# PostgreSQL Database Configuration
+
+Schema for configuring PostgreSQL database connection parameters
+
 
 **Example**
 

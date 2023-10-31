@@ -3,9 +3,9 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# any
+# Oracle Database Configuration
 
-Oracle
+Schema for configuring Oracle database connection parameters
 
 
 **Example**

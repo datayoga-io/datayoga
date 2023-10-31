@@ -3,9 +3,9 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# any
+# Redis Database Configuration
 
-Redis
+Schema for configuring Redis database connection parameters
 
 
 **Example**

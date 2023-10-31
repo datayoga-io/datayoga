@@ -3,7 +3,10 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# any
+# SQL Server Database Configuration
+
+Schema for configuring SQL Server database connection parameters
+
 
 **Example**
 
