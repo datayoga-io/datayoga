@@ -17,10 +17,10 @@ Schema for configuring Redis database connection parameters
 |**port**|`integer`|Redis DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|yes|
 |**user**|`string`|Redis DB user<br/>|no|
 |**password**|`string`|Redis DB password<br/>|no|
-|**key**<br/>(Private key file to authenticate with)|`string`||no|
-|**key\_password**<br/>(Password for unlocking an encrypted private key)|`string`||no|
-|**cert**<br/>(Client certificate file to authenticate with)|`string`||no|
-|**cacert**<br/>(CA certificate file to verify with)|`string`||no|
+|**key**|`string`|Private key file to authenticate with<br/>|no|
+|**key\_password**|`string`|Password for unlocking an encrypted private key<br/>|no|
+|**cert**|`string`|Client certificate file to authenticate with<br/>|no|
+|**cacert**|`string`|CA certificate file to verify with<br/>|no|
 
 **Additional Properties:** not allowed  
 **If property *key* is defined**, property/ies *cert* is/are required.  

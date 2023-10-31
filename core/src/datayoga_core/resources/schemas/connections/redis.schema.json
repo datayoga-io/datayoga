@@ -24,19 +24,19 @@
       "type": "string"
     },
     "key": {
-      "title": "Private key file to authenticate with",
+      "description": "Private key file to authenticate with",
       "type": "string"
     },
     "key_password": {
-      "title": "Password for unlocking an encrypted private key",
+      "description": "Password for unlocking an encrypted private key",
       "type": "string"
     },
     "cert": {
-      "title": "Client certificate file to authenticate with",
+      "description": "Client certificate file to authenticate with",
       "type": "string"
     },
     "cacert": {
-      "title": "CA certificate file to verify with",
+      "description": "CA certificate file to verify with",
       "type": "string"
     }
   },
