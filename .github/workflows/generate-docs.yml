@@ -39,7 +39,7 @@ jobs:
           done
 
           cp /tmp/blocks.md ./docs/reference/blocks.md
-          cp /tmp/connections.md ./docs/reference/connection_types.md
+          cp /tmp/connection_types.md ./docs/reference/connection_types.md
 
       - name: Generate connection type schema docs
         run: |
