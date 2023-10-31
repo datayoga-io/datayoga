@@ -24,7 +24,7 @@ jobs:
       - name: Generate resource schema doc
         run: |
           cp ./docs/reference/blocks.md /tmp/blocks.md
-          cp ./docs/reference/connections.md /tmp/connections.md
+          cp ./docs/reference/connection_types.md /tmp/connection_types.md
 
           rm -rf ./docs/reference
           mkdir ./docs/reference
@@ -39,7 +39,7 @@ jobs:
           done
 
           cp /tmp/blocks.md ./docs/reference/blocks.md
-          cp /tmp/connections.md ./docs/reference/connections.md
+          cp /tmp/connection_types.md ./docs/reference/connection_types.md
 
       - name: Generate connection type schema docs
         run: |
@@ -49,7 +49,7 @@ jobs:
           for schema in ./core/src/datayoga_core/resources/schemas/connections/*.schema.json
           do
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
-              --extension front-matter -fm.parent "Connection_Types" --fm.grand_parent "Reference" > \
+              --extension front-matter --fm.parent "Connection Types" --fm.grand_parent "Reference" > \
               ./docs/reference/connection_types/$(basename "${schema}" .schema.json).md
           done
 
