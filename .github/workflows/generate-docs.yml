@@ -39,6 +39,7 @@ jobs:
           done
 
           # Connection Types
+          mkdir ./docs/reference/connection_types
           for schema in ./core/src/datayoga_core/resources/schemas/connections/*.schema.json
           do
             npx jsonschema2mk --schema ${schema} --extension yaml-examples \
