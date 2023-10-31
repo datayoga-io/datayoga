@@ -1,4 +1,5 @@
 ---
+parent: Connection Types
 grand_parent: Reference
 ---
 
