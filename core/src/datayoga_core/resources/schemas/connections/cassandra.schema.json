@@ -1,5 +1,7 @@
 {
-  "description": "Cassandra",
+  "title": "Cassandra",
+  "description": "Schema for configuring Cassandra database connection parameters",
+  "type": "object",
   "properties": {
     "type": {
       "description": "DB type",

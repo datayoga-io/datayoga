@@ -1,4 +1,7 @@
 {
+  "title": "PostgreSQL",
+  "description": "Schema for configuring PostgreSQL database connection parameters",
+  "type": "object",
   "properties": {
     "host": { "description": "DB host", "type": "string" },
     "port": {

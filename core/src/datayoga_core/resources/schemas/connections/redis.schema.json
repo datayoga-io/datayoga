@@ -1,5 +1,7 @@
 {
-  "description": "Redis",
+  "title": "Redis",
+  "description": "Schema for configuring Redis database connection parameters",
+  "type": "object",
   "properties": {
     "type": {
       "description": "DB type",

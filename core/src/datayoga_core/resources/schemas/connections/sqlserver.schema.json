@@ -1,4 +1,7 @@
 {
+  "title": "SQL Server",
+  "description": "Schema for configuring SQL Server database connection parameters",
+  "type": "object",
   "properties": {
     "host": { "description": "DB host", "type": "string" },
     "port": {
