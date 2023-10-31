@@ -1,5 +1,6 @@
 {
-  "description": "Oracle",
+  "title": "Oracle Database Configuration",
+  "description": "Schema for configuring Oracle database connection parameters",
   "properties": {
     "host": { "description": "DB host", "type": "string" },
     "port": {

@@ -1,4 +1,6 @@
 {
+  "title": "PostgreSQL Database Configuration",
+  "description": "Schema for configuring PostgreSQL database connection parameters",
   "properties": {
     "host": { "description": "DB host", "type": "string" },
     "port": {

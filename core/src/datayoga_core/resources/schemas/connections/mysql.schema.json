@@ -1,4 +1,6 @@
 {
+  "title": "MySQL Database Configuration",
+  "description": "Schema for configuring MySQL database connection parameters",
   "properties": {
     "host": { "description": "DB host", "type": "string" },
     "port": {
