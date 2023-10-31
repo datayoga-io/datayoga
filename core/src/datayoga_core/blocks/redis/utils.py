@@ -47,6 +47,7 @@ def get_client(connection: Dict[str, Any]) -> Redis:
             decode_responses=True,
             client_name="datayoga"
         )
+        client.json()
 
         client.ping()
         return client
