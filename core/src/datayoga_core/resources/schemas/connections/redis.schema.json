@@ -1,5 +1,5 @@
 {
-  "title": "Redis Database Configuration",
+  "title": "Redis",
   "description": "Schema for configuring Redis database connection parameters",
   "type": "object",
   "properties": {

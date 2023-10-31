@@ -1,5 +1,5 @@
 {
-  "title": "Oracle Database Configuration",
+  "title": "Oracle",
   "description": "Schema for configuring Oracle database connection parameters",
   "type": "object",
   "properties": {

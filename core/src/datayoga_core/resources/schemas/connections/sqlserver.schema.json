@@ -1,5 +1,5 @@
 {
-  "title": "SQL Server Database Configuration",
+  "title": "SQL Server",
   "description": "Schema for configuring SQL Server database connection parameters",
   "type": "object",
   "properties": {

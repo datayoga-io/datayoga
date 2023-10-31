@@ -1,5 +1,5 @@
 {
-  "title": "MySQL Database Configuration",
+  "title": "MySQL",
   "description": "Schema for configuring MySQL database connection parameters",
   "type": "object",
   "properties": {

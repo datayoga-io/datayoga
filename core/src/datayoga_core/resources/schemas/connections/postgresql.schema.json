@@ -1,5 +1,5 @@
 {
-  "title": "PostgreSQL Database Configuration",
+  "title": "PostgreSQL",
   "description": "Schema for configuring PostgreSQL database connection parameters",
   "type": "object",
   "properties": {
