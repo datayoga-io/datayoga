@@ -3,6 +3,7 @@
     "esbenp.prettier-vscode",
     "ms-python.autopep8",
     "ms-python.isort",
+    "ms-python.pylint",
     "ms-python.python",
     "njpwerner.autodocstring",
     "streetsidesoftware.code-spell-checker",

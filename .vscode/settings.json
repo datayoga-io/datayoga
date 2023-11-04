@@ -1,26 +1,45 @@
 {
-  // this is the default formatter for everything except Python
+  "editor.formatOnSave": true,
+  "editor.trimAutoWhitespace": true,
+  // Prettier is the default formatter for everything except Python and TOML
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "prettier.configPath": "dev/.prettierrc.json",
-  "editor.formatOnSave": true,
-  // for Python we use a differnet formatter
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  // for Python we use autopep8
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python",
+    "editor.defaultFormatter": "ms-python.autopep8",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": true,
+      "source.fixAll": true
     },
-    "editor.formatOnSaveMode": "modifications"
+    "editor.formatOnSaveMode": "file",
+    "editor.formatOnSave": true
   },
-  "python.formatting.provider": "autopep8",
-  "python.formatting.autopep8Args": [
-    "--max-line-length",
-    "120",
-    "--experimental"
-  ],
-  "python.linting.enabled": true,
-  "python.linting.lintOnSave": true,
-  "python.linting.pylintEnabled": true,
-  "python.linting.pylintArgs": ["--rcfile", "${workspaceFolder}/dev/.pylintrc"],
+  "autopep8.args": ["--experimental", "--max-line-length=120"],
+  // we use isort to sort imports
+  "isort.check": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.gotoDefinitionInStringLiteral": true,
+  // all diagnostic settings for Pylance are described here:
+  // https://github.com/microsoft/pyright/blob/main/docs/configuration.md#type-check-diagnostics-settings
+  "python.analysis.diagnosticSeverityOverrides": {
+    // change this to "none" to ignore all of them across the board
+    // alternatively use '# type: ignore' hint
+    // to ignore the specific type issue in the source code
+    "reportGeneralTypeIssues": "information"
+  },
+  "python.languageServer": "Default",
+  // python linting is configured in the file below
+  "pylint.args": ["--rcfile=${workspaceFolder}/dev/.pylintrc"],
+  // toml settings
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "evenBetterToml.formatter.arrayTrailingComma": false,
+  // spell checker
   "cSpell.words": [
     "autopep",
     "datayoga",
@@ -45,21 +64,5 @@
     "venv",
     "xadd",
     "zadd"
-  ],
-  "python.analysis.typeCheckingMode": "basic",
-  "python.languageServer": "Default",
-  "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true,
-  "editor.trimAutoWhitespace": true,
-  // all diagnostic settings for Pylance are described here:
-  // https://github.com/microsoft/pyright/blob/main/docs/configuration.md#type-check-diagnostics-settings
-  "python.analysis.diagnosticSeverityOverrides": {
-    // change this to "none" to ignore all of them across the board
-    // alternatively use '# type: ignore' hint
-    // to ignore the specific type issue in the source code
-    "reportGeneralTypeIssues": "information"
-  },
-  "python.testing.pytestArgs": ["core"],
-  "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  ]
 }
