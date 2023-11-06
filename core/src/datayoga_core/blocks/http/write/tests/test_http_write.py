@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 
 
 class MockResponse:
-    def __init__(self, status_code: int, json_data: Any, headers: Dict[str, Any] = None):
+    def __init__(self, status_code: int, json_data: Any, headers: Dict[str, Any]):
         self.status_code = status_code
         self.json_data = json_data
         self.headers = headers
@@ -29,7 +29,7 @@ async def test_http_write(mocker: MockerFixture):
                 "base_uri": "https://datayoga.io",
                 "headers": {
                         "Authorization": {
-                            "expression": "concat(['Bearer your_access_token ', credit_card])",
+                            "expression": "concat(['Bearer ', credit_card])",
                             "language": "jmespath"
                         },
                     "Content-Type": "application/json"
@@ -60,7 +60,7 @@ async def test_http_write(mocker: MockerFixture):
             },
         },
         "extra_headers": {
-            "my_header": {
+            "custom_header": {
                 "expression": "lname || '-' || fname",
                 "language": "sql"
             }
@@ -94,23 +94,20 @@ async def test_http_write(mocker: MockerFixture):
         {"id": 123,  "credit_card": "1234-5678-0000-9999", "fname": "john", "lname": "doe", "country_name": "usa", "response": {"status_code": 200, "headers": {"my_header": 123}, "content": b'{"status": "success"}'}}
     ])
 
-    # Assert that requests.put was called with the expected arguments
-    expected_url = "https://datayoga.io/users/123"
-
-    expected_headers = {
-        "Authorization": "Bearer your_access_token 1234-5678-0000-9999",
-        "Content-Type": "application/json",
-        "my_header": "doe-john",
-    }
-    expected_params = {
-        "country": "usa",
-        "origin_country": "israel",
-        "fname": "JOHN"
-    }
-    expected_payload = {
-        "full_name": "john doe",
-    }
-
-    # Assert that requests.put was called with the expected arguments
-    mock_put.assert_called_once_with(expected_url, headers=expected_headers,
-                                     params=expected_params, data=expected_payload, timeout=3)
+    mock_put.assert_called_once_with(
+        "https://datayoga.io/users/123",
+        headers={
+            "Authorization": "Bearer 1234-5678-0000-9999",
+            "Content-Type": "application/json",
+            "custom_header": "doe-john",
+        },
+        params={
+            "country": "usa",
+            "origin_country": "israel",
+            "fname": "JOHN"
+        },
+        data={
+            "full_name": "john doe",
+        },
+        timeout=3
+    )
