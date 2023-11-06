@@ -4,9 +4,9 @@
   "type": "object",
   "properties": {
     "type": {
-      "description": "DB type",
+      "description": "Connection type",
       "type": "string",
-      "enum": ["redis"]
+      "const": "redis"
     },
     "host": { "description": "Redis DB host", "type": "string" },
     "port": {

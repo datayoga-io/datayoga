@@ -1,0 +1,192 @@
+{
+  "title": "http.write",
+  "description": "Write data using an HTTP request",
+  "type": "object",
+  "properties": {
+    "connection": {
+      "type": "string",
+      "title": "The connection to use for the HTTP request",
+      "description": "Logical connection name as defined in the connections.yaml",
+      "examples": ["api_connection", "external_service"]
+    },
+    "endpoint": {
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "API Endpoint",
+          "description": "The endpoint URL for the HTTP request",
+          "examples": ["/users"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "expression": {
+              "description": "Expression",
+              "type": "string"
+            },
+            "language": {
+              "description": "Language",
+              "type": "string",
+              "enum": ["jmespath", "sql"]
+            }
+          },
+          "required": ["expression", "language"],
+          "examples": [
+            { "expression": "concat(['/users/', id]')", "language": "jmespath" }
+          ]
+        }
+      ]
+    },
+    "method": {
+      "type": "string",
+      "title": "HTTP Method",
+      "description": "HTTP method to be used for the request",
+      "enum": ["GET", "PUT", "POST", "DELETE"],
+      "examples": ["GET", "POST"]
+    },
+    "payload": {
+      "type": "object",
+      "title": "Request Payload",
+      "description": "Data to be sent in the request body",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "description": "Expression",
+                "type": "string"
+              },
+              "language": {
+                "description": "Language",
+                "type": "string",
+                "enum": ["jmespath", "sql"]
+              }
+            },
+            "required": ["expression", "language"]
+          }
+        ]
+      }
+    },
+    "extra_headers": {
+      "type": "object",
+      "title": "Additional HTTP Headers",
+      "description": "Extra headers to be included in the HTTP request",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "description": "Expression",
+                "type": "string"
+              },
+              "language": {
+                "description": "Language",
+                "type": "string",
+                "enum": ["jmespath", "sql"]
+              }
+            },
+            "required": ["expression", "language"]
+          }
+        ]
+      }
+    },
+    "extra_query_parameters": {
+      "description": "Extra query parameters to be included in the HTTP request",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "description": "Expression",
+                "type": "string"
+              },
+              "language": {
+                "description": "Language",
+                "type": "string",
+                "enum": ["jmespath", "sql"]
+              }
+            },
+            "required": ["expression", "language"]
+          }
+        ]
+      }
+    },
+    "timeout": {
+      "type": "integer",
+      "title": "Timeout in Seconds",
+      "description": "Timeout duration for this specific HTTP request in seconds"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "status_code": {
+          "type": "string",
+          "title": "Status Code Field Name",
+          "description": "Name of the field where the HTTP response status code will be stored after the request"
+        },
+        "headers": {
+          "type": "string",
+          "title": "Headers Field Name",
+          "description": "Name of the field where the HTTP response headers will be stored after the request"
+        },
+        "body": {
+          "type": "string",
+          "title": "Body Field Name",
+          "description": "Name of the field where the HTTP response content will be stored after the request"
+        }
+      }
+    }
+  },
+  "required": ["connection", "endpoint", "method"],
+  "examples": [
+    {
+      "connection": "http_example",
+      "endpoint": {
+        "expression": "concat(['users/', id])",
+        "language": "jmespath"
+      },
+      "method": "PUT",
+      "payload": {
+        "full_name": {
+          "expression": "full_name",
+          "language": "jmespath"
+        },
+        "greeting": {
+          "expression": "greeting",
+          "language": "jmespath"
+        }
+      },
+      "extra_headers": {
+        "my_header": {
+          "expression": "lname || '-' || fname",
+          "language": "sql"
+        }
+      },
+      "extra_query_parameters": {
+        "fname": {
+          "expression": "UPPER(fname)",
+          "language": "sql"
+        }
+      },
+      "output": {
+        "status_code": "response.status_code",
+        "headers": "response.headers",
+        "body": "response.content"
+      },
+      "timeout": 3
+    }
+  ]
+}

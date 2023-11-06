@@ -18,7 +18,7 @@ class Block(DyBlock, metaclass=ABCMeta):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection_name = self.properties.get("connection")
+        connection_name = self.properties["connection"]
         connection_details = utils.get_connection_details(connection_name, context)
         if connection_details.get("type") != "cassandra":
             raise ValueError(f"{connection_name} is not a cassandra connection")

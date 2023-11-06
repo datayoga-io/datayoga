@@ -15,13 +15,10 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyProducer):
-    """
-    Azure Event Hub block for reading events.
-    """
+    """Azure Event Hub block for reading events."""
 
     def init(self, context: Optional[Context] = None):
-        """
-        Initializes the block.
+        """Initializes the block.
 
         Args:
             context (Context, optional): The block context. Defaults to None.
@@ -43,8 +40,7 @@ class Block(DyProducer):
         self.messages = asyncio.Queue()
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
-        """
-        Starts the event receiving process and yield batches of messages.
+        """Starts the event receiving process and yield batches of messages.
 
         Yields:
             AsyncGenerator[List[Message], None]: A generator of message batches.
@@ -66,9 +62,7 @@ class Block(DyProducer):
             await asyncio.sleep(0.1)
 
     async def receive_batch(self):
-        """
-        Receives events in batches from the Event Hub.
-        """
+        """Receives events in batches from the Event Hub."""
         await self.consumer_client.receive_batch(
             on_event_batch=self.on_event_batch,
             max_batch_size=self.batch_size,
@@ -76,8 +70,7 @@ class Block(DyProducer):
         )
 
     async def on_event_batch(self, partition_context: PartitionContext, events: List[EventData]):
-        """
-        Processes each batch of events received from the Event Hub.
+        """Processes each batch of events received from the Event Hub.
 
         Args:
             partition_context (PartitionContext): The partition context.
@@ -96,8 +89,7 @@ class Block(DyProducer):
                 logger.error(e)
 
     async def complete_events(self, msg_ids: List[str]):
-        """
-        Completes the events and update the checkpoint.
+        """Completes the events and update the checkpoint.
 
         Args:
             msg_ids (List[str]): The list of message IDs to complete.
@@ -112,8 +104,7 @@ class Block(DyProducer):
                 logger.warning(f"Couldn't find event {msg_id} for acknowledging")
 
     def ack(self, msg_ids: List[str]):
-        """
-        Acknowledges the completion of events.
+        """Acknowledges the completion of events.
 
         Args:
             msg_ids (List[str]): The list of message IDs to acknowledge.

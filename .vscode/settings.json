@@ -62,6 +62,7 @@
     "sqlalchemy",
     "sqlserver",
     "venv",
+    "xack",
     "xadd",
     "zadd"
   ]

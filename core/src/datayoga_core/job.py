@@ -28,22 +28,20 @@ class ErrorHandling(str, Enum):
 
 
 class Job:
-    """
-    Job
+    """Job.
 
     Attributes:
-        steps List[Block]: List of steps
+        steps List[Block]: List of steps.
     """
 
     def __init__(self, steps: Optional[List[Step]] = None, producer: Optional[Producer] = None,
                  error_handling: Optional[ErrorHandling] = None):
-        """
-        Constructs a job and its blocks
+        """Constructs a job and its blocks.
 
         Args:
-            steps (List[Dict[str, Any]]): Job steps
-            producer (Optional[Producer]): Block to be used as a producer
-            error_handling (Optional[ErrorHandling]): error handling strategy
+            steps (List[Dict[str, Any]]): Job steps.
+            producer (Optional[Producer]): Block to be used as a producer.
+            error_handling (Optional[ErrorHandling]): error handling strategy.
         """
         self.producer = producer
         self.steps = steps
@@ -74,8 +72,7 @@ class Job:
         self.initialized = True
 
     def transform(self, data: List[Dict[str, Any]], deepcopy: bool = True) -> JobResult:
-        """
-        Transforms data
+        """Transforms data.
 
         Args:
             data (List[Dict[str, Any]]): Data.
@@ -126,8 +123,7 @@ class Job:
         return result
 
     async def async_transform(self, data: List[Dict[str, Any]], deepcopy: bool = True) -> JobResult:
-        """
-        Transforms data (async version).
+        """Transforms data (async version).
 
         Args:
             data (List[Dict[str, Any]]): Data.
@@ -217,7 +213,7 @@ class Job:
 
     @staticmethod
     def get_json_schema(whitelisted_blocks: Optional[List[str]] = None) -> Dict[str, Any]:
-        # compiles a complete json schema of the job and all possible blocks
+        """"Compiles a complete json schema of the job and all possible blocks"""
         block_schemas = []
         # we traverse the json schemas directly instead of 'walk_packages'
         # to avoid importing all of the block classes

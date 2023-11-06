@@ -3,6 +3,11 @@
   "description": "Schema for configuring Oracle database connection parameters",
   "type": "object",
   "properties": {
+    "type": {
+      "description": "Connection type",
+      "type": "string",
+      "const": "oracle"
+    },
     "host": { "description": "DB host", "type": "string" },
     "port": {
       "description": "DB port",

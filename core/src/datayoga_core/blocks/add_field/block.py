@@ -18,24 +18,14 @@ class Block(DyBlock, metaclass=ABCMeta):
 
         self.fields = {}
         for prop in self.properties["fields"]:
-            self.fields[prop["field"]] = expression.compile(
-                prop["language"],
-                prop["expression"])
+            self.fields[prop["field"]] = expression.compile(prop["language"], prop["expression"])
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
         for field, expr in self.fields.items():
             expression_results = expr.search_bulk(data)
-            field_path = utils.split_field(field)
 
             for i, row in enumerate(data):
-                obj = row
-                # handle nested fields. in that case, the obj points at the nested entity
-                for key in field_path[:-1]:
-                    key = utils.unescape_field(key)
-                    obj = obj.setdefault(key, {})  # Setdefault creates missing nested keys as dictionaries
-
-                # assign the new values
-                obj[utils.unescape_field(field_path[-1:][0])] = expression_results[i]
+                utils.set_field(row, field, expression_results[i])
 
         return utils.all_success(data)

@@ -6,7 +6,7 @@
     "type": {
       "description": "DB type",
       "type": "string",
-      "enum": ["cassandra"]
+      "const": "cassandra"
     },
     "hosts": {
       "description": "Cassandra hosts",

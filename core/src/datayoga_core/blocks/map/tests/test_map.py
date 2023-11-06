@@ -77,9 +77,7 @@ async def test_map_expression_non_quoted_jmespath():
                                   "name": "fname"
                               }})
     block.init()
-    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([
-        {"name": "john"}]
-    )
+    assert await block.run([{"fname": "john", "lname": "doe"}]) == utils.all_success([{"name": "john"}])
 
 
 @pytest.mark.asyncio

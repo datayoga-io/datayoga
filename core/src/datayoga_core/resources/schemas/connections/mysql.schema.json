@@ -3,6 +3,11 @@
   "description": "Schema for configuring MySQL database connection parameters",
   "type": "object",
   "properties": {
+    "type": {
+      "description": "Connection type",
+      "type": "string",
+      "const": "mysql"
+    },
     "host": { "description": "DB host", "type": "string" },
     "port": {
       "description": "DB port",
