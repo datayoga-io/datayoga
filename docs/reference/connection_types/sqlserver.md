@@ -12,6 +12,7 @@ Schema for configuring SQL Server database connection parameters
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**type**|`string`|Connection type<br/>Constant Value: `"sqlserver"`<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
 |**database**|`string`|DB name<br/>|yes|

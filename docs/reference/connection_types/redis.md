@@ -12,7 +12,7 @@ Schema for configuring Redis database connection parameters
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|DB type<br/>Enum: `"redis"`<br/>|yes|
+|**type**|`string`|Connection type<br/>Constant Value: `"redis"`<br/>|yes|
 |**host**|`string`|Redis DB host<br/>|yes|
 |**port**|`integer`|Redis DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|yes|
 |**user**|`string`|Redis DB user<br/>|no|

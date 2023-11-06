@@ -12,7 +12,7 @@ Schema for configuring Cassandra database connection parameters
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|DB type<br/>Enum: `"cassandra"`<br/>|yes|
+|**type**|`string`|DB type<br/>Constant Value: `"cassandra"`<br/>|yes|
 |[**hosts**](#hosts)|`string[]`|Cassandra hosts<br/>|yes|
 |**port**|`integer`|Cassandra DB port<br/>Default: `9042`<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
 |**database**|`string`|DB name<br/>|no|
