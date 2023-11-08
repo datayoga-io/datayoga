@@ -4,11 +4,10 @@ from typing import Any, Dict, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
 import redis
-from datayoga_core import expression
+from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult, Result, Status
-from datayoga_core.utils import get_connection_details
 
 logger = logging.getLogger("dy")
 
@@ -18,8 +17,8 @@ class Block(DyBlock, metaclass=ABCMeta):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection = get_connection_details(self.properties.get("connection"), context)
-        self.redis_client = redis_utils.get_client(connection)
+        connection_details = utils.get_connection_details(self.properties["connection"], context)
+        self.redis_client = redis_utils.get_client(connection_details)
 
         self.command = self.properties.get("command", "HSET")
 

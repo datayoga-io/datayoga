@@ -41,6 +41,9 @@
   "evenBetterToml.formatter.arrayTrailingComma": false,
   // spell checker
   "cSpell.words": [
+    "aiohttp",
+    "aioresponse",
+    "aioresponses",
     "autopep",
     "datayoga",
     "hgetall",
@@ -62,6 +65,7 @@
     "sqlalchemy",
     "sqlserver",
     "venv",
+    "xack",
     "xadd",
     "zadd"
   ]

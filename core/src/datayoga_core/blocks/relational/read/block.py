@@ -15,7 +15,7 @@ class Block(DyProducer):
 
     def init(self, context: Optional[Context] = None):
         self.engine, self.db_type = relational_utils.get_engine(
-            self.properties.get("connection"),
+            self.properties["connection"],
             context,
             autocommit=False
         )

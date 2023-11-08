@@ -75,7 +75,7 @@ def init(
 @cli.command(name="validate", help="Validates a job in dry run mode")
 @cli_helpers.add_options(LOG_LEVEL_OPTION)
 def validate(
-        loglevel: str
+    loglevel: str
 ):
     set_logging_level(loglevel)
 
@@ -101,6 +101,7 @@ def run(
         connections = utils.read_yaml(connections_file)
         logger.debug(f"connections: {connections}")
         connections_schema = dy.get_connections_json_schema()
+        logger.debug(f"connections_schema: {connections_schema}")
         jsonschema.validate(instance=connections, schema=connections_schema)
     except jsonschema.exceptions.ValidationError as schema_error:
         # print a validation message with the source lines

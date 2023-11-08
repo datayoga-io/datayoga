@@ -1,0 +1,97 @@
+{
+  "title": "HTTP Connection",
+  "description": "Schema for configuring HTTP connection parameters",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "Connection type",
+      "type": "string",
+      "const": "http"
+    },
+    "base_uri": {
+      "description": "Base URI for the API endpoint",
+      "type": "string"
+    },
+    "headers": {
+      "description": "HTTP headers, including authorization token",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "description": "Expression",
+                "type": "string"
+              },
+              "language": {
+                "description": "Language",
+                "type": "string",
+                "enum": ["jmespath", "sql"]
+              }
+            },
+            "required": ["expression", "language"]
+          }
+        ]
+      }
+    },
+    "query_parameters": {
+      "description": "Default query parameters for all API endpoints",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "expression": {
+                "description": "Expression",
+                "type": "string"
+              },
+              "language": {
+                "description": "Language",
+                "type": "string",
+                "enum": ["jmespath", "sql"]
+              }
+            },
+            "required": ["expression", "language"]
+          }
+        ]
+      }
+    },
+    "timeout": {
+      "description": "Timeout for HTTP connection in seconds",
+      "type": "integer",
+      "default": 10
+    }
+  },
+  "required": ["type", "base_uri"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "base_uri": "https://api.example.com",
+      "headers": {
+        "Authorization": {
+          "expression": "concat([ 'Bearer ', token])",
+          "language": "jmespath"
+        },
+        "Content-Type": "application/json"
+      },
+      "query_parameters": {
+        "id": {
+          "expression": "user_id",
+          "language": "jmespath"
+        },
+        "timestamp": {
+          "expression": "date('now')",
+          "language": "sql"
+        }
+      }
+    }
+  ]
+}

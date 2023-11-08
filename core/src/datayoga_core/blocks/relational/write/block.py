@@ -35,7 +35,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             return
 
         try:
-            self.engine, self.db_type = relational_utils.get_engine(self.properties.get("connection"), self.context)
+            self.engine, self.db_type = relational_utils.get_engine(self.properties["connection"], self.context)
 
             logger.debug(f"Connecting to {self.db_type}")
             self.connection = self.engine.connect()

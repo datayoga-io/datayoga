@@ -1,47 +1,24 @@
 import logging
 from abc import ABCMeta
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
-import orjson
-from datayoga_core import expression
+from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
-from datayoga_core.expression import Language
+from datayoga_core.expression import Expression
 from datayoga_core.result import BlockResult, Result, Status
 
 logger = logging.getLogger("dy")
 
 
 class Block(DyBlock, metaclass=ABCMeta):
-
-    @staticmethod
-    def _prepare_expression(language: Language, expr: Union[dict, str]) -> str:
-        """Prepares the expression to compile.
-        The sql expression will be dumped as json.
-        For the jmespath the expression will be generated."""
-
-        if language == Language.SQL:
-            return orjson.dumps(expr).decode() if isinstance(expr, dict) else expr.strip()
-
-        def prepare_key(key: str) -> str:
-            return f'"{key}"' if " " in key else key
-
-        # If there is an object here, we generate an expression.
-        if isinstance(expr, dict):
-            expr = ", ".join(f"{prepare_key(k)}: {v}" for k, v in expr.items())
-            expr = f"{{{expr}}}"
-
-        return expr.strip()
+    expression: Expression
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         language = self.properties["language"]
-        expression_prop = self._prepare_expression(language, self.properties["expression"])
-
-        # jmespath expression for map block must be enclosed in { }
-        if not (expression_prop.startswith("{") and expression_prop.endswith("}")):
-            raise ValueError("map expression must be in a json-like format enclosed in { }")
+        expression_prop = utils.prepare_expression(language, self.properties["expression"])
 
         self.expression = expression.compile(language, expression_prop)
 

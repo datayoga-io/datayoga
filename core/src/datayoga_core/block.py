@@ -21,36 +21,31 @@ class Block(metaclass=ABCMeta):
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
     RESULT_FIELD = f"{INTERNAL_FIELD_PREFIX}result"
     OPCODE_FIELD = f"{INTERNAL_FIELD_PREFIX}opcode"
-    """
-    Block
+    """Block.
 
     Attributes:
-        properties Dict[str, Any]: Block properties
+        properties Dict[str, Any]: Block properties.
     """
 
     def __init__(self, properties: Optional[Dict[str, Any]] = None):
-        """
-        Constructs a block
+        """Constructs a block.
 
         Args:
-            properties (Optional[Dict[str, Any]]): Block [properties]
+            properties (Optional[Dict[str, Any]]): Block [properties].
         """
         self.properties = properties or {}
         self.validate()
 
     def validate(self):
-        """
-        Validates block against its JSON Schema
-        """
+        """Validates block against its JSON Schema"""
         logger.debug(f"validating {self.properties}")
         validate(instance=self.properties, schema=self.get_json_schema())
 
     def get_json_schema(self) -> Dict[str, Any]:
-        """
-        Returns the JSON Schema for this block
+        """Returns the JSON Schema for this block.
 
         Returns:
-            Dict[str, Any]: JSON Schema
+            Dict[str, Any]: JSON Schema.
         """
         json_schema_file = path.join(
             utils.get_bundled_dir(),
@@ -65,8 +60,7 @@ class Block(metaclass=ABCMeta):
 
     @abstractmethod
     def init(self, context: Optional[Context] = None):
-        """
-        Initializes block
+        """Initializes block.
 
         Args:
             context (Context, optional): Context. Defaults to None.
@@ -74,20 +68,18 @@ class Block(metaclass=ABCMeta):
         raise NotImplementedError
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
-        """Transforms data
+        """Transforms data.
 
         Args:
-            data (List[Dict[str, Any]]): Data
+            data (List[Dict[str, Any]]): Data.
 
         Returns:
-            BlockResult: Block result
+            BlockResult: Block result.
         """
         pass
 
     def stop(self):
-        """
-        Cleans the block connections and state
-        """
+        """Cleans the block connections and state."""
         pass
 
     def get_block_name(self):

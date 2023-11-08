@@ -26,31 +26,31 @@ DEFAULT_DRIVERS = {
 
 
 def get_engine(connection_name: str, context: Context, autocommit: bool = True) -> Tuple[sa.engine.Engine, DbType]:
-    connection = utils.get_connection_details(connection_name, context)
+    connection_details = utils.get_connection_details(connection_name, context)
 
-    db_type = DbType(connection.get("type", "").lower())
+    db_type = DbType(connection_details.get("type", "").lower())
 
-    query_args = connection.get("query_args", {})
-    connect_args = connection.get("connect_args", {})
+    query_args = connection_details.get("query_args", {})
+    connect_args = connection_details.get("connect_args", {})
     extra = {}
 
     if autocommit:
         extra["isolation_level"] = "AUTOCOMMIT"
 
-    if db_type == DbType.ORACLE and connection.get("oracle_thick_mode", False):
-        lib_dir = connection.get("oracle_thick_mode_lib_dir")
+    if db_type == DbType.ORACLE and connection_details.get("oracle_thick_mode", False):
+        lib_dir = connection_details.get("oracle_thick_mode_lib_dir")
         extra["thick_mode"] = {"lib_dir": lib_dir} if lib_dir else {}
 
     engine = sa.create_engine(
         sa.engine.URL.create(
-            drivername=connection.get("driver", DEFAULT_DRIVERS.get(db_type)),
-            host=connection.get("host"),
-            port=connection.get("port"),
-            username=connection.get("user"),
-            password=connection.get("password"),
-            database=connection.get("database"),
+            drivername=connection_details.get("driver", DEFAULT_DRIVERS.get(db_type)),
+            host=connection_details.get("host"),
+            port=connection_details.get("port"),
+            username=connection_details.get("user"),
+            password=connection_details.get("password"),
+            database=connection_details.get("database"),
             query=query_args),
-        echo=connection.get("debug", False),
+        echo=connection_details.get("debug", False),
         connect_args=connect_args,
         **extra)
 

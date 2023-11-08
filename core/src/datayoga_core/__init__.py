@@ -88,12 +88,9 @@ def get_connections_json_schema() -> Dict[str, Any]:
             "if": {
                 "properties": {
                     "type": {
-                        "description": "Connection type",
-                        "type": "string",
                         "const": connection_type
                     },
                 },
-                "required": ["type"]
             },
             "then": schema
         })
