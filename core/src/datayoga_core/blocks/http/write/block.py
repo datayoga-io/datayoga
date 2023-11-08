@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-import requests
+import aiohttp
 from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
 from datayoga_core.context import Context
@@ -74,52 +74,49 @@ class Block(DyBlock):
         request_configs = {}
         process_dict(self.request_config, request_configs)
 
-        for i, row in enumerate(data):
-            response = None
+        async with aiohttp.ClientSession() as session:
+            for i, row in enumerate(data):
+                response = None
 
-            try:
-                url = f"{self.base_uri}/{request_configs['endpoint'][i].lstrip('/')}"
-                headers = {key: value[i] for key, value in request_configs["headers"].items()}
-                query_params = {key: value[i] for key, value in request_configs["query_params"].items()}
-                payload = {key: value[i] for key, value in request_configs["payload"].items()}
+                try:
+                    url = f"{self.base_uri}/{request_configs['endpoint'][i].lstrip('/')}"
+                    headers = {key: value[i] for key, value in request_configs["headers"].items()}
+                    query_params = {
+                        key: str(value[i]) for key, value in request_configs["query_params"].items()
+                        if value[i] is not None}
+                    payload = {key: value[i] for key, value in request_configs["payload"].items()}
 
-                logger.debug(
-                    f"Sending HTTP {self.method} request to: {url}\nheaders:{headers}\n\tquery_params: {query_params}\n\tpayload: {payload}")
+                    logger.debug(
+                        f"Sending HTTP {self.method} request to: {url}\nheaders:{headers}\n\tquery_params: {query_params}\n\tpayload: {payload}")
 
-                if self.method == "GET":
-                    response = requests.get(url, params=query_params, headers=headers, timeout=self.timeout)
-                elif self.method == "POST":
-                    response = requests.post(url, data=payload, params=query_params,
-                                             headers=headers, timeout=self.timeout)
-                elif self.method == "PUT":
-                    response = requests.put(url, data=payload, params=query_params,
-                                            headers=headers, timeout=self.timeout)
-                elif self.method == "DELETE":
-                    response = requests.delete(url, params=query_params, headers=headers, timeout=self.timeout)
+                    async with session.request(self.method, url, params=query_params, headers=headers, data=payload, timeout=self.timeout) as response:
+                        response_status = response.status
+                        response_headers = dict(response.headers)
+                        response_text = await response.text()
 
-                if response:
-                    logger.debug(f"HTTP response code: {response.status_code}")
-                    logger.debug(f"Response Content: {response.content}")
+                    logger.debug(f"HTTP response code: {response_status}")
+                    logger.debug(f"Response Headers: {response_headers}")
+                    logger.debug(f"Response Content: {response_text}")
 
                     if self.response_status_code_field:
-                        utils.set_field(row, self.response_status_code_field, response.status_code)
+                        utils.set_field(row, self.response_status_code_field, response_status)
 
                     if self.response_headers_field:
-                        utils.set_field(row, self.response_headers_field, response.headers)
+                        utils.set_field(row, self.response_headers_field, response_headers)
 
                     if self.response_content_field:
-                        utils.set_field(row, self.response_content_field, response.content)
+                        utils.set_field(row, self.response_content_field, response_text)
 
                     if response.ok:
                         block_result.processed.append(Result(Status.SUCCESS, payload=row))
                     else:
-                        error_message = response.text if response else "Unknown error"
+                        error_message = response_text if response_text else "Unknown error"
                         block_result.rejected.append(
                             Result(
                                 status=Status.REJECTED, payload=row,
-                                message=f"HTTP request failed with status code {response.status_code if response else 'Unknown'}. Error message: {error_message}"))
-            except Exception as e:
-                block_result.rejected.append(
-                    Result(status=Status.REJECTED, payload=row, message=f"Error making HTTP request: {f'{e}'}"))
+                                message=f"HTTP request failed with status code {response_status}. Error message: {error_message}"))
+                except Exception as e:
+                    block_result.rejected.append(
+                        Result(status=Status.REJECTED, payload=row, message=f"Error making HTTP request: {f'{e}'}"))
 
         return block_result

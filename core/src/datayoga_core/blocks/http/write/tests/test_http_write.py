@@ -1,26 +1,25 @@
 import json
-from typing import Any, Dict
+from typing import Generator
 
 import pytest
+from aioresponses import aioresponses
 from datayoga_core import Context, utils
 from datayoga_core.blocks.http.write.block import Block
-from pytest_mock import MockerFixture
 
 
-class MockResponse:
-    def __init__(self, status_code: int, json_data: Any, headers: Dict[str, Any]):
-        self.status_code = status_code
-        self.json_data = json_data
-        self.headers = headers
-        self.content = json.dumps(json_data).encode("utf-8")
-        self.ok = 200 <= status_code < 300
+@pytest.fixture
+def mock_aioresponse() -> Generator[aioresponses, None, None]:
+    """Fixture providing an aioresponses instance for mocking aiohttp requests.
 
-    def json(self):
-        return self.json_data
+    Yields:
+        aioresponses: An instance of aioresponses for mocking aiohttp requests.
+    """
+    with aioresponses() as m:
+        yield m
 
 
 @pytest.mark.asyncio
-async def test_http_write(mocker: MockerFixture):
+async def test_http_write(mock_aioresponse: aioresponses):
     """Test case for the HTTP write block with mocked requests.put."""
     context = Context({
         "connections": {
@@ -81,33 +80,60 @@ async def test_http_write(mocker: MockerFixture):
 
     block.init(context)
 
-    mock_response = {
-        "status": "success"
-    }
+    url = "https://datayoga.io/users/123?country=usa&fname=JOHN&origin_country=israel"
 
-    mock_put = mocker.patch("requests.put", return_value=MockResponse(
-        status_code=200, json_data=mock_response, headers={"my_header": 123}))
+    mock_aioresponse.put(url,
+                         status=200,
+                         body=json.dumps({"status": "success"}),
+                         headers={"my_header": "123", 'Content-Type': 'application/json'})
 
     assert await block.run([
-        {"id": 123, "credit_card": "1234-5678-0000-9999", "fname": "john", "lname": "doe", "country_name": "usa"}
+        {
+            "id": 123,
+            "credit_card": "1234-5678-0000-9999",
+            "fname": "john",
+            "lname": "doe",
+            "country_name": "usa"
+        }
     ]) == utils.all_success([
-        {"id": 123,  "credit_card": "1234-5678-0000-9999", "fname": "john", "lname": "doe", "country_name": "usa", "response": {"status_code": 200, "headers": {"my_header": 123}, "content": b'{"status": "success"}'}}
+        {
+            "id": 123,
+            "credit_card": "1234-5678-0000-9999",
+            "fname": "john",
+            "lname": "doe",
+            "country_name": "usa",
+            "response": {
+                "status_code": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "my_header": "123"
+                },
+                "content": '{"status": "success"}'
+            }
+        }
     ])
 
-    mock_put.assert_called_once_with(
-        "https://datayoga.io/users/123",
-        headers={
-            "Authorization": "Bearer 1234-5678-0000-9999",
-            "Content-Type": "application/json",
-            "custom_header": "doe-john",
-        },
-        params={
-            "country": "usa",
-            "origin_country": "israel",
-            "fname": "JOHN"
-        },
-        data={
-            "full_name": "john doe",
-        },
-        timeout=3
-    )
+    # Validate the aiohttp request
+    calls = mock_aioresponse.requests
+
+    assert len(calls) == 1
+
+    request_key = list(calls.keys())[0]
+    request = calls[request_key][0].kwargs
+
+    assert request_key[0] == "PUT"
+    assert f"{request_key[1]}" == url
+
+    # Validate the request headers
+    assert request["headers"]["Authorization"] == "Bearer 1234-5678-0000-9999"
+    assert request["headers"]["Content-Type"] == "application/json"
+    assert request["headers"]["custom_header"] == "doe-john"
+
+    # Validate the request query parameters
+    assert request["params"]["country"] == "usa"
+    assert request["params"]["origin_country"] == "israel"
+    assert request["params"]["fname"] == "JOHN"
+
+    # Validate the request body (data)
+    assert request["data"] == {"full_name": "john doe"}
+    assert request["timeout"] == 3
