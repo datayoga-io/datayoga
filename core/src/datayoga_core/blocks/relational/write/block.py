@@ -77,7 +77,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         except DatabaseError as e:
             # Handling specific OracleDB errors: Network failure and Database restart
             if self.db_type == relational_utils.DbType.ORACLE:
-                self.hande_oracle_database_error(e)
+                self.handle_oracle_database_error(e)
             raise
 
     def dispose_engine(self):
@@ -182,7 +182,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             raise ConnectionError(e)
         except DatabaseError as e:
             if self.db_type == relational_utils.DbType.ORACLE:
-                self.hande_oracle_database_error(e)
+                self.handle_oracle_database_error(e)
 
             raise
 
@@ -191,7 +191,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         if e.orig.args[0] in (245, 2628):
             raise
 
-    def hande_oracle_database_error(self, e):
+    def handle_oracle_database_error(self, e):
         """Handling specific OracleDB cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
         if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
             self.dispose_engine()
