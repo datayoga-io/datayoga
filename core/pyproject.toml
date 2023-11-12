@@ -35,7 +35,6 @@ pytest-asyncio = { version = "^0.20.2", optional = true }
 pytest-describe = { version = "^2.0.1", optional = true }
 pytest-mock = { version = "^3.7.0", optional = true }
 pytest-timeout = { version = "^2.1.0", optional = true }
-pytest-xdist = { version = "^3.4.0", optional = true }
 requests-mock = { version = "^1.9.3", optional = true }
 testcontainers = { version = "^3.7.0", optional = true }
 
@@ -80,7 +79,6 @@ test = [
         "pytest-describe",
         "pytest-mock",
         "pytest-timeout",
-        "pytest-xdist",
         "redis",
         "requests-mock",
         "SQLAlchemy",
