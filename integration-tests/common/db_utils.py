@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional
 
 import sqlalchemy
+from datayoga_core.blocks.relational.utils import DEFAULT_DRIVERS, DbType
 from sqlalchemy import Column, Integer, String, Table, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
@@ -15,7 +16,7 @@ from testcontainers.postgres import PostgresContainer
 
 class Db2Container(DbContainer):
     def __init__(self, dbname: str, username: str, password: str, **kwargs):
-        super(Db2Container, self).__init__(image="ibmcom/db2", **kwargs)
+        super(Db2Container, self).__init__(image="icr.io/db2_community/db2", **kwargs)
         self.with_bind_ports(50000, 50000)
         self.dbname = dbname
         self.username = username
@@ -23,9 +24,9 @@ class Db2Container(DbContainer):
 
     def get_connection_url(self):
         return super()._create_connection_url(
-            dialect="ibm_db_sa", username=self.username, password=self.password, port=self.get_exposed_port(50000),
-            db_name=self.dbname
-        )
+            dialect=DEFAULT_DRIVERS.get(DbType.DB2),
+            username=self.username, password=self.password, port=self.get_exposed_port(50000),
+            db_name=self.dbname,)
 
     @wait_container_is_ready()
     def _connect(self):
@@ -33,10 +34,11 @@ class Db2Container(DbContainer):
         engine.connect()
 
     def _configure(self):
+        self.with_env("DB2INSTANCE", self.username)
         self.with_env("DB2INST1_PASSWORD", self.password)
         self.with_env("LICENSE", "accept")
         self.with_env("DBNAME", self.dbname)
-        self.with_env("DB2INST1_USER", self.username)
+        self.with_volume_mapping("/tmp/db2", "/database", mode="rw")
 
 
 def get_db2_container(db_name: str, db_user: str, db_password: str) -> Db2Container:
@@ -74,10 +76,8 @@ def get_postgres_container(db_name: str, db_user: str, db_password: str) -> Post
 def get_oracle_container() -> OracleDbContainer:
     class FixedOracleDbContainer(OracleDbContainer):
         def get_connection_url(self):
-            return super()._create_connection_url(
-                dialect="oracle+oracledb", username="system", password="oracle", port=self.container_port,
-                db_name="xe"
-            )
+            return super()._create_connection_url(dialect=DEFAULT_DRIVERS.get(DbType.ORACLE),
+                                                  username="system", password="oracle", port=self.container_port, db_name="xe")
 
         @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
         def _connect(self):

@@ -13,14 +13,11 @@ def test_redis_to_db2():
     try:
         schema_name = "hr"
 
-        # Start Redis container
         redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
-        # Add data to Redis stream
         redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
-        # Start Db2 container
         db2_container = db_utils.get_db2_container("hr", "my_user", "my_pass")
         db2_container.start()
 
