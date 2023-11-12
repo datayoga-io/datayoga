@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional
 
-import sqlalchemy
 from datayoga_core.blocks.relational.utils import DEFAULT_DRIVERS, DbType
-from sqlalchemy import Column, Integer, String, Table, text
+from sqlalchemy import (Column, Integer, String, Table, create_engine, inspect,
+                        text)
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import (ADDITIONAL_TRANSIENT_ERRORS,
@@ -31,7 +31,7 @@ class Db2Container(DbContainer):
 
     @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
     def _connect(self):
-        engine = sqlalchemy.create_engine(self.get_connection_url())
+        engine = create_engine(self.get_connection_url())
         engine.connect()
 
     def _configure(self):
@@ -81,20 +81,26 @@ def get_oracle_container() -> OracleDbContainer:
 
         @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
         def _connect(self):
-            engine = sqlalchemy.create_engine(self.get_connection_url(), thick_mode={}, isolation_level="AUTOCOMMIT")
+            engine = create_engine(self.get_connection_url(), thick_mode={}, isolation_level="AUTOCOMMIT")
             engine.connect()
 
     return FixedOracleDbContainer().with_bind_ports(1521, 11521)
 
 
 def get_engine(db_container: DbContainer) -> Engine:
-    return sqlalchemy.create_engine(db_container.get_connection_url())
+    return create_engine(db_container.get_connection_url())
 
 
-def create_schema(engine: Engine, schema_name: str):
-    with engine.connect() as connection:
-        with connection.begin():
-            connection.execute(sqlalchemy.schema.CreateSchema(schema_name))
+def schema_exists(engine, schema_name):
+    inspector = inspect(engine)
+    return schema_name in inspector.get_schema_names()
+
+
+def create_schema(engine, schema_name):
+    if not schema_exists(engine, schema_name):
+        with engine.connect() as connection:
+            with connection.begin():
+                connection.execute(text(f"CREATE SCHEMA {schema_name}"))
 
 
 def create_emp_table(engine: Engine, schema_name: str):
