@@ -1,3 +1,10 @@
+db2-hr:
+  type: db2
+  host: localhost
+  port: 50000
+  database: hr
+  user: my_user
+  password: my_pass
 psql-hr:
   type: postgresql
   host: localhost

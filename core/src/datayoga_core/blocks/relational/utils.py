@@ -11,6 +11,7 @@ logger = logging.getLogger("dy")
 
 @unique
 class DbType(str, Enum):
+    DB2 = "db2"
     MYSQL = "mysql"
     ORACLE = "oracle"
     PSQL = "postgresql"
@@ -18,6 +19,7 @@ class DbType(str, Enum):
 
 
 DEFAULT_DRIVERS = {
+    DbType.DB2: "db2+ibm_db",
     DbType.MYSQL: "mysql+pymysql",
     DbType.ORACLE: "oracle+oracledb",
     DbType.PSQL: "postgresql",

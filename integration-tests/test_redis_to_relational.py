@@ -9,6 +9,38 @@ from sqlalchemy.engine import Engine
 logger = logging.getLogger("dy")
 
 
+def test_redis_to_db2():
+    try:
+        schema_name = "hr"
+
+        # Start Redis container
+        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
+        redis_container.start()
+
+        # Add data to Redis stream
+        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
+
+        # Start Db2 container
+        db2_container = db_utils.get_db2_container(name="hr", username="my_user", password="my_pass")
+        db2_container.start()
+
+        engine = db_utils.get_engine(db2_container)
+        db_utils.create_schema(engine, schema_name)
+        setup_database(engine, schema_name)
+
+        # Run the integration job
+        run_job("tests.redis_to_db2")
+
+        # Check the results in Db2
+        check_results(engine, schema_name)
+    finally:
+        # Stop containers in a context manager to ensure cleanup
+        with suppress(Exception):
+            redis_container.stop()
+        with suppress(Exception):
+            db2_container.stop()
+
+
 def test_redis_to_mysql():
     try:
         schema_name = "hr"

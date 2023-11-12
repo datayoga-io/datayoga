@@ -1,0 +1,50 @@
+{
+  "title": "DB2",
+  "description": "Schema for configuring DB2 database connection parameters",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "Connection type",
+      "type": "string",
+      "const": "db2"
+    },
+    "host": { "description": "DB host", "type": "string" },
+    "port": {
+      "description": "DB port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "database": { "description": "DB name", "type": "string" },
+    "user": { "description": "DB user", "type": "string" },
+    "password": { "description": "DB password", "type": "string" },
+    "connect_args": {
+      "description": "Additional arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "query_args": {
+      "description": "Additional query string arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": ["type", "host", "database", "user"],
+  "examples": [
+    {
+      "db2": {
+        "type": "db2",
+        "host": "localhost",
+        "port": 50000,
+        "database": "sample",
+        "user": "myuser",
+        "password": "mypass",
+        "connect_args": {
+          "ssl_ca": "/opt/ssl/ca.crt",
+          "ssl_cert": "/opt/ssl/client.crt",
+          "ssl_key": "/opt/ssl/client.key"
+        }
+      }
+    }
+  ]
+}

@@ -13,6 +13,29 @@ from testcontainers.oracle import OracleDbContainer
 from testcontainers.postgres import PostgresContainer
 
 
+class Db2Container(DbContainer):
+    def __init__(self, dbname: str, username: str, password: str, **kwargs):
+        super(Db2Container, self).__init__(
+            image="ibmcom/db2",
+            environment={"DB2INST1_PASSWORD": password, "LICENSE": "accept", "DBNAME": dbname,
+                         "DB2INST1_USER": username},
+            ports={"50000/tcp": None},
+            **kwargs)
+
+    def get_connection_url(self):
+        port = self.get_exposed_port(50000)
+        return f"ibm_db_sa://db2inst1:{port}/{self.get_param('DBNAME')}"
+
+    @wait_container_is_ready()
+    def _connect(self):
+        engine = sqlalchemy.create_engine(self.get_connection_url(), isolation_level="AUTOCOMMIT")
+        engine.connect()
+
+
+def get_db2_container(db_name: str, db_user: str, db_password: str) -> Db2Container:
+    return Db2Container(dbname=db_name, username=db_user, password=db_password)
+
+
 def get_sqlserver_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
     return SqlServerContainer(dbname=db_name, user=db_user, password=db_password).with_bind_ports(1433, 11433)
 
@@ -51,7 +74,6 @@ def get_oracle_container() -> OracleDbContainer:
 
         @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
         def _connect(self):
-            import sqlalchemy
             engine = sqlalchemy.create_engine(self.get_connection_url(), thick_mode={}, isolation_level="AUTOCOMMIT")
             engine.connect()
 
