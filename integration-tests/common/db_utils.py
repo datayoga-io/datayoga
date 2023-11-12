@@ -18,6 +18,7 @@ class Db2Container(DbContainer):
     def __init__(self, dbname: str, username: str, password: str, **kwargs):
         super(Db2Container, self).__init__(image="icr.io/db2_community/db2", **kwargs)
         self.with_bind_ports(50000, 50000)
+        self.with_kwargs(privileged=True)
         self.dbname = dbname
         self.username = username
         self.password = password
@@ -28,9 +29,9 @@ class Db2Container(DbContainer):
             username=self.username, password=self.password, port=self.get_exposed_port(50000),
             db_name=self.dbname,)
 
-    @wait_container_is_ready()
+    @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
     def _connect(self):
-        engine = sqlalchemy.create_engine(self.get_connection_url(), isolation_level="AUTOCOMMIT")
+        engine = sqlalchemy.create_engine(self.get_connection_url())
         engine.connect()
 
     def _configure(self):
@@ -38,7 +39,6 @@ class Db2Container(DbContainer):
         self.with_env("DB2INST1_PASSWORD", self.password)
         self.with_env("LICENSE", "accept")
         self.with_env("DBNAME", self.dbname)
-        self.with_volume_mapping("/tmp/db2", "/database", mode="rw")
 
 
 def get_db2_container(db_name: str, db_user: str, db_password: str) -> Db2Container:
@@ -94,7 +94,7 @@ def get_engine(db_container: DbContainer) -> Engine:
 def create_schema(engine: Engine, schema_name: str):
     with engine.connect() as connection:
         with connection.begin():
-            connection.execute(sqlalchemy.schema.CreateSchema(schema_name, if_not_exists=True))
+            connection.execute(sqlalchemy.schema.CreateSchema(schema_name))
 
 
 def create_emp_table(engine: Engine, schema_name: str):

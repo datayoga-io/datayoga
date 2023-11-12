@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import suppress
 
 import pytest
@@ -25,13 +26,9 @@ def test_redis_to_db2():
         db_utils.create_schema(engine, schema_name)
         setup_database(engine, schema_name)
 
-        # Run the integration job
         run_job("tests.redis_to_db2")
-
-        # Check the results in Db2
         check_results(engine, schema_name)
     finally:
-        # Stop containers in a context manager to ensure cleanup
         with suppress(Exception):
             redis_container.stop()
         with suppress(Exception):
@@ -164,7 +161,7 @@ def check_results(engine: Engine, schema_name: str):
     assert second_employee["country"] == "972 - ISRAEL"
     assert second_employee["gender"] == "F"
     # address was not in the inserted record. verify that additional columns are set to null
-    assert second_employee["address"] == None
+    assert second_employee["address"] is None
 
     # address is not in the record. verify an upsert operation doesn't remove it
     third_employee = db_utils.select_one_row(engine, f"select * from {schema_name}.emp where id = 12")

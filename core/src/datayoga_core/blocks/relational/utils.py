@@ -19,7 +19,7 @@ class DbType(str, Enum):
 
 
 DEFAULT_DRIVERS = {
-    DbType.DB2: "db2+ibm_db",
+    DbType.DB2: "ibm_db_sa",
     DbType.MYSQL: "mysql+pymysql",
     DbType.ORACLE: "oracle+oracledb",
     DbType.PSQL: "postgresql",
@@ -37,7 +37,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
     extra = {}
 
     if autocommit:
-        extra["isolation_level"] = "AUTOCOMMIT"
+        extra["isolation_level"] = None if db_type == DbType.DB2 else "AUTOCOMMIT"
 
     if db_type == DbType.ORACLE and connection_details.get("oracle_thick_mode", False):
         lib_dir = connection_details.get("oracle_thick_mode_lib_dir")
