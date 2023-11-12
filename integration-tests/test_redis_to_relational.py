@@ -21,7 +21,7 @@ def test_redis_to_db2():
         redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
         # Start Db2 container
-        db2_container = db_utils.get_db2_container(name="hr", username="my_user", password="my_pass")
+        db2_container = db_utils.get_db2_container("hr", "my_user", "my_pass")
         db2_container.start()
 
         engine = db_utils.get_engine(db2_container)
