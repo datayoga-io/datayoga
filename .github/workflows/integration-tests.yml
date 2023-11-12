@@ -45,4 +45,4 @@ jobs:
       - name: Run tests
         run: |
           cd integration-tests
-          PYTHONPATH=. python -m pytest -n auto -s --log-cli-level=DEBUG -k db2
+          PYTHONPATH=. python -m pytest -n auto -s --log-cli-level=DEBUG
