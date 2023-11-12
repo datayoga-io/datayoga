@@ -67,6 +67,7 @@ test = [
         "aiohttp",
         "cassandra-driver",
         "fastparquet",
+        "ibm_db_sa",
         "mock",
         "oracledb",
         "psycopg2-binary",
