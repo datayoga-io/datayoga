@@ -21,15 +21,19 @@ class Db2Container(DbContainer):
                          "DB2INST1_USER": username},
             ports={"50000/tcp": None},
             **kwargs)
+        self.dbname = dbname
 
     def get_connection_url(self):
         port = self.get_exposed_port(50000)
-        return f"ibm_db_sa://db2inst1:{port}/{self.get_param('DBNAME')}"
+        return f"ibm_db_sa://db2inst1:{port}/{self.dbname}"
 
     @wait_container_is_ready()
     def _connect(self):
         engine = sqlalchemy.create_engine(self.get_connection_url(), isolation_level="AUTOCOMMIT")
         engine.connect()
+
+    def _configure(self):
+        pass
 
 
 def get_db2_container(db_name: str, db_user: str, db_password: str) -> Db2Container:
