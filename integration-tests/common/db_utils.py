@@ -15,13 +15,10 @@ from testcontainers.postgres import PostgresContainer
 
 class Db2Container(DbContainer):
     def __init__(self, dbname: str, username: str, password: str, **kwargs):
-        super(Db2Container, self).__init__(
-            image="ibmcom/db2",
-            environment={"DB2INST1_PASSWORD": password, "LICENSE": "accept", "DBNAME": dbname,
-                         "DB2INST1_USER": username},
-            ports={"50000/tcp": None},
-            **kwargs)
+        super(Db2Container, self).__init__(image="ibmcom/db2", **kwargs)
         self.dbname = dbname
+        self.username = username
+        self.password = password
 
     def get_connection_url(self):
         port = self.get_exposed_port(50000)
@@ -33,7 +30,10 @@ class Db2Container(DbContainer):
         engine.connect()
 
     def _configure(self):
-        pass
+        self.with_env("DB2INST1_PASSWORD", self.password)
+        self.with_env("LICENSE", "accept")
+        self.with_env("DBNAME", self.dbname)
+        self.with_env("DB2INST1_USER", self.username)
 
 
 def get_db2_container(db_name: str, db_user: str, db_password: str) -> Db2Container:
