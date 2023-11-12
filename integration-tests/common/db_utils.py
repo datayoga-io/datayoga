@@ -16,6 +16,7 @@ from testcontainers.postgres import PostgresContainer
 class Db2Container(DbContainer):
     def __init__(self, dbname: str, username: str, password: str, **kwargs):
         super(Db2Container, self).__init__(image="ibmcom/db2", **kwargs)
+        self.with_bind_ports(50000, 50000)
         self.dbname = dbname
         self.username = username
         self.password = password
