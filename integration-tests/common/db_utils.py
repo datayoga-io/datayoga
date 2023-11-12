@@ -22,8 +22,10 @@ class Db2Container(DbContainer):
         self.password = password
 
     def get_connection_url(self):
-        port = self.get_exposed_port(50000)
-        return f"ibm_db_sa://db2inst1:{port}/{self.dbname}"
+        return super()._create_connection_url(
+            dialect="ibm_db_sa", username=self.username, password=self.password, port=self.get_exposed_port(50000),
+            db_name=self.dbname
+        )
 
     @wait_container_is_ready()
     def _connect(self):
