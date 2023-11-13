@@ -9,12 +9,11 @@ from sqlalchemy.engine import Engine
 logger = logging.getLogger("dy")
 SCHEMA_NAME = "hr"
 
+
 # sqlserver test fails due https://github.com/testcontainers/testcontainers-python/issues/285
 # will be changed once this [1] PR is merged:
 #
 # [1] https://github.com/testcontainers/testcontainers-python/pull/286
-
-
 @pytest.mark.parametrize("db_type",
                          ["db2", "mysql", "pg", "oracle", pytest.param("sqlserver", marks=pytest.mark.xfail)])
 def test_redis_to_relational_db(db_type: str):
@@ -22,6 +21,8 @@ def test_redis_to_relational_db(db_type: str):
     try:
         redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
+
+        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
 
         if db_type == "db2":
             db_container = db_utils.get_db2_container("hr", "my_user", "my_pass")
