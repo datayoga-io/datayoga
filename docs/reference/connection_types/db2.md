@@ -14,7 +14,7 @@ Schema for configuring DB2 database connection parameters
 |----|----|-----------|--------|
 |**type**|`string`|Connection type<br/>Constant Value: `"db2"`<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
-|**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|no|
+|**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|yes|
 |**database**|`string`|DB name<br/>|yes|
 |**user**|`string`|DB user<br/>|yes|
 |**password**|`string`|DB password<br/>|no|
