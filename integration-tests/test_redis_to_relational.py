@@ -1,5 +1,4 @@
 import logging
-import os
 from contextlib import suppress
 
 import pytest
@@ -8,143 +7,51 @@ from common.utils import run_job
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
+SCHEMA_NAME = "hr"
+
+# sqlserver test fails due https://github.com/testcontainers/testcontainers-python/issues/285
+# will be changed once this [1] PR is merged:
+#
+# [1] https://github.com/testcontainers/testcontainers-python/pull/286
 
 
-def test_redis_to_db2():
+@pytest.mark.parametrize("db_type",
+                         ["db2", "mysql", "pg", "oracle", pytest.param("sqlserver", marks=pytest.mark.xfail)])
+def test_redis_to_relational_db(db_type: str):
+    """Reads data from a Redis stream and writes it to a relational database."""
     try:
-        schema_name = "hr"
-
         redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
+        if db_type == "db2":
+            db_container = db_utils.get_db2_container("hr", "my_user", "my_pass")
+        elif db_type == "mysql":
+            db_container = db_utils.get_mysql_container("root", "hr", "my_user", "my_pass")
+        elif db_type == "pg":
+            db_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
+        elif db_type == "oracle":
+            db_container = db_utils.get_oracle_container()
+        elif db_type == "sqlserver":
+            db_container = db_utils.get_sqlserver_container("tempdb", "sa")
+        else:
+            raise ValueError(f"Unsupported database type: {db_type}")
 
-        db2_container = db_utils.get_db2_container("hr", "my_user", "my_pass")
-        db2_container.start()
+        db_container.start()
 
-        engine = db_utils.get_engine(db2_container)
-        db_utils.create_schema(engine, schema_name)
-        setup_database(engine, schema_name)
+        engine = db_utils.get_engine(db_container)
+        db_utils.create_schema(engine, SCHEMA_NAME)
+        db_utils.create_emp_table(engine, SCHEMA_NAME)
+        db_utils.create_address_table(engine, SCHEMA_NAME)
+        db_utils.insert_to_emp_table(engine, SCHEMA_NAME)
+        db_utils.insert_to_address_table(engine, SCHEMA_NAME)
 
-        run_job("tests.redis_to_db2")
-        check_results(engine, schema_name)
+        run_job(f"tests.redis_to_{db_type}")
+        check_results(engine, SCHEMA_NAME)
     finally:
         with suppress(Exception):
             redis_container.stop()
         with suppress(Exception):
-            db2_container.stop()
-
-
-def test_redis_to_mysql():
-    try:
-        schema_name = "hr"
-
-        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
-        redis_container.start()
-
-        mysql_container = db_utils.get_mysql_container("root", "hr", "my_user", "my_pass")
-        mysql_container.start()
-
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
-
-        engine = db_utils.get_engine(mysql_container)
-        db_utils.create_schema(engine, schema_name)
-        setup_database(engine, schema_name)
-
-        run_job("tests.redis_to_mysql")
-        check_results(engine, schema_name)
-    finally:
-        with suppress(Exception):
-            redis_container.stop()  # noqa
-        with suppress(Exception):
-            mysql_container.stop()  # noqa
-
-
-def test_redis_to_pg():
-    try:
-        schema_name = "hr"
-
-        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
-        redis_container.start()
-
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
-
-        postgres_container = db_utils.get_postgres_container("postgres", "postgres", "postgres")
-        postgres_container.start()
-
-        engine = db_utils.get_engine(postgres_container)
-        db_utils.create_schema(engine, schema_name)
-        setup_database(engine, schema_name)
-
-        run_job("tests.redis_to_pg")
-        check_results(engine, schema_name)
-    finally:
-        with suppress(Exception):
-            redis_container.stop()  # noqa
-        with suppress(Exception):
-            postgres_container.stop()  # noqa
-
-
-def test_redis_to_oracle():
-    try:
-        schema_name = "hr"
-
-        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
-        redis_container.start()
-
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
-
-        oracle_container = db_utils.get_oracle_container()
-        oracle_container.start()
-
-        engine = db_utils.get_engine(oracle_container)
-        setup_database(engine, schema_name)
-
-        run_job("tests.redis_to_oracle")
-
-        check_results(engine, schema_name)
-    finally:
-        with suppress(Exception):
-            redis_container.stop()  # noqa
-        with suppress(Exception):
-            oracle_container.stop()  # noqa
-
-
-@pytest.mark.xfail
-# fails due https://github.com/testcontainers/testcontainers-python/issues/285
-# will be changed once this [1] PR is merged:
-#
-# [1] https://github.com/testcontainers/testcontainers-python/pull/286
-def test_redis_to_sqlserver():
-    try:
-        schema_name = "dbo"
-
-        redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
-        redis_container.start()
-
-        redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
-
-        sqlserver_container = db_utils.get_sqlserver_container("tempdb", "sa")
-        sqlserver_container.start()
-
-        engine = db_utils.get_engine(sqlserver_container)
-        setup_database(engine, schema_name)
-
-        run_job("tests.redis_to_sqlserver")
-
-        check_results(engine, schema_name)
-    finally:
-        with suppress(Exception):
-            redis_container.stop()  # noqa
-        with suppress(Exception):
-            sqlserver_container.stop()  # noqa
-
-
-def setup_database(engine: Engine, schema_name: str):
-    db_utils.create_emp_table(engine, schema_name)
-    db_utils.create_address_table(engine, schema_name)
-    db_utils.insert_to_emp_table(engine, schema_name)
-    db_utils.insert_to_address_table(engine, schema_name)
+            database_container.stop()
 
 
 def check_results(engine: Engine, schema_name: str):

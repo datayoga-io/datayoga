@@ -91,13 +91,9 @@ def get_engine(db_container: DbContainer) -> Engine:
     return create_engine(db_container.get_connection_url())
 
 
-def schema_exists(engine, schema_name):
+def create_schema(engine: Engine, schema_name: str):
     inspector = inspect(engine)
-    return schema_name in inspector.get_schema_names()
-
-
-def create_schema(engine, schema_name):
-    if not schema_exists(engine, schema_name):
+    if not schema_name in inspector.get_schema_names():
         with engine.connect() as connection:
             with connection.begin():
                 connection.execute(text(f"CREATE SCHEMA {schema_name}"))
