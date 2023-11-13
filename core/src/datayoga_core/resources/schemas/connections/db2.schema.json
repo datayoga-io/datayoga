@@ -29,7 +29,7 @@
       "additionalProperties": true
     }
   },
-  "required": ["type", "host", "database", "user"],
+  "required": ["type", "host", "port", "database", "user"],
   "examples": [
     {
       "db2": {
