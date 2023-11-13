@@ -11,7 +11,6 @@ from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
-from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import (DatabaseError, OperationalError,
                             PendingRollbackError)
 from sqlalchemy.sql.expression import ColumnCollection
@@ -77,7 +76,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         except DatabaseError as e:
             # Handling specific OracleDB errors: Network failure and Database restart
             if self.db_type == relational_utils.DbType.ORACLE:
-                self.hande_oracle_database_error(e)
+                self.handle_oracle_database_error(e)
             raise
 
     def dispose_engine(self):
@@ -169,11 +168,32 @@ class Block(DyBlock, metaclass=ABCMeta):
                 ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
             ))
 
-    def execute(self, statement: Any, records: List[Dict[str, Any]]) -> CursorResult:
+        if self.db_type == relational_utils.DbType.DB2:
+            return sa.sql.text("""
+                MERGE INTO %s AS target
+                USING (VALUES (%s)) AS source (%s)
+                ON (%s)
+                WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
+                WHEN MATCHED THEN UPDATE SET %s
+                """ % (
+                f"{self.tbl.schema}.{self.tbl.name}",
+                ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
+                ", ".join([f"{column}" for column in self.business_key_columns]),
+                " AND ".join([f"target.{column} = source.{column}" for column in self.business_key_columns]),
+                ", ".join([f"{column}" for column in self.columns]),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
+                ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
+            ))
+
+    def execute(self, statement: Any, records: List[Dict[str, Any]]):
         try:
             if isinstance(statement, str):
                 statement = text(statement)
-            return self.connection.execute(statement, records)
+            logger.debug(f"Executing {statement} on {records}")
+            self.connection.execute(statement, records)
+            if not self.connection._is_autocommit_isolation():
+                self.connection.commit()
+
         except (OperationalError, PendingRollbackError) as e:
             if self.db_type == relational_utils.DbType.SQLSERVER:
                 self.handle_mssql_operational_error(e)
@@ -182,7 +202,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             raise ConnectionError(e)
         except DatabaseError as e:
             if self.db_type == relational_utils.DbType.ORACLE:
-                self.hande_oracle_database_error(e)
+                self.handle_oracle_database_error(e)
 
             raise
 
@@ -191,7 +211,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         if e.orig.args[0] in (245, 2628):
             raise
 
-    def hande_oracle_database_error(self, e):
+    def handle_oracle_database_error(self, e):
         """Handling specific OracleDB cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
         if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
             self.dispose_engine()

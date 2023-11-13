@@ -1,7 +1,8 @@
 from typing import Any, Dict, Optional
 
-import sqlalchemy
-from sqlalchemy import Column, Integer, String, Table, text
+from datayoga_core.blocks.relational.utils import DEFAULT_DRIVERS, DbType
+from sqlalchemy import (Column, Integer, String, Table, create_engine, inspect,
+                        text)
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import (ADDITIONAL_TRANSIENT_ERRORS,
@@ -11,6 +12,37 @@ from testcontainers.mssql import SqlServerContainer
 from testcontainers.mysql import MySqlContainer
 from testcontainers.oracle import OracleDbContainer
 from testcontainers.postgres import PostgresContainer
+
+
+class Db2Container(DbContainer):
+    def __init__(self, dbname: str, username: str, password: str, **kwargs):
+        super(Db2Container, self).__init__(image="icr.io/db2_community/db2", **kwargs)
+        self.with_bind_ports(50000, 50000)
+        self.with_kwargs(privileged=True)
+        self.dbname = dbname
+        self.username = username
+        self.password = password
+
+    def get_connection_url(self):
+        return super()._create_connection_url(
+            dialect=DEFAULT_DRIVERS.get(DbType.DB2),
+            username=self.username, password=self.password, port=self.get_exposed_port(50000),
+            db_name=self.dbname,)
+
+    @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
+    def _connect(self):
+        engine = create_engine(self.get_connection_url())
+        engine.connect()
+
+    def _configure(self):
+        self.with_env("DB2INSTANCE", self.username)
+        self.with_env("DB2INST1_PASSWORD", self.password)
+        self.with_env("LICENSE", "accept")
+        self.with_env("DBNAME", self.dbname)
+
+
+def get_db2_container(db_name: str, db_user: str, db_password: str) -> Db2Container:
+    return Db2Container(dbname=db_name, username=db_user, password=db_password)
 
 
 def get_sqlserver_container(db_name: str, db_user: str, db_password: Optional[str] = None) -> SqlServerContainer:
@@ -44,28 +76,27 @@ def get_postgres_container(db_name: str, db_user: str, db_password: str) -> Post
 def get_oracle_container() -> OracleDbContainer:
     class FixedOracleDbContainer(OracleDbContainer):
         def get_connection_url(self):
-            return super()._create_connection_url(
-                dialect="oracle+oracledb", username="system", password="oracle", port=self.container_port,
-                db_name="xe"
-            )
+            return super()._create_connection_url(dialect=DEFAULT_DRIVERS.get(DbType.ORACLE),
+                                                  username="system", password="oracle", port=self.container_port, db_name="xe")
 
         @wait_container_is_ready(*ADDITIONAL_TRANSIENT_ERRORS)
         def _connect(self):
-            import sqlalchemy
-            engine = sqlalchemy.create_engine(self.get_connection_url(), thick_mode={}, isolation_level="AUTOCOMMIT")
+            engine = create_engine(self.get_connection_url(), thick_mode={}, isolation_level="AUTOCOMMIT")
             engine.connect()
 
     return FixedOracleDbContainer().with_bind_ports(1521, 11521)
 
 
 def get_engine(db_container: DbContainer) -> Engine:
-    return sqlalchemy.create_engine(db_container.get_connection_url())
+    return create_engine(db_container.get_connection_url())
 
 
 def create_schema(engine: Engine, schema_name: str):
-    with engine.connect() as connection:
-        with connection.begin():
-            connection.execute(sqlalchemy.schema.CreateSchema(schema_name, if_not_exists=True))
+    inspector = inspect(engine)
+    if not schema_name in inspector.get_schema_names():
+        with engine.connect() as connection:
+            with connection.begin():
+                connection.execute(text(f"CREATE SCHEMA {schema_name}"))
 
 
 def create_emp_table(engine: Engine, schema_name: str):

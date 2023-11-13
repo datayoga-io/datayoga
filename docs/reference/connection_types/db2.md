@@ -3,16 +3,16 @@ parent: Connection Types
 grand_parent: Reference
 ---
 
-# MySQL
+# DB2
 
-Schema for configuring MySQL database connection parameters
+Schema for configuring DB2 database connection parameters
 
 
 **Properties**
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|Connection type<br/>Constant Value: `"mysql"`<br/>|yes|
+|**type**|`string`|Connection type<br/>Constant Value: `"db2"`<br/>|yes|
 |**host**|`string`|DB host<br/>|yes|
 |**port**|`integer`|DB port<br/>Minimum: `1`<br/>Maximum: `65535`<br/>|yes|
 |**database**|`string`|DB name<br/>|yes|
@@ -24,11 +24,11 @@ Schema for configuring MySQL database connection parameters
 **Example**
 
 ```yaml
-hr:
-  type: mysql
+db2:
+  type: db2
   host: localhost
-  port: 3306
-  database: hr
+  port: 50000
+  database: sample
   user: myuser
   password: mypass
   connect_args:

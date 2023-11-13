@@ -1,12 +1,12 @@
 {
-  "title": "Oracle",
-  "description": "Schema for configuring Oracle database connection parameters",
+  "title": "DB2",
+  "description": "Schema for configuring DB2 database connection parameters",
   "type": "object",
   "properties": {
     "type": {
       "description": "Connection type",
       "type": "string",
-      "const": "oracle"
+      "const": "db2"
     },
     "host": { "description": "DB host", "type": "string" },
     "port": {
@@ -15,19 +15,9 @@
       "minimum": 1,
       "maximum": 65535
     },
-    "driver": { "description": "Driver", "type": "string" },
     "database": { "description": "DB name", "type": "string" },
     "user": { "description": "DB user", "type": "string" },
     "password": { "description": "DB password", "type": "string" },
-    "oracle_thick_mode": {
-      "description": "Enable oracle's thick mode(requires installed Oracle Client)",
-      "type": "boolean",
-      "default": false
-    },
-    "oracle_thick_mode_lib_dir": {
-      "description": "Path to Oracle Client libraries",
-      "type": "string"
-    },
     "connect_args": {
       "description": "Additional arguments to use when connecting to the DB",
       "type": "object",
@@ -42,15 +32,18 @@
   "required": ["type", "host", "port", "database", "user"],
   "examples": [
     {
-      "hr": {
-        "type": "oracle",
+      "db2": {
+        "type": "db2",
         "host": "localhost",
-        "port": 5432,
-        "database": "orcl",
-        "user": "scott",
-        "password": "tiger",
-        "oracle_thick_mode": true,
-        "oracle_thick_mode_lib_dir": "/opt/oracle/instantclient_21_8/"
+        "port": 50000,
+        "database": "sample",
+        "user": "myuser",
+        "password": "mypass",
+        "connect_args": {
+          "ssl_ca": "/opt/ssl/ca.crt",
+          "ssl_cert": "/opt/ssl/client.crt",
+          "ssl_key": "/opt/ssl/client.key"
+        }
       }
     }
   ]
