@@ -91,15 +91,16 @@ def get_engine(db_container: DbContainer) -> Engine:
     return create_engine(db_container.get_connection_url())
 
 
-def create_schema(engine: Engine, schema_name: str):
-    inspector = inspect(engine)
-    if not schema_name in inspector.get_schema_names():
-        with engine.connect() as connection:
-            with connection.begin():
-                connection.execute(text(f"CREATE SCHEMA {schema_name}"))
+def create_schema(engine: Engine, schema_name: Optional[str]):
+    if schema_name:
+        inspector = inspect(engine)
+        if not schema_name in inspector.get_schema_names():
+            with engine.connect() as connection:
+                with connection.begin():
+                    connection.execute(text(f"CREATE SCHEMA {schema_name}"))
 
 
-def create_emp_table(engine: Engine, schema_name: str):
+def create_emp_table(engine: Engine, schema_name: Optional[str]):
     base = declarative_base()
 
     columns = [
@@ -114,7 +115,7 @@ def create_emp_table(engine: Engine, schema_name: str):
     base.metadata.create_all(engine)
 
 
-def create_address_table(engine: Engine, schema_name: str):
+def create_address_table(engine: Engine, schema_name: Optional[str]):
     base = declarative_base()
 
     columns = [
@@ -128,26 +129,30 @@ def create_address_table(engine: Engine, schema_name: str):
     base.metadata.create_all(engine)
 
 
-def insert_to_emp_table(engine: Engine, schema_name: str):
+def insert_to_emp_table(engine: Engine, schema_name: Optional[str]):
+    schema_prefix = f"{schema_name}." if schema_name else ""
+    emp_table = f"{schema_prefix}emp"
     with engine.connect() as connection:
         with connection.begin():
             connection.execute(text(
-                f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')"))
+                f"INSERT INTO {emp_table} (id, full_name, country, gender) VALUES (1, 'John Doe', '972 - ISRAEL', 'M')"))
             connection.execute(text(
-                f"INSERT INTO {schema_name}.emp (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')"))
+                f"INSERT INTO {emp_table} (id, full_name, country, gender) VALUES (10, 'john doe', '972 - ISRAEL', 'M')"))
             connection.execute(text(
-                f"INSERT INTO {schema_name}.emp (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
+                f"INSERT INTO {emp_table} (id, full_name, country, gender, address) VALUES (12, 'steve steve', '972 - ISRAEL', 'M', 'main street')"))
 
 
-def insert_to_address_table(engine: Engine, schema_name: str):
+def insert_to_address_table(engine: Engine, schema_name: Optional[str]):
+    schema_prefix = f"{schema_name}." if schema_name else ""
+    address_table = f"{schema_prefix}address"
     with engine.connect() as connection:
         with connection.begin():
             connection.execute(text(
-                f"INSERT INTO {schema_name}.address (id, emp_id, country_code, address) VALUES (1, 1, 'IL', 'my address 1')"))
+                f"INSERT INTO {address_table} (id, emp_id, country_code, address) VALUES (1, 1, 'IL', 'my address 1')"))
             connection.execute(text(
-                f"INSERT INTO {schema_name}.address (id, emp_id, country_code, address) VALUES (2, 1, 'US', 'my address 2')"))
+                f"INSERT INTO {address_table} (id, emp_id, country_code, address) VALUES (2, 1, 'US', 'my address 2')"))
             connection.execute(text(
-                f"INSERT INTO {schema_name}.address (id, emp_id, country_code, address) VALUES (5, 12, 'US', 'my address 0')"))
+                f"INSERT INTO {address_table} (id, emp_id, country_code, address) VALUES (5, 12, 'US', 'my address 0')"))
 
 
 def select_one_row(engine: Engine, query: str) -> Optional[Dict[str, Any]]:

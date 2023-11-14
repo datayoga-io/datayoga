@@ -1,5 +1,6 @@
 import logging
 from contextlib import suppress
+from typing import Optional
 
 import pytest
 from common import db_utils, redis_utils
@@ -7,7 +8,7 @@ from common.utils import run_job
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
-SCHEMA_NAME = "hr"
+SCHEMA_NAME = None  # "hr"
 
 
 # sqlserver test fails due https://github.com/testcontainers/testcontainers-python/issues/285
@@ -55,15 +56,19 @@ def test_redis_to_relational_db(db_type: str):
             database_container.stop()
 
 
-def check_results(engine: Engine, schema_name: str):
+def check_results(engine: Engine, schema_name: Optional[str]):
+    schema_prefix = f"{schema_name}." if schema_name else ""
+    emp_table = f"{schema_prefix}emp"
+    address_table = f"{schema_prefix}address"
+
     # the first record was supposed to be deleted due to opcode=="d"
-    total_employees = db_utils.select_one_row(engine, f"select count(*) as total from {schema_name}.emp")
+    total_employees = db_utils.select_one_row(engine, f"select count(*) as total from {emp_table}")
     assert total_employees and total_employees["total"] == 3
 
-    first_employee = db_utils.select_one_row(engine, f"select * from {schema_name}.emp where id = 1")
+    first_employee = db_utils.select_one_row(engine, f"select * from {emp_table} where id = 1")
     assert first_employee is None
 
-    second_employee = db_utils.select_one_row(engine, f"select * from {schema_name}.emp where id = 2")
+    second_employee = db_utils.select_one_row(engine, f"select * from {emp_table} where id = 2")
     assert second_employee is not None
     assert second_employee["full_name"] == "Jane Doe"
     assert second_employee["country"] == "972 - ISRAEL"
@@ -72,29 +77,29 @@ def check_results(engine: Engine, schema_name: str):
     assert second_employee["address"] is None
 
     # address is not in the record. verify an upsert operation doesn't remove it
-    third_employee = db_utils.select_one_row(engine, f"select * from {schema_name}.emp where id = 12")
+    third_employee = db_utils.select_one_row(engine, f"select * from {emp_table} where id = 12")
     assert third_employee is not None
     assert third_employee["full_name"] == "John Doe"
     assert third_employee["country"] == "972 - ISRAEL"
     assert third_employee["gender"] == "M"
     assert third_employee["address"] == "main street"
 
-    total_addresses = db_utils.select_one_row(engine, f"select count(*) as total from {schema_name}.address")
+    total_addresses = db_utils.select_one_row(engine, f"select count(*) as total from {address_table}")
     assert total_addresses and total_addresses["total"] == 3
 
-    updated_address = db_utils.select_one_row(engine, f"select * from {schema_name}.address where id = 5")
+    updated_address = db_utils.select_one_row(engine, f"select * from {address_table} where id = 5")
     assert updated_address is not None
     assert updated_address["emp_id"] == 12
     assert updated_address["country_code"] == "IL"
     assert updated_address["address"] == "my address 5"
 
-    new_address_1 = db_utils.select_one_row(engine, f"select * from {schema_name}.address where id = 3")
+    new_address_1 = db_utils.select_one_row(engine, f"select * from {address_table} where id = 3")
     assert new_address_1 is not None
     assert new_address_1["emp_id"] == 2
     assert new_address_1["country_code"] == "IL"
     assert new_address_1["address"] == "my address 3"
 
-    new_address_2 = db_utils.select_one_row(engine, f"select * from {schema_name}.address where id = 4")
+    new_address_2 = db_utils.select_one_row(engine, f"select * from {address_table} where id = 4")
     assert new_address_2 is not None
     assert new_address_2["emp_id"] == 2
     assert new_address_2["country_code"] == "US"

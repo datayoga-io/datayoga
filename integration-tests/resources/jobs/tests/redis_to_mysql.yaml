@@ -22,7 +22,7 @@ steps:
   - uses: relational.write
     with:
       connection: mysql-hr
-      schema: hr
+      #schema: hr
       table: emp
       opcode_field: __$$opcode
       keys:
