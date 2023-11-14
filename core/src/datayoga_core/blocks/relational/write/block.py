@@ -145,7 +145,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                     WHEN NOT MATCHED BY target THEN INSERT (%s) VALUES (%s)
                     WHEN MATCHED THEN UPDATE SET %s;
                     """ % (
-                f"[{self.tbl.schema}].[{self.tbl.name}]",
+                relational_utils.construct_table_reference(self.tbl, with_brackets=True),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
                 ", ".join([f"[{column}]" for column in self.business_key_columns]),
                 "AND ".join([f"target.[{column}] = source.[{column}]" for column in self.business_key_columns]),
@@ -161,7 +161,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                     WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
                     WHEN MATCHED THEN UPDATE SET %s
                     """ % (
-                f"{self.tbl.schema}.{self.tbl.name}",
+                relational_utils.construct_table_reference(self.tbl),
                 "AND ".join([f"target.{column} = :{column}" for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.columns]),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
@@ -176,7 +176,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
                 WHEN MATCHED THEN UPDATE SET %s
                 """ % (
-                f"{self.tbl.schema}.{self.tbl.name}",
+                relational_utils.construct_table_reference(self.tbl),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.business_key_columns]),
                 " AND ".join([f"target.{column} = source.{column}" for column in self.business_key_columns]),

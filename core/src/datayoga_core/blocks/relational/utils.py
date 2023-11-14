@@ -57,3 +57,20 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
         **extra)
 
     return engine, db_type
+
+
+def construct_table_reference(table: sa.Table, with_brackets: bool = False) -> str:
+    """Constructs a table reference string.
+
+    Args:
+        table (sa.Table): The SQLAlchemy Table object.
+        with_brackets (bool, optional): Whether to include brackets around schema and table names or not.
+
+    Returns:
+        str: The formatted table reference string.
+    """
+    schema_prefix = ""
+    if table.schema:
+        schema_prefix = f"[{table.schema}]." if with_brackets else f"{table.schema}."
+    table_name = f"[{table.name}]" if with_brackets else table.name
+    return f"{schema_prefix}{table_name}"
