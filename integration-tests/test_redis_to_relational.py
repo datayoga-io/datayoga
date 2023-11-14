@@ -45,7 +45,8 @@ def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
         db_container.start()
 
         engine = db_utils.get_engine(db_container)
-        db_utils.create_schema(engine, schema_name)
+        if schema_name:
+            db_utils.create_schema(engine, schema_name)
         db_utils.create_emp_table(engine, schema_name)
         db_utils.create_address_table(engine, schema_name)
         db_utils.insert_to_emp_table(engine, schema_name)

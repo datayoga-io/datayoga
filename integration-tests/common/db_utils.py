@@ -91,13 +91,12 @@ def get_engine(db_container: DbContainer) -> Engine:
     return create_engine(db_container.get_connection_url())
 
 
-def create_schema(engine: Engine, schema_name: Optional[str]):
-    if schema_name:
-        inspector = inspect(engine)
-        if not schema_name in inspector.get_schema_names():
-            with engine.connect() as connection:
-                with connection.begin():
-                    connection.execute(text(f"CREATE SCHEMA {schema_name}"))
+def create_schema(engine: Engine, schema_name: str):
+    inspector = inspect(engine)
+    if not schema_name in inspector.get_schema_names():
+        with engine.connect() as connection:
+            with connection.begin():
+                connection.execute(text(f"CREATE SCHEMA {schema_name}"))
 
 
 def create_emp_table(engine: Engine, schema_name: Optional[str]):
