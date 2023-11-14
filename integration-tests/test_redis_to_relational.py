@@ -8,16 +8,20 @@ from common.utils import run_job
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("dy")
-SCHEMA_NAME = None  # "hr"
 
 
 # sqlserver test fails due https://github.com/testcontainers/testcontainers-python/issues/285
 # will be changed once this [1] PR is merged:
 #
 # [1] https://github.com/testcontainers/testcontainers-python/pull/286
-@pytest.mark.parametrize("db_type",
-                         ["db2", "mysql", "pg", "oracle", pytest.param("sqlserver", marks=pytest.mark.xfail)])
-def test_redis_to_relational_db(db_type: str):
+@pytest.mark.parametrize("db_type, schema_name", [
+    ("db2", None),
+    ("mysql", "hr"),
+    ("pg", "hr"),
+    ("oracle", "hr"),
+    pytest.param("sqlserver", "dbo", marks=pytest.mark.xfail)
+])
+def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
     """Reads data from a Redis stream and writes it to a relational database."""
     try:
         redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
@@ -41,14 +45,14 @@ def test_redis_to_relational_db(db_type: str):
         db_container.start()
 
         engine = db_utils.get_engine(db_container)
-        db_utils.create_schema(engine, SCHEMA_NAME)
-        db_utils.create_emp_table(engine, SCHEMA_NAME)
-        db_utils.create_address_table(engine, SCHEMA_NAME)
-        db_utils.insert_to_emp_table(engine, SCHEMA_NAME)
-        db_utils.insert_to_address_table(engine, SCHEMA_NAME)
+        db_utils.create_schema(engine, schema_name)
+        db_utils.create_emp_table(engine, schema_name)
+        db_utils.create_address_table(engine, schema_name)
+        db_utils.insert_to_emp_table(engine, schema_name)
+        db_utils.insert_to_address_table(engine, schema_name)
 
         run_job(f"tests.redis_to_{db_type}")
-        check_results(engine, SCHEMA_NAME)
+        check_results(engine, schema_name)
     finally:
         with suppress(Exception):
             redis_container.stop()

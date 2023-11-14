@@ -18,23 +18,6 @@ from sqlalchemy.sql.expression import ColumnCollection
 logger = logging.getLogger("dy")
 
 
-def construct_table_reference(table: sa.Table, with_brackets: bool = False) -> str:
-    """Constructs a table reference string.
-
-    Args:
-        table (sa.Table): The SQLAlchemy Table object.
-        with_brackets (bool, optional): Whether to include brackets around schema and table names or not.
-
-    Returns:
-        str: The formatted table reference string.
-    """
-    schema_prefix = ""
-    if table.schema:
-        schema_prefix = f"[{table.schema}]." if with_brackets else f"{table.schema}."
-    table_name = f"[{table.name}]" if with_brackets else table.name
-    return f"{schema_prefix}{table_name}"
-
-
 class Block(DyBlock, metaclass=ABCMeta):
     _engine_fields = ("business_key_columns", "mapping_columns", "columns",
                       "delete_stmt", "upsert_stmt", "tbl", "connection", "engine")
@@ -162,7 +145,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                     WHEN NOT MATCHED BY target THEN INSERT (%s) VALUES (%s)
                     WHEN MATCHED THEN UPDATE SET %s;
                     """ % (
-                construct_table_reference(self.tbl, with_brackets=True),
+                relational_utils.construct_table_reference(self.tbl, with_brackets=True),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
                 ", ".join([f"[{column}]" for column in self.business_key_columns]),
                 "AND ".join([f"target.[{column}] = source.[{column}]" for column in self.business_key_columns]),
@@ -178,7 +161,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                     WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
                     WHEN MATCHED THEN UPDATE SET %s
                     """ % (
-                construct_table_reference(self.tbl),
+                relational_utils.construct_table_reference(self.tbl),
                 "AND ".join([f"target.{column} = :{column}" for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.columns]),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
@@ -193,7 +176,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
                 WHEN MATCHED THEN UPDATE SET %s
                 """ % (
-                construct_table_reference(self.tbl),
+                relational_utils.construct_table_reference(self.tbl),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.business_key_columns]),
                 " AND ".join([f"target.{column} = source.{column}" for column in self.business_key_columns]),
