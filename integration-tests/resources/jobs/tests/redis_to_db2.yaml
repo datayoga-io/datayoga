@@ -34,7 +34,7 @@ steps:
   - uses: relational.write
     with:
       connection: db2-hr
-      schema: hr
+      #schema: hr
       table: address
       opcode_field: __$$opcode
       foreach: "addresses: addresses[]"
