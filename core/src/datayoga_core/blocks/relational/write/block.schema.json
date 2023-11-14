@@ -25,7 +25,7 @@
     "schema": {
       "type": "string",
       "title": "The table schema of the target table",
-      "description": "If left blank, the default schema of this connection will be used as defined in the connections.yaml",
+      "description": "If not specified, no specific schema will be used when connecting to the database.",
       "examples": ["dbo"]
     },
     "table": {
@@ -93,6 +93,6 @@
       ]
     }
   },
-  "required": ["connection", "table", "schema"],
+  "required": ["connection", "table"],
   "allOf": [{ "not": { "required": ["opcode_field", "load_strategy"] } }]
 }
