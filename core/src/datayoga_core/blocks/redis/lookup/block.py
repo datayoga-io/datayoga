@@ -35,7 +35,7 @@ class Block(DyBlock, metaclass=ABCMeta):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         logger.debug(f"Running {self.get_block_name()}")
 
-        pipeline = self.redis_client.pipeline()
+        pipeline = self.redis_client.pipeline(transaction=False)
         block_result = BlockResult()
 
         for record in data:
