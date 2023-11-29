@@ -179,10 +179,12 @@ class Block(DyBlock, metaclass=ABCMeta):
                 relational_utils.construct_table_reference(self.tbl),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.business_key_columns]),
-                " AND ".join([f'target."{column}" = source."{column}"' for column in self.business_key_columns]),
+                " AND ".join([f"target.{column} = source.{column}" for column in self.business_key_columns]),
+                # " AND ".join([f'target."{column}" = source."{column}"' for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.columns]),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
-                ", ".join([f'target."{column}" = {sa.bindparam(column)}' for column in self.mapping_columns])
+                ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
+                # ", ".join([f'target."{column}" = {sa.bindparam(column)}' for column in self.mapping_columns])
             ))
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]):
