@@ -168,7 +168,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
             ))
 
-       if self.db_type == relational_utils.DbType.DB2:
+        if self.db_type == relational_utils.DbType.DB2:
             return sa.sql.text("""
                 MERGE INTO %s AS target
                 USING (VALUES (%s)) AS source (%s)
@@ -184,8 +184,6 @@ class Block(DyBlock, metaclass=ABCMeta):
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
                 ", ".join([f'target."{column}" = {sa.bindparam(column)}' for column in self.mapping_columns])
             ))
-
-
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]):
         try:
