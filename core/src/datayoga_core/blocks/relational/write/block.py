@@ -61,7 +61,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                                                             if x not in self.business_key_columns]
 
                 for column in self.columns:
-                    if column not in self.tbl.columns:
+                    if not any(col.name.lower() == column.lower() for col in self.tbl.columns):
                         raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
                 self.delete_stmt = self.tbl.delete().where(
@@ -168,6 +168,22 @@ class Block(DyBlock, metaclass=ABCMeta):
                 ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
             ))
 
+        if self.db_type == relational_utils.DbType.SQLSERVER:
+            return sa.sql.text("""
+                    MERGE %s AS target
+                    USING (VALUES (%s)) AS source (%s) ON (%s)
+                    WHEN NOT MATCHED BY target THEN INSERT (%s) VALUES (%s)
+                    WHEN MATCHED THEN UPDATE SET %s;
+                    """ % (
+                relational_utils.construct_table_reference(self.tbl, with_brackets=True),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
+                ", ".join([f"[{column}]" for column in self.business_key_columns]),
+                " AND ".join([f"target.[{column}] = source.[{column}]" for column in self.business_key_columns]),
+                ", ".join([f"[{column}]" for column in self.tbl.columns if column.name in self.columns]),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.tbl.columns if column.name in self.columns]),
+                ", ".join([f"target.[{column}] = {sa.bindparam(column)}" for column in self.tbl.columns if column.name in self.mapping_columns])
+            ))
+
         if self.db_type == relational_utils.DbType.DB2:
             return sa.sql.text("""
                 MERGE INTO %s AS target
@@ -179,11 +195,26 @@ class Block(DyBlock, metaclass=ABCMeta):
                 relational_utils.construct_table_reference(self.tbl),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
                 ", ".join([f"{column}" for column in self.business_key_columns]),
-                # " AND ".join([f"target.{column} = source.{column}" for column in self.business_key_columns]),
                 " AND ".join([f'target."{column}" = source."{column}"' for column in self.business_key_columns]),
                 ", ".join([f'"{column}"' for column in self.columns]),
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
-                # ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
+                ", ".join([f'target."{column}" = {sa.bindparam(column)}' for column in self.mapping_columns])
+            ))
+
+        if self.db_type == relational_utils.DbType.DB2:
+            return sa.sql.text("""
+                MERGE INTO %s AS target
+                USING (VALUES (%s)) AS source (%s)
+                ON (%s)
+                WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)
+                WHEN MATCHED THEN UPDATE SET %s
+                """ % (
+                relational_utils.construct_table_reference(self.tbl),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
+                ", ".join([f"{column}" for column in self.business_key_columns]),
+                " AND ".join([f'target."{column}" = source."{column}"' for column in self.business_key_columns]),
+                ", ".join([f'"{column}"' for column in self.columns]),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
                 ", ".join([f'target."{column}" = {sa.bindparam(column)}' for column in self.mapping_columns])
             ))
 
