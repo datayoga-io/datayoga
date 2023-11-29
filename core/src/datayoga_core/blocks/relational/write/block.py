@@ -168,23 +168,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                 ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
             ))
 
-        if self.db_type == relational_utils.DbType.SQLSERVER:
-            return sa.sql.text("""
-                    MERGE %s AS target
-                    USING (VALUES (%s)) AS source (%s) ON (%s)
-                    WHEN NOT MATCHED BY target THEN INSERT (%s) VALUES (%s)
-                    WHEN MATCHED THEN UPDATE SET %s;
-                    """ % (
-                relational_utils.construct_table_reference(self.tbl, with_brackets=True),
-                ", ".join([f"{sa.bindparam(column)}" for column in self.business_key_columns]),
-                ", ".join([f"[{column}]" for column in self.business_key_columns]),
-                " AND ".join([f"target.[{column}] = source.[{column}]" for column in self.business_key_columns]),
-                ", ".join([f"[{column}]" for column in self.tbl.columns if column.name in self.columns]),
-                ", ".join([f"{sa.bindparam(column)}" for column in self.tbl.columns if column.name in self.columns]),
-                ", ".join([f"target.[{column}] = {sa.bindparam(column)}" for column in self.tbl.columns if column.name in self.mapping_columns])
-            ))
-
-        if self.db_type == relational_utils.DbType.DB2:
+       if self.db_type == relational_utils.DbType.DB2:
             return sa.sql.text("""
                 MERGE INTO %s AS target
                 USING (VALUES (%s)) AS source (%s)
