@@ -72,11 +72,6 @@ class Block(DyBlock, metaclass=ABCMeta):
                             break
 
                 self.delete_stmt = self.tbl.delete().where(sa.and_(*conditions))
-
-                # self.delete_stmt = self.tbl.delete().where(
-                #     sa.and_(
-                #         *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
-
                 self.upsert_stmt = self.generate_upsert_stmt()
 
         except OperationalError as e:

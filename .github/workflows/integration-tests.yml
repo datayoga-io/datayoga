@@ -42,4 +42,4 @@ jobs:
       - name: Run tests
         run: |
           cd integration-tests
-          PYTHONPATH=. python -m pytest -s --log-cli-level=DEBUG -k test_redis_to_relational
+          PYTHONPATH=. python -m pytest -s --log-cli-level=DEBUG

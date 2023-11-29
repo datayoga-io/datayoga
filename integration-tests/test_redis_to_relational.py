@@ -16,10 +16,10 @@ logger = logging.getLogger("dy")
 # [1] https://github.com/testcontainers/testcontainers-python/pull/286
 @pytest.mark.parametrize("db_type, schema_name", [
     ("db2", None),
-    # ("mysql", "hr"),
-    # ("pg", "hr"),
-    # ("oracle", "hr"),
-    # pytest.param("sqlserver", "dbo", marks=pytest.mark.xfail)
+    ("mysql", "hr"),
+    ("pg", "hr"),
+    ("oracle", "hr"),
+    pytest.param("sqlserver", "dbo", marks=pytest.mark.xfail)
 ])
 def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
     """Reads data from a Redis stream and writes it to a relational database."""
