@@ -25,9 +25,9 @@ steps:
       table: emp
       opcode_field: __$$opcode
       keys:
-        - ID: _id
+        - id: _id
       mapping:
-        - FULL_NAME: full_name
+        - full_name
         - country
         - gender
   - uses: relational.write
