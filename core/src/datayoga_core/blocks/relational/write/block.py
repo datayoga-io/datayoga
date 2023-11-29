@@ -64,9 +64,12 @@ class Block(DyBlock, metaclass=ABCMeta):
                     if not any(col.name.lower() == column.lower() for col in self.tbl.columns):
                         raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
-                self.delete_stmt = self.tbl.delete().where(
-                    sa.and_(
-                        *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+                self.delete_stmt = self.tbl.delete().where(sa.and_(
+                    *[(self.tbl.columns[column].ilike(sa.bindparam(column))) for column in self.business_key_columns]))
+
+                # self.delete_stmt = self.tbl.delete().where(
+                #     sa.and_(
+                #         *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
 
                 self.upsert_stmt = self.generate_upsert_stmt()
 
