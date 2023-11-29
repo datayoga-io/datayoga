@@ -61,13 +61,17 @@ class Block(DyBlock, metaclass=ABCMeta):
                                                             if x not in self.business_key_columns]
 
                 for column in self.columns:
-                    if column not in self.tbl.columns:
+                    if not any(col.name.lower() == column.lower() for col in self.tbl.columns):
                         raise ValueError(f"{column} column does not exist in {self.tbl.fullname} table")
 
-                self.delete_stmt = self.tbl.delete().where(
-                    sa.and_(
-                        *[(self.tbl.columns[column] == sa.bindparam(column)) for column in self.business_key_columns]))
+                conditions = []
+                for business_key_column in self.business_key_columns:
+                    for tbl_column in self.tbl.columns:
+                        if tbl_column.name.lower() == business_key_column.lower():
+                            conditions.append(tbl_column == sa.bindparam(business_key_column))
+                            break
 
+                self.delete_stmt = self.tbl.delete().where(sa.and_(*conditions))
                 self.upsert_stmt = self.generate_upsert_stmt()
 
         except OperationalError as e:
