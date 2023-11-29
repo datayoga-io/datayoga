@@ -68,5 +68,8 @@
     "xack",
     "xadd",
     "zadd"
-  ]
+  ],
+  "python.testing.pytestArgs": ["."],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }
