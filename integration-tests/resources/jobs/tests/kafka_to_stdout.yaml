@@ -1,0 +1,4 @@
+input:
+  uses: kafka.read
+steps:
+  - uses: std.write

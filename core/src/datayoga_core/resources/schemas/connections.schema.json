@@ -16,7 +16,8 @@
             "mysql",
             "postgresql",
             "redis",
-            "sqlserver"
+            "sqlserver",
+            "kafka"
           ]
         },
         "if": {

@@ -1,0 +1,47 @@
+{
+  "title": "Kafka",
+  "description": "Schema for configuring Kafka connection parameters",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "Connection type",
+      "type": "string",
+      "const": "kafka"
+    },
+    "bootstrap_servers": {
+      "description": "Kafka Hosts",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "port": {
+      "description": "Kafka port",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "topics": {
+      "description": "Kafka Topics",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "group": "Kafka Group",
+    "type": "string"
+  },
+  "additionalProperties": false,
+  "required": ["type", "bootstrap_servers", "port", "topics", "group"],
+  "examples": [
+    {
+      "kafka": {
+        "type": "kafka",
+        "host": ["localhost"],
+        "port": 9093,
+        "group":"test",
+        "topics": ["test"]
+      }
+    }
+  ]
+}
