@@ -1,4 +1,18 @@
 {
   "title": "kafka.read",
-  "description": "Read from the kafka consumer"
+  "description": "Read from the kafka consumer",
+  "type": "object",
+  "properties": {
+    "bootstrap_servers": {
+      "description": "host name",
+      "type": "string"
+    },
+    "seek_to_beginning": {
+      "description": "Consumer seek to beginning",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "bootstrap_servers"
+  ]
 }

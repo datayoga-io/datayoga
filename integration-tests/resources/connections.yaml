@@ -46,7 +46,6 @@ cassandra:
   port: 9042
 kafka:
   type: kafka
-  bootstrap_servers: ["localhost"]
-  port: 9093
-  group-id: "test"
-  topics: ["test"]
+  bootstrap_servers: ["localhost:9093"]
+  group: "test"
+  topic: "integration-tests"

@@ -1,4 +1,7 @@
 input:
   uses: kafka.read
+  with:
+    bootstrap_servers: kafka
+    seek_to_beginning: Yes
 steps:
   - uses: std.write

@@ -2,8 +2,8 @@ from typing import List
 
 from kafka import KafkaProducer
 from testcontainers.kafka import KafkaContainer
-def get_kafka_container(port: int) -> KafkaContainer:
-    return KafkaContainer().with_bind_ports(9092, port)
+def get_kafka_container() -> KafkaContainer:
+    return KafkaContainer().with_bind_ports(KafkaContainer.KAFKA_PORT, KafkaContainer.KAFKA_PORT)
 
-def get_kafka_producer(topic: str) -> KafkaProducer:
-    return KafkaProducer()
+def get_kafka_producer(bootstrap_servers: str) -> KafkaProducer:
+    return KafkaProducer(bootstrap_servers=[bootstrap_servers])
