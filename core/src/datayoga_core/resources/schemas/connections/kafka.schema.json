@@ -10,10 +10,7 @@
     },
     "bootstrap_servers": {
       "description": "Kafka Hosts",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "type": "string"
     },
     "topic": {
       "description": "Kafka Topics",

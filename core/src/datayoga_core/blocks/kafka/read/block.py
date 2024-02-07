@@ -1,26 +1,27 @@
 import logging
+import json
 from abc import ABCMeta
-from itertools import count
 
 from datayoga_core.context import Context
 from typing import AsyncGenerator, List, Optional
 from datayoga_core.producer import Producer as DyProducer, Message
-from kafka import KafkaConsumer, TopicPartition
-from kafka.errors import KafkaError
+from confluent_kafka import Consumer, KafkaException, KafkaError, TopicPartition, OFFSET_BEGINNING
+
+from itertools import count
 from datayoga_core import utils
 
 logger = logging.getLogger("dy")
 
-import json
-
 
 class Block(DyProducer, metaclass=ABCMeta):
-    bootstrap_servers: List[str]
+    bootstrap_servers: str
     group: str
     topic: str
-    seek_to_beginning: bool = False
+    seek_to_beginning: bool
+    snapshot: bool
     INTERNAL_FIELD_PREFIX = "__$$"
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
+    MIN_COMMIT_COUNT = 10
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
@@ -28,26 +29,56 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         self.port = int(connection_details.get("port", 9092))
         logger.debug(f"Connection details: {json.dumps(connection_details)}")
-        self.bootstrap_servers = connection_details.get("bootstrap_servers", ["0.0.0.0"])
+        self.bootstrap_servers = connection_details.get("bootstrap_servers")
         self.group = connection_details.get("group")
         self.topic = connection_details.get("topic", "integration-tests")
         self.seek_to_beginning = self.properties.get("seek_to_beginning", False)
+        self.snapshot = self.properties.get("snapshot", False)
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
         logger.debug(f"Producing {self.get_block_name()}")
 
-        if self.seek_to_beginning:
-            logger.debug(f"Seeking to beginning...")
-            consumer = KafkaConsumer(bootstrap_servers=self.bootstrap_servers, group_id=self.group)
-            tp = TopicPartition(self.topic, 0)
-            consumer.assign([tp])
-            consumer.seek_to_beginning()
-        else:
-            consumer = KafkaConsumer(self.topic, bootstrap_servers=self.bootstrap_servers, group_id=self.group)
+        consumer = Consumer({
+            'bootstrap.servers': self.bootstrap_servers,
+            'group.id': self.group,
+            'enable.auto.commit': 'false'
+        })
 
-        if not consumer.bootstrap_connected():
-            raise KafkaError("Unable to connect with kafka container!")
-        for message in consumer:
-            counter = iter(count())
-            logger.debug(f"Received message: {message}")
-            yield [{self.MSG_ID_FIELD: f"{next(counter)}", **message}]
+        if self.seek_to_beginning:
+            def on_assign(c, ps):
+                for p in ps:
+                    p.offset = -2
+                c.assign(ps)
+            consumer.subscribe([self.topic], on_assign)
+        else:
+            consumer.subscribe([self.topic])
+
+        try:
+            while True:
+                # Poll for messages
+                msg = consumer.poll(1.0)
+                counter = next(count())
+
+                if msg is None:
+                    if self.snapshot:
+                        break
+                    continue
+                if msg.error():
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+                        # End of partition event
+                        logger.info("Reached end of partition")
+                    else:
+                        # Handle other errors
+                        logger.error("Error: {}".format(msg.error()))
+
+                else:
+                    # Process the message
+                    yield [{self.MSG_ID_FIELD: msg.value()}]
+                    # Commit the message offset
+                    consumer.commit(msg)
+                    if counter % self.MIN_COMMIT_COUNT == 0:
+                        consumer.commit(asynchronous=False)
+        finally:
+            consumer.close()
+
+

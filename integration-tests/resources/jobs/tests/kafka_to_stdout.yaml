@@ -2,6 +2,7 @@ input:
   uses: kafka.read
   with:
     bootstrap_servers: kafka
-    seek_to_beginning: Yes
+    snapshot: true
+    seek_to_beginning: true
 steps:
   - uses: std.write

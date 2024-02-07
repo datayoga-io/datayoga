@@ -10,6 +10,12 @@
     "seek_to_beginning": {
       "description": "Consumer seek to beginning",
       "type": "boolean"
+    },
+    "snapshot": {
+      "type": "boolean",
+      "title": "Snapshot current entries and quit",
+      "description": "Snapshot current entries and quit",
+      "default": false
     }
   },
   "required": [
