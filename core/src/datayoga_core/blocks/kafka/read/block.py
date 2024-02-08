@@ -5,10 +5,11 @@ from abc import ABCMeta
 from datayoga_core.context import Context
 from typing import AsyncGenerator, List, Optional
 from datayoga_core.producer import Producer as DyProducer, Message
-from confluent_kafka import Consumer, KafkaException, KafkaError, TopicPartition, OFFSET_BEGINNING
+from confluent_kafka import Consumer, KafkaError
 
 from itertools import count
 from datayoga_core import utils
+import orjson
 
 logger = logging.getLogger("dy")
 
@@ -34,35 +35,32 @@ class Block(DyProducer, metaclass=ABCMeta):
         self.topic = connection_details.get("topic", "integration-tests")
         self.seek_to_beginning = self.properties.get("seek_to_beginning", False)
         self.snapshot = self.properties.get("snapshot", False)
-
-    async def produce(self) -> AsyncGenerator[List[Message], None]:
-        logger.debug(f"Producing {self.get_block_name()}")
-
-        consumer = Consumer({
+        self.consumer = Consumer({
             'bootstrap.servers': self.bootstrap_servers,
             'group.id': self.group,
             'enable.auto.commit': 'false'
         })
+
+    async def produce(self) -> AsyncGenerator[List[Message], None]:
+        logger.debug(f"Producing {self.get_block_name()}")
 
         if self.seek_to_beginning:
             def on_assign(c, ps):
                 for p in ps:
                     p.offset = -2
                 c.assign(ps)
-            consumer.subscribe([self.topic], on_assign)
+            self.consumer.subscribe([self.topic], on_assign)
         else:
-            consumer.subscribe([self.topic])
+            self.consumer.subscribe([self.topic])
 
         try:
             while True:
                 # Poll for messages
-                msg = consumer.poll(1.0)
-                counter = next(count())
-
+                msg = self.consumer.poll(3.0 if self.snapshot else None)
                 if msg is None:
-                    if self.snapshot:
-                        break
-                    continue
+                    assert self.snapshot
+                    logger.warning(f"Snapshot defined quitting on topic {self.topic}"'')
+                    break
                 if msg.error():
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         # End of partition event
@@ -73,12 +71,16 @@ class Block(DyProducer, metaclass=ABCMeta):
 
                 else:
                     # Process the message
-                    yield [{self.MSG_ID_FIELD: msg.value()}]
-                    # Commit the message offset
-                    consumer.commit(msg)
-                    if counter % self.MIN_COMMIT_COUNT == 0:
-                        consumer.commit(asynchronous=False)
+                    message = orjson.loads(msg.value())
+                    yield [{self.MSG_ID_FIELD: msg.offset(), **message}]
+
         finally:
-            consumer.close()
+            self.consumer.close()
+
+    def ack(self, msg_ids: List[str]):
+        try:
+            self.consumer.commit(asynchronous=False)
+        except Exception as e:
+            logger.error(f"Cannot commit: {e}")
 
 
