@@ -47,5 +47,3 @@ cassandra:
 kafka:
   type: kafka
   bootstrap_servers: "localhost:9093"
-  group: "integration-tests"
-  topic: "integration-tests"

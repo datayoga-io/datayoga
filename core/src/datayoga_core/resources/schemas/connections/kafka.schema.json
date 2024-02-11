@@ -11,24 +11,15 @@
     "bootstrap_servers": {
       "description": "Kafka Hosts",
       "type": "string"
-    },
-    "topic": {
-      "description": "Kafka Topics",
-      "type": "string"
-    },
-    "group": {
-      "description": "Kafka Group",
-      "type": "string"
     }
   },
   "additionalProperties": false,
-  "required": ["type", "bootstrap_servers", "topic"],
+  "required": ["type", "bootstrap_servers"],
   "examples": [
     {
       "kafka": {
         "type": "kafka",
-        "bootstrap_servers": ["localhost"],
-        "topic": "test"
+        "bootstrap_servers": ["localhost:9092"]
       }
     }
   ]

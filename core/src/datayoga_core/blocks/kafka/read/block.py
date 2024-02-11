@@ -31,8 +31,8 @@ class Block(DyProducer, metaclass=ABCMeta):
         self.port = int(connection_details.get("port", 9092))
         logger.debug(f"Connection details: {json.dumps(connection_details)}")
         self.bootstrap_servers = connection_details.get("bootstrap_servers")
-        self.group = connection_details.get("group")
-        self.topic = connection_details.get("topic", "integration-tests")
+        self.group = self.properties.get("group")
+        self.topic = self.properties["topic"]
         self.seek_to_beginning = self.properties.get("seek_to_beginning", False)
         self.snapshot = self.properties.get("snapshot", False)
         self.consumer = Consumer({

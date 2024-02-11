@@ -7,6 +7,14 @@
       "description": "host name",
       "type": "string"
     },
+    "topic": {
+      "description": "Kafka topic",
+      "type": "string"
+    },
+    "group": {
+      "description": "Kafka group",
+      "type": "string"
+    },
     "seek_to_beginning": {
       "description": "Consumer seek to beginning",
       "type": "boolean"
@@ -19,6 +27,7 @@
     }
   },
   "required": [
-    "bootstrap_servers"
+    "bootstrap_servers",
+    "topic"
   ]
 }
