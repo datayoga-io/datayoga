@@ -46,4 +46,9 @@ cassandra:
   port: 9042
 kafka:
   type: kafka
-  bootstrap_servers: "localhost:9093"
+  bootstrap_servers: "localhost:9092"
+  security.protocol: SASL_PLAINTEXT
+  sasl.mechanisms: PLAIN
+  sasl.username: admin
+  sasl.password: admin-secret
+

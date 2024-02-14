@@ -1,0 +1,33 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf"
+
+#      KAFKA_SASL_JAAS_CONFIG: |
+#        org.apache.kafka.common.security.plain.PlainLoginModule required \
+#        username="admin" \
+#        password="admin-secret" \
+#        user_admin="admin-secret" \
+#        user_alice="alice-secret";
+
+    volumes:
+      - ./kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
+    ports:
+      - 9093:9092
+    #command: ["sleep","3600"]

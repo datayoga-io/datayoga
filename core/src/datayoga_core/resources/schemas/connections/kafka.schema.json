@@ -11,6 +11,19 @@
     "bootstrap_servers": {
       "description": "Kafka Hosts",
       "type": "string"
+    },
+    "security.protocol":{
+      "description": "Auth protocols",
+      "type": "string"
+    },
+    "sasl.mechanisms": {
+      "type": "string"
+    },
+    "sasl.username": {
+      "type": "string"
+    },
+    "sasl.password": {
+      "type": "string"
     }
   },
   "additionalProperties": false,

@@ -1,0 +1,6 @@
+FROM confluentinc/cp-kafka-rest:latest
+
+COPY password.properties /etc/kafka-rest/
+COPY rest-jaas.properties /etc/kafka-rest/
+
+CMD ["/etc/confluent/docker/run"]

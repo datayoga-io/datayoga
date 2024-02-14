@@ -1,6 +1,6 @@
 import logging
-import json
 from abc import ABCMeta
+from typing import Dict
 
 from datayoga_core.context import Context
 from typing import AsyncGenerator, List, Optional
@@ -23,12 +23,13 @@ class Block(DyProducer, metaclass=ABCMeta):
     INTERNAL_FIELD_PREFIX = "__$$"
     MSG_ID_FIELD = f"{INTERNAL_FIELD_PREFIX}msg_id"
     MIN_COMMIT_COUNT = 10
+    connection_details: Dict
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
-        connection_details = utils.get_connection_details(self.properties["bootstrap_servers"], context)
-        logger.debug(f"Connection details: {json.dumps(connection_details)}")
-        self.bootstrap_servers = connection_details.get("bootstrap_servers")
+        self.connection_details = utils.get_connection_details(self.properties["bootstrap_servers"], context)
+
+        self.bootstrap_servers = self.connection_details.get("bootstrap_servers")
         self.group = self.properties.get("group")
         self.topic = self.properties["topic"]
         self.seek_to_beginning = self.properties.get("seek_to_beginning", False)
@@ -36,11 +37,7 @@ class Block(DyProducer, metaclass=ABCMeta):
 
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
-        consumer = Consumer({
-            'bootstrap.servers': self.bootstrap_servers,
-            'group.id': self.group,
-            'enable.auto.commit': 'false'
-        })
+        consumer = Consumer(self._get_config())
         logger.debug(f"Producing {self.get_block_name()}")
 
         if self.seek_to_beginning:
@@ -78,6 +75,22 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         finally:
             consumer.close()
+
+    def _get_config(self):
+        conf = {
+            'bootstrap.servers': self.bootstrap_servers,
+            'group.id': self.group,
+            'enable.auto.commit': 'false'
+        }
+        proto = self.connection_details.get("security.protocol")
+        if proto:
+            conf['security.protocol'] = proto
+        # TODO: how to distinguish here different auth protocols in kafka?
+        if proto.startswith("SASL_"):
+            conf['sasl.mechanisms'] = self.connection_details["sasl.mechanisms"]
+            conf['sasl.username'] = self.connection_details["sasl.username"]
+            conf['sasl.password'] = self.connection_details["sasl.password"]
+        return conf
 
 
 
