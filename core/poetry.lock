@@ -461,7 +461,7 @@ files = [
 name = "confluent-kafka"
 version = "2.3.0"
 description = "Confluent's Python client for Apache Kafka"
-optional = true
+optional = false
 python-versions = "*"
 files = [
     {file = "confluent-kafka-2.3.0.tar.gz", hash = "sha256:4069e7b56e0baf9db18c053a605213f0ab2d8f23715dca7b3bd97108df446ced"},
@@ -1125,6 +1125,20 @@ files = [
 [package.dependencies]
 importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""}
 referencing = ">=0.31.0"
+
+[[package]]
+name = "kafka-python"
+version = "2.0.2"
+description = "Pure Python client for Apache Kafka"
+optional = false
+python-versions = "*"
+files = [
+    {file = "kafka-python-2.0.2.tar.gz", hash = "sha256:04dfe7fea2b63726cd6f3e79a2d86e709d608d74406638c5da33a01d45a9d7e3"},
+    {file = "kafka_python-2.0.2-py2.py3-none-any.whl", hash = "sha256:2d92418c7cb1c298fa6c7f0fb3519b520d0d7526ac6cb7ae2a4fc65a51a94b6e"},
+]
+
+[package.extras]
+crc32c = ["crc32c"]
 
 [[package]]
 name = "markupsafe"
@@ -2611,7 +2625,6 @@ azure = ["azure-eventhub", "azure-eventhub-checkpointstoreblob-aio"]
 cassandra = ["cassandra-driver"]
 db2 = ["ibm_db_sa"]
 http = ["aiohttp"]
-kafka = ["confluent-kafka"]
 mysql = ["PyMySQL", "SQLAlchemy"]
 oracle = ["SQLAlchemy", "oracledb"]
 parquet = ["fastparquet"]
@@ -2623,4 +2636,4 @@ test = ["PyMySQL", "SQLAlchemy", "aiohttp", "cassandra-driver", "fastparquet", "
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "aaa529700a218376912af8d88f7a47722d5f1b4b7c80ed3d91091799b2f9c493"
+content-hash = "221d3f8c03e37783bf7b1de4584d3f82fa0a20fdb2b58935644b2d11a0e500eb"
