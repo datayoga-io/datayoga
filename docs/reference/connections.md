@@ -21,7 +21,7 @@ Connection catalog
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**type**|`string`|Connection type<br/>Enum: `"cassandra"`, `"db2"`, `"http"`, `"mysql"`, `"postgresql"`, `"redis"`, `"sqlserver"`<br/>|yes|
+|**type**|`string`|Connection type<br/>Enum: `"cassandra"`, `"db2"`, `"http"`, `"mysql"`, `"postgresql"`, `"redis"`, `"sqlserver"`, `"kafka"`<br/>|yes|
 |**if**|||no|
 |**then**|||no|
 
