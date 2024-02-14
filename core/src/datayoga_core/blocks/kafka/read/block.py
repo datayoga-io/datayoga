@@ -5,7 +5,7 @@ from abc import ABCMeta
 from datayoga_core.context import Context
 from typing import AsyncGenerator, List, Optional
 from datayoga_core.producer import Producer as DyProducer, Message
-from confluent_kafka import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError, TopicPartition
 
 from itertools import count
 from datayoga_core import utils
@@ -36,10 +36,10 @@ class Block(DyProducer, metaclass=ABCMeta):
 
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
-        consumer = Consumer({
+        consumer = Consumer(**{
             'bootstrap.servers': self.bootstrap_servers,
             'group.id': self.group,
-            'enable.auto.commit': 'false'
+            'enable.auto.commit': False
         })
         logger.debug(f"Producing {self.get_block_name()}")
 
@@ -49,6 +49,7 @@ class Block(DyProducer, metaclass=ABCMeta):
                     p.offset = -2
                 c.assign(ps)
             consumer.subscribe([self.topic], on_assign)
+            logger.debug(f"Seeking to beginning on topic {self.topic}"'')
         else:
             consumer.subscribe([self.topic])
 
@@ -73,10 +74,18 @@ class Block(DyProducer, metaclass=ABCMeta):
                     # Process the message
                     message = orjson.loads(msg.value())
                     yield [{self.MSG_ID_FIELD: msg.offset(), **message}]
+                    # res = consumer.get_watermark_offsets(TopicPartition(self.topic, 0))
+                    # logger.error(res)
+                    # consumer.commit(offsets=res, asynchronous=False)
                     if counter % self.MIN_COMMIT_COUNT == 0:
                         consumer.commit(asynchronous=False)
 
+
         finally:
+            try:
+                consumer.commit(asynchronous=False)
+            except Exception as e:
+                logger.error(e)
             consumer.close()
 
 

@@ -5,6 +5,5 @@ input:
     topic: "integration-tests"
     group: "integration-tests"
     snapshot: true
-    seek_to_beginning: true
 steps:
   - uses: std.write
