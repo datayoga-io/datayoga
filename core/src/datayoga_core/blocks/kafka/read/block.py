@@ -39,9 +39,11 @@ class Block(DyProducer, metaclass=ABCMeta):
         consumer = Consumer(**{
             'bootstrap.servers': self.bootstrap_servers,
             'group.id': self.group,
-            'enable.auto.commit': False
+            'enable.auto.commit': False,
+            'auto.offset.reset': 'earliest',
         })
         logger.debug(f"Producing {self.get_block_name()}")
+        #consumer.assign([TopicPartition(self.topic, 0)])
 
         if self.seek_to_beginning:
             def on_assign(c, ps):

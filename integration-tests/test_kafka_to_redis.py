@@ -17,8 +17,8 @@ def test_kafka_to_redis():
 
             bootstrap_servers = kafka.get_bootstrap_server()
             producer = kafka_utils.get_kafka_producer(bootstrap_servers)
-            producer.produce("integration-tests", message_one)
-            producer.produce("integration-tests", message_two)
+            producer.send("integration-tests", message_one)
+            producer.send("integration-tests", message_two)
             producer.flush()
             run_job("tests.kafka_to_redis")
 
