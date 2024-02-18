@@ -1,15 +1,15 @@
-import logging
 import json
+import logging
 from abc import ABCMeta
-
-from datayoga_core.context import Context
-from typing import AsyncGenerator, List, Optional
-from datayoga_core.producer import Producer as DyProducer, Message
-from confluent_kafka import Consumer, KafkaError, TopicPartition
-
 from itertools import count
-from datayoga_core import utils
+from typing import AsyncGenerator, List, Optional
+
 import orjson
+from confluent_kafka import Consumer, KafkaError, TopicPartition
+from datayoga_core import utils
+from datayoga_core.context import Context
+from datayoga_core.producer import Message
+from datayoga_core.producer import Producer as DyProducer
 
 logger = logging.getLogger("dy")
 
