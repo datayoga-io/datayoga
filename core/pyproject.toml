@@ -69,8 +69,10 @@ kafka = ["kafka-python", "confluent-kafka"]
 test = [
         "aiohttp",
         "cassandra-driver",
+        "confluent-kafka",
         "fastparquet",
         "ibm_db_sa",
+        "kafka-python",
         "mock",
         "oracledb",
         "psycopg2-binary",
@@ -85,7 +87,7 @@ test = [
         "redis",
         "requests-mock",
         "SQLAlchemy",
-        "testcontainers"
+        "testcontainers",
 ]
 
 [tool.poetry.urls]
