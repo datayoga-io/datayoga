@@ -26,8 +26,5 @@
       "default": false
     }
   },
-  "required": [
-    "bootstrap_servers",
-    "topic"
-  ]
+  "required": ["bootstrap_servers", "topic"]
 }
