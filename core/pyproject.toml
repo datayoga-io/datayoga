@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datayoga-core"
-version = "1.1.1"
+version = "0.0.0"
 description = "DataYoga for Python"
 authors = ["DataYoga <admin@datayoga.io>"]
 license = "Apache-2.0"
@@ -24,7 +24,7 @@ jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
 orjson = "^3.8.7"
 prometheus-client = "^0.16.0"
-python = "^3.8"
+python = "^3.7"
 PyYAML = "^6.0"
 sqlglot = "^10.4.3"
 
