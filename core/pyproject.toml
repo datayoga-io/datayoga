@@ -64,6 +64,7 @@ parquet = ["fastparquet"]
 pg = ["psycopg2-binary", "SQLAlchemy"]
 redis = ["redis"]
 sqlserver = ["pymssql", "SQLAlchemy"]
+kafka = ["kafka-python", "confluent-kafka"]
 
 test = [
         "aiohttp",

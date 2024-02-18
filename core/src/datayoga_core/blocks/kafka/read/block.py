@@ -64,9 +64,7 @@ class Block(DyProducer, metaclass=ABCMeta):
                 counter = next(count())
                 if msg is None:
                     assert self.snapshot
-                    logger.warning(
-                        f"Snapshot defined quitting on topic {self.topic}"
-                        '')
+                    logger.warning(f"Snapshot defined quitting on topic {self.topic}")
                     break
                 if msg.error():
                     if msg.error().code() == KafkaError._PARTITION_EOF:

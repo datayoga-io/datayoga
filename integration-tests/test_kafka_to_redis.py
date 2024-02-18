@@ -13,8 +13,7 @@ def test_kafka_to_redis():
     kafka_container = kafka_utils.get_kafka_container()
     try:
         with kafka_container as kafka:
-            redis_container = redis_utils.get_redis_oss_container(
-                redis_utils.REDIS_PORT)
+            redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
             redis_container.start()
 
             bootstrap_servers = kafka.get_bootstrap_server()
