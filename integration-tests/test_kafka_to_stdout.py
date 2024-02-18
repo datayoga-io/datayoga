@@ -10,6 +10,7 @@ message_two = b'{"id":2,"name":"Ivan"}'
 message_three = b'{"id":3,"name":"Yossi"}'
 message_four = b'{"id":4,"name":"Adi"}'
 
+
 def test_kafka_to_stdout(tmpdir):
     kafka_container = kafka_utils.get_kafka_container()
     output_file = tmpdir.join("tests_kafka_to_stdout.txt")
@@ -17,7 +18,7 @@ def test_kafka_to_stdout(tmpdir):
 
         with kafka_container as kafka:
             bootstrap_servers = kafka.get_bootstrap_server()
-            #bootstrap_servers = "host.docker.internal:9093"
+            # bootstrap_servers = "host.docker.internal:9093"
             producer = kafka_utils.get_kafka_producer(bootstrap_servers)
             producer.send("integration-tests", message_one)
             producer.send("integration-tests", message_two)
@@ -40,6 +41,3 @@ def test_kafka_to_stdout(tmpdir):
             assert result[1].strip().encode() == message_four
     finally:
         os.remove(output_file)
-
-
-

@@ -8,6 +8,7 @@ logger = logging.getLogger("dy")
 message_one = b'{"id":"1","name":"Boris"}'
 message_two = b'{"id":"2","name":"Ivan"}'
 
+
 def test_kafka_to_redis():
     kafka_container = kafka_utils.get_kafka_container()
     try:
@@ -33,9 +34,3 @@ def test_kafka_to_redis():
             assert ivan == json.loads(message_two.decode())
     finally:
         redis_container.stop()
-
-
-
-
-
-

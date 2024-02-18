@@ -34,7 +34,6 @@ class Block(DyProducer, metaclass=ABCMeta):
         self.seek_to_beginning = self.properties.get("seek_to_beginning", False)
         self.snapshot = self.properties.get("snapshot", False)
 
-
     async def produce(self) -> AsyncGenerator[List[Message], None]:
         consumer = Consumer(**{
             'bootstrap.servers': self.bootstrap_servers,
@@ -43,13 +42,14 @@ class Block(DyProducer, metaclass=ABCMeta):
             'auto.offset.reset': 'earliest',
         })
         logger.debug(f"Producing {self.get_block_name()}")
-        #consumer.assign([TopicPartition(self.topic, 0)])
+        # consumer.assign([TopicPartition(self.topic, 0)])
 
         if self.seek_to_beginning:
             def on_assign(c, ps):
                 for p in ps:
                     p.offset = -2
                 c.assign(ps)
+
             consumer.subscribe([self.topic], on_assign)
             logger.debug(f"Seeking to beginning on topic {self.topic}"'')
         else:
@@ -89,7 +89,3 @@ class Block(DyProducer, metaclass=ABCMeta):
             except Exception as e:
                 logger.error(e)
             consumer.close()
-
-
-
-
