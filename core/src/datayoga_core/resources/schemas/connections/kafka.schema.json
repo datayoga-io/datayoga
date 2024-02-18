@@ -9,7 +9,7 @@
       "const": "kafka"
     },
     "bootstrap_servers": {
-      "description": "Kafka Hosts",
+      "description": "Kafka Hosts List comma separated",
       "type": "string"
     }
   },
@@ -19,7 +19,7 @@
     {
       "kafka": {
         "type": "kafka",
-        "bootstrap_servers": ["localhost:9092"]
+        "bootstrap_servers": ["localhost:9092,localhost:9093"]
       }
     }
   ]

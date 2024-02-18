@@ -23,8 +23,7 @@ def test_kafka_to_redis():
             producer.flush()
             run_job("tests.kafka_to_redis")
 
-            redis_client = redis_utils.get_redis_client(
-                "localhost", redis_utils.REDIS_PORT)
+            redis_client = redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT)
 
             assert len(redis_client.keys()) == 2
 

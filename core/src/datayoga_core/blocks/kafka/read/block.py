@@ -5,7 +5,7 @@ from itertools import count
 from typing import AsyncGenerator, List, Optional
 
 import orjson
-from confluent_kafka import Consumer, KafkaError, TopicPartition
+from confluent_kafka import Consumer, KafkaError
 from datayoga_core import utils
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
@@ -26,14 +26,12 @@ class Block(DyProducer, metaclass=ABCMeta):
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
-        connection_details = utils.get_connection_details(
-            self.properties["bootstrap_servers"], context)
+        connection_details = utils.get_connection_details(self.properties["bootstrap_servers"], context)
         logger.debug(f"Connection details: {json.dumps(connection_details)}")
         self.bootstrap_servers = connection_details.get("bootstrap_servers")
         self.group = self.properties.get("group")
         self.topic = self.properties["topic"]
-        self.seek_to_beginning = self.properties.get(
-            "seek_to_beginning", False)
+        self.seek_to_beginning = self.properties.get("seek_to_beginning", False)
         self.snapshot = self.properties.get("snapshot", False)
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
