@@ -10,8 +10,8 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.autopep8",
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true,
-      "source.fixAll": true
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
     },
     "editor.formatOnSaveMode": "file",
     "editor.formatOnSave": true
