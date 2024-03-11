@@ -1,0 +1,52 @@
+name: Generate JSON Schema
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-jsonschemas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel poetry
+
+      - name: Install prettier
+        run: npm install --global prettier
+
+      - name: Build and Install DataYoga Core
+        run: |
+          cd core
+          poetry build
+          pip install dist/*.whl
+
+      - name: Generate DataYoga Job Schema
+        run: |
+          python -c "import json; from datayoga_core.job import Job; schema = Job.get_json_schema(); open('schemas/job.schema.json', 'w').write(json.dumps(schema))"
+
+      - name: Prettify JSON Schema files
+        run: prettier --write "schemas/**/*.json"
+
+      - name: Push to repo
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git diff --cached --exit-code || git commit -m "update json schemas"
+          git push --force
