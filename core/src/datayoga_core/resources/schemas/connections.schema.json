@@ -1,51 +1,42 @@
 {
+  "type": ["object", "null"],
   "title": "Connections",
   "description": "Connection catalog",
-  "type": ["object", "null"],
   "patternProperties": {
     ".": {
       "type": "object",
-      "properties": {
-        "type": {
-          "description": "Connection type",
-          "type": "string",
-          "enum": [
-            "cassandra",
-            "db2",
-            "http",
-            "mysql",
-            "postgresql",
-            "redis",
-            "sqlserver"
-          ]
-        },
-        "if": {
-          "properties": {
-            "type": {
-              "enum": ["cassandra", "mysql", "postgresql", "sqlserver"]
-            }
+      "$ref": "#/definitions/connection"
+    }
+  },
+  "definitions": {
+    "connection": {
+      "type": "object",
+      "if": {
+        "properties": {
+          "type": {
+            "enum": ["cassandra", "mysql", "postgresql", "sqlserver"]
           }
-        },
-        "then": {
-          "properties": {
-            "driver": {
-              "description": "Explicit driver to use, if not using default",
-              "type": "string"
-            },
-            "connect_args": {
-              "description": "Additional arguments to use when connecting to the DB",
-              "type": "object"
-            },
-            "query_args": {
-              "description": "Additional query string arguments to use when connecting to the DB",
-              "type": "object"
-            },
-            "debug": {
-              "title": "Debug mode",
-              "description": "Echo all SQL commands to stdout",
-              "type": "boolean",
-              "default": false
-            }
+        }
+      },
+      "then": {
+        "properties": {
+          "driver": {
+            "description": "Explicit driver to use, if not using default",
+            "type": "string"
+          },
+          "connect_args": {
+            "description": "Additional arguments to use when connecting to the DB",
+            "type": "object"
+          },
+          "query_args": {
+            "description": "Additional query string arguments to use when connecting to the DB",
+            "type": "object"
+          },
+          "debug": {
+            "title": "Debug mode",
+            "description": "Echo all SQL commands to stdout",
+            "type": "boolean",
+            "default": false
           }
         }
       },

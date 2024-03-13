@@ -56,12 +56,12 @@ docker run -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
 
 ### Define Connections
 
-DataYoga manages connections in a special file named `connections.yaml`. Each connection is defined with a logical name and can define properties needed for the connection. Reference to environment variables, interpolation, and secrets is available.
+DataYoga manages connections in a special file named `connections.dy.yaml`. Each connection is defined with a logical name and can define properties needed for the connection. Reference to environment variables, interpolation, and secrets is available.
 
-Add the connections to Redis and Postgres above to the `connections.yaml`:
+Add the connections to Redis and Postgres above to the `connections.dy.yaml`:
 
 ```bash
-cat << EOF > connections.yaml
+cat << EOF > connections.dy.yaml
 - name: hr
   type: postgresql
   host: localhost

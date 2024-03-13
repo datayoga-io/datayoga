@@ -19,7 +19,7 @@
     "connection": {
       "type": "string",
       "title": "The connection to use for loading",
-      "description": "Logical connection name as defined in the connections.yaml",
+      "description": "Logical connection name as defined in the connections.dy.yaml",
       "examples": ["europe_db", "target", "eu_dwh"]
     },
     "keyspace": {

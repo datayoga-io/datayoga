@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 import aiohttp
 from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
+from datayoga_core.connection import Connection
 from datayoga_core.context import Context
 from datayoga_core.expression import Expression
 from datayoga_core.result import BlockResult, Result, Status
@@ -24,7 +25,7 @@ class Block(DyBlock):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         connection_name = self.properties["connection"]
-        connection_details = utils.get_connection_details(connection_name, context)
+        connection_details = Connection.get_connection_details(connection_name, context)
         if connection_details["type"] != "http":
             raise ValueError(f"{connection_name} is not an HTTP connection")
 

@@ -10,9 +10,9 @@ This example reads change events from a Kafka stream and continuously pushes the
 
 ### Prerequisites
 
-- Set up a local postgres instance and define the connection named `pg` in `connections.yaml`.
+- Set up a local postgres instance and define the connection named `pg` in `connections.dy.yaml`.
 - Set up a local Kafka instance and define a topic named 'emp_cdc'
-- Define the Kafka connection named `kafka` in `connections.yaml`
+- Define the Kafka connection named `kafka` in `connections.dy.yaml`
 
 ### Code
 
@@ -40,7 +40,7 @@ This example reads a CSV file from the AirBNB open data, filters by minimum numb
 
 ### Prerequisites
 
-- Set up a local redis instance and define the connection named `redis-data` in `connections.yaml`.
+- Set up a local redis instance and define the connection named `redis-data` in `connections.dy.yaml`.
 - Download the data set from Kaggle [here](http://data.insideairbnb.com/united-states/ny/new-york-city/2022-09-07/visualisations/listings.csv)
 
 ### Code

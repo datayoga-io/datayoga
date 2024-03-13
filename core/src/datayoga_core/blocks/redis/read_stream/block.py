@@ -3,7 +3,7 @@ from typing import AsyncGenerator, List, Optional
 
 import datayoga_core.blocks.redis.utils as redis_utils
 import orjson
-from datayoga_core import utils
+from datayoga_core.connection import Connection
 from datayoga_core.context import Context
 from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer
@@ -15,7 +15,7 @@ class Block(DyProducer):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection_details = utils.get_connection_details(self.properties["connection"], context)
+        connection_details = Connection.get_connection_details(self.properties["connection"], context)
         self.redis_client = redis_utils.get_client(connection_details)
 
         self.stream = self.properties["stream_name"]

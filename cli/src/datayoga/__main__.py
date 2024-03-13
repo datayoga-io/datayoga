@@ -96,7 +96,7 @@ def run(
     logger.info("Runner started...")
 
     # validate the connections
-    connections_file = path.join(directory, "connections.yaml")
+    connections_file = path.join(directory, "connections.dy.yaml")
     try:
         connections = utils.read_yaml(connections_file)
         logger.debug(f"connections: {connections}")
