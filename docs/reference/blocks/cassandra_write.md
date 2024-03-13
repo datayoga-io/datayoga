@@ -12,7 +12,7 @@ Write into a Cassandra data store
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.yaml<br/>|yes|
+|**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.dy.yaml<br/>|yes|
 |**keyspace**|`string`|Keyspace<br/>|yes|
 |**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |[**keys**](#keys)<br/>(Business keys)|`array`||yes|
