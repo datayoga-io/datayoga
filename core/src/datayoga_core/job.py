@@ -220,7 +220,7 @@ class Job:
         blocks_dir = (os.path.join(utils.get_bundled_dir(), "blocks") if utils.is_bundled() else
                       os.path.dirname(os.path.realpath(blocks.__file__)))
         block_types = []
-        for schema_path in sorted(Path(blocks_dir).rglob("**/block.schema.json"), key=lambda p: p.stem):
+        for schema_path in Path(blocks_dir).rglob("**/block.schema.json"):
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
                 os.path.dirname(os.path.realpath(blocks.__file__))

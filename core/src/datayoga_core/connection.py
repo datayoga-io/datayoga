@@ -23,7 +23,7 @@ class Connection:
 
         connections_dir = utils.get_resource_path(os.path.join("schemas", "connections"))
 
-        for schema_path in sorted(Path(connections_dir).rglob("**/connections/*.schema.json"), key=lambda p: p.stem):
+        for schema_path in sorted(Path(connections_dir).rglob("**/*.schema.json"), key=lambda p: p.stem):
             connection_schemas.append(utils.read_json(f"{schema_path}"))
 
         connections_general_schema = utils.read_json(
