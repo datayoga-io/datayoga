@@ -31,7 +31,7 @@ def execute_program(command: str, background: bool = False) -> Optional[Popen]:
 
 def wait_program(process: Popen, sig: Optional[int] = signal.SIGTERM, ignore_errors: bool = False):
     """Waits a child program to finish and logs its output.
-    Sends a signal to the process if it set
+    Sends a signal to the process if it set.
 
     Args:
         process (Popen): Process to kill.
@@ -57,8 +57,12 @@ def wait_program(process: Popen, sig: Optional[int] = signal.SIGTERM, ignore_err
             raise ValueError("command failed")
 
 
-def run_job(job_name: str, piped_from: Optional[str] = None, piped_to: Optional[str] = None,
-            background: bool = False) -> Optional[Popen]:
+def run_job(
+    job_name: str,
+    piped_from: Optional[str] = None,
+    piped_to: Optional[str] = None,
+    background: bool = False
+) -> Optional[Popen]:
     """Runs a job using the `datayoga` command-line tool.
 
     Args:

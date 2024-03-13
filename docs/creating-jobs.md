@@ -4,9 +4,9 @@ nav_order: 5
 
 # Creating Jobs
 
-Jobs are created by creating yaml files in the `jobs` folder. Each job is composed of several `steps` that activate `blocks`. A `block` defines the business logic of an action. For example, a `block` can write to a Kafka stream, can read from a cloud API, can transform structure, or enrich a message with external data. A `steps` activates the `block` with a set of parameters.
+Jobs are created by creating `dy.yaml` files in the `jobs` folder. Each job is composed of several `steps` that activate `blocks`. A `block` defines the business logic of an action. For example, a `block` can write to a Kafka stream, can read from a cloud API, can transform structure, or enrich a message with external data. A `steps` activates the `block` with a set of parameters.
 
-## Overview of the Job Yaml Structure
+## Overview of the Job YAML Structure
 
 Each Job must start with a block that either produces data or accepts data from external sources.
 The subsequent blocks each receive the output of the previous step as an input. The data will be streamed through these blocks as data flows through the chain.
@@ -33,7 +33,7 @@ It supports both async processing, multi-threading, and multi-processing to enab
 To deploy a job to the DataYoga Runner, use the DataYoga CLI.
 
 ```bash
-datayoga run jobname.yaml
+datayoga run jobname
 ```
 
 ## Tutorial - a Job that Reads from Redis and Writes to Postgres
@@ -58,7 +58,7 @@ docker run -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
 
 DataYoga manages connections in a special file named `connections.yaml`. Each connection is defined with a logical name and can define properties needed for the connection. Reference to environment variables, interpolation, and secrets is available.
 
-Add the connections to Redis and Postgres above to the connections.yaml:
+Add the connections to Redis and Postgres above to the `connections.yaml`:
 
 ```bash
 cat << EOF > connections.yaml
@@ -79,7 +79,7 @@ EOF
 ### Create the Job
 
 ```bash
-cat << EOF > redis_to_pg.yaml
+cat << EOF > redis_to_pg.dy.yaml
 steps:
 - uses: redis.read_stream
   with:
@@ -114,5 +114,5 @@ EOF
 ### Run the Job in the DataYoga Runner
 
 ```bash
-datayoga run redis_to_pg.yaml
+datayoga run redis_to_pg
 ```
