@@ -1,26 +1,28 @@
-- uses: redis.read_stream
+input:
+  uses: redis.read_stream
   with:
     connection: cache
     stream_name: emp
-- uses: add_field
-  with:
-    fields:
-      - field: full_name
-        language: jmespath
-        expression: concat([fname, ' ' , lname])
-- uses: map
-  with:
-    expression:
-      {
-        first_name: fname,
-        last_name: lname,
-        country: country_code || ' - ' || UPPER(country_name),
-        full_name: full_name,
-        greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
-      }
-    language: sql
-- uses: relational.write
-  with:
-    connection: hr
-    schema: hr
-    table: emp
+steps:
+  - uses: add_field
+    with:
+      fields:
+        - field: full_name
+          language: jmespath
+          expression: concat([fname, ' ' , lname])
+  - uses: map
+    with:
+      expression:
+        {
+          first_name: fname,
+          last_name: lname,
+          country: country_code || ' - ' || UPPER(country_name),
+          full_name: full_name,
+          greeting: "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name"
+        }
+      language: sql
+  - uses: relational.write
+    with:
+      connection: hr
+      schema: hr
+      table: emp
