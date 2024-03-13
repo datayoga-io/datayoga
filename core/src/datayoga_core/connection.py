@@ -21,19 +21,16 @@ class Connection:
         """Compiles a complete JSON schema of the connection with all possible types"""
         connection_schemas = []
 
-        connections_dir = os.path.join(
-            utils.get_bundled_dir(),
-            "connections") if utils.is_bundled() else os.path.dirname(
-            os.path.realpath(__file__))
+        connections_dir = utils.get_resource_path(os.path.join("schemas", "connections"))
 
-        for schema_path in Path(connections_dir).rglob("**/connections/*.schema.json"):
+        for schema_path in sorted(Path(connections_dir).rglob("**/connections/*.schema.json"), key=lambda p: p.stem):
             connection_schemas.append(utils.read_json(f"{schema_path}"))
 
-        connections_schema = utils.read_json(
+        connections_general_schema = utils.read_json(
             os.path.join(
                 utils.get_bundled_dir() if utils.is_bundled() else os.path.dirname(os.path.realpath(__file__)),
                 "resources", "schemas", "connections.schema.json"))
 
-        connections_schema["definitions"]["connection"]["oneOf"] = connection_schemas
+        connections_general_schema["definitions"]["connection"]["oneOf"] = connection_schemas
 
-        return connections_schema
+        return connections_general_schema
