@@ -7,8 +7,11 @@ from datayoga_core.context import Context
 
 
 class Connection:
+    """Connection"""
+
     @staticmethod
     def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
+        """Gets connection details from the context"""
         if context and context.properties:
             connection = context.properties.get("connections", {}).get(connection_name)
             if connection:
