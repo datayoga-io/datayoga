@@ -150,7 +150,7 @@
                   "connection": {
                     "type": "string",
                     "title": "The connection to use for the HTTP request",
-                    "description": "Logical connection name as defined in the connections.yaml",
+                    "description": "Logical connection name as defined in the connections.dy.yaml",
                     "examples": ["api_connection", "external_service"]
                   },
                   "endpoint": {
@@ -750,7 +750,7 @@
                   "connection": {
                     "type": "string",
                     "title": "The connection to use for loading",
-                    "description": "Logical connection name as defined in the connections.yaml",
+                    "description": "Logical connection name as defined in the connections.dy.yaml",
                     "examples": ["europe_db", "target", "eu_dwh"]
                   },
                   "schema": {
@@ -861,13 +861,13 @@
                   "connection": {
                     "type": "string",
                     "title": "The connection to use for loading",
-                    "description": "Logical connection name as defined in the connections.yaml",
+                    "description": "Logical connection name as defined in the connections.dy.yaml",
                     "examples": ["europe_db", "target", "eu_dwh"]
                   },
                   "schema": {
                     "type": "string",
                     "title": "The table schema of the table",
-                    "description": "If left blank, the default schema of this connection will be used as defined in the connections.yaml",
+                    "description": "If left blank, the default schema of this connection will be used as defined in the connections.dy.yaml",
                     "examples": ["dbo"]
                   },
                   "table": {
@@ -1279,7 +1279,7 @@
                   "connection": {
                     "type": "string",
                     "title": "The connection to use for loading",
-                    "description": "Logical connection name as defined in the connections.yaml",
+                    "description": "Logical connection name as defined in the connections.dy.yaml",
                     "examples": ["europe_db", "target", "eu_dwh"]
                   },
                   "keyspace": {

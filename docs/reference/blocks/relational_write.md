@@ -12,7 +12,7 @@ Write into a SQL-compatible data store
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.yaml<br/>|yes|
+|**connection**<br/>(The connection to use for loading)|`string`|Logical connection name as defined in the connections.dy.yaml<br/>|yes|
 |**schema**<br/>(The table schema of the target table)|`string`|If not specified, no specific schema will be used when connecting to the database.<br/>|no|
 |**table**<br/>(The target table name)|`string`|Target table name<br/>|yes|
 |[**keys**](#keys)<br/>(Business keys to use in case of \`load\_strategy\` is UPSERT or working with \`opcode\_field\`)|`array`||no|
