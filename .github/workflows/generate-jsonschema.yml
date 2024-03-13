@@ -49,4 +49,4 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git diff --cached --exit-code || git commit -m "update json schemas"
-          git push --force
+          git diff --exit-code || git push
