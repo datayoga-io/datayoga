@@ -10,7 +10,6 @@ import orjson
 import yaml
 from datayoga_core import result
 from datayoga_core.block import Block
-from datayoga_core.context import Context
 from datayoga_core.expression import JMESPathExpression, Language
 from datayoga_core.result import BlockResult, Result, Status
 
@@ -148,15 +147,6 @@ def split_field(field: str, *, __expression=re.compile(r"(?<!\\)\.")) -> List[st
 def unescape_field(field: str) -> str:
     r"""Replaces "\\." by "."."""
     return field.replace("\\.", ".")
-
-
-def get_connection_details(connection_name: str, context: Context) -> Dict[str, Any]:
-    if context and context.properties:
-        connection = context.properties.get("connections", {}).get(connection_name)
-        if connection:
-            return connection
-
-    raise ValueError(f"{connection_name} connection not found")
 
 
 def all_success(records: List[Dict[str, Any]]) -> BlockResult:

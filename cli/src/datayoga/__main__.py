@@ -13,6 +13,7 @@ import click
 import datayoga_core as dy
 import jsonschema
 from datayoga_core import prometheus, utils
+from datayoga_core.connection import Connection
 from pkg_resources import DistributionNotFound, get_distribution
 
 from datayoga import cli_helpers
@@ -96,11 +97,11 @@ def run(
     logger.info("Runner started...")
 
     # validate the connections
-    connections_file = path.join(directory, "connections.yaml")
+    connections_file = path.join(directory, "connections.dy.yaml")
     try:
         connections = utils.read_yaml(connections_file)
         logger.debug(f"connections: {connections}")
-        connections_schema = dy.get_connections_json_schema()
+        connections_schema = Connection.get_json_schema()
         logger.debug(f"connections_schema: {connections_schema}")
         jsonschema.validate(instance=connections, schema=connections_schema)
     except jsonschema.exceptions.ValidationError as schema_error:

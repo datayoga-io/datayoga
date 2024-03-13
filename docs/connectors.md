@@ -8,11 +8,11 @@ nav_order: 7
 
 `datayoga` supports a wide variety of `connectors` to support external sources including stream providers, relational databases, non-relational databases, blob storage, and external APIs.
 
-the connections are defined in the `connections.yaml`. This file includes a reference to a logical name for each declared connection along with its extra configuration properties and credentials.
+the connections are defined in the `connections.dy.yaml`. This file includes a reference to a logical name for each declared connection along with its extra configuration properties and credentials.
 
 Some connectors require installation of optional drivers.
 
-## Connections.yaml Example
+## `connections.dy.yaml` Example
 
 Example
 

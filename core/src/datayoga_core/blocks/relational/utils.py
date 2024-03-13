@@ -3,7 +3,7 @@ from enum import Enum, unique
 from typing import Tuple
 
 import sqlalchemy as sa
-from datayoga_core import utils
+from datayoga_core.connection import Connection
 from datayoga_core.context import Context
 
 logger = logging.getLogger("dy")
@@ -28,7 +28,7 @@ DEFAULT_DRIVERS = {
 
 
 def get_engine(connection_name: str, context: Context, autocommit: bool = True) -> Tuple[sa.engine.Engine, DbType]:
-    connection_details = utils.get_connection_details(connection_name, context)
+    connection_details = Connection.get_connection_details(connection_name, context)
 
     db_type = DbType(connection_details.get("type", "").lower())
 

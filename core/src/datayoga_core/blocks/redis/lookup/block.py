@@ -6,6 +6,7 @@ import datayoga_core.blocks.redis.utils as redis_utils
 import redis
 from datayoga_core import expression, utils
 from datayoga_core.block import Block as DyBlock
+from datayoga_core.connection import Connection
 from datayoga_core.context import Context
 from datayoga_core.result import BlockResult, Result, Status
 
@@ -17,7 +18,7 @@ class Block(DyBlock, metaclass=ABCMeta):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
 
-        connection_details = utils.get_connection_details(self.properties.get("connection"), context)
+        connection_details = Connection.get_connection_details(self.properties.get("connection"), context)
 
         # Dry mode is internal and used for validate the block without establishing a connection.
         # This behavior should be implemented in a common way, see this issue: https://lnk.pw/eklj

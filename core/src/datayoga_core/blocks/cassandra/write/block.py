@@ -4,8 +4,9 @@ from typing import Any, Dict, List, Optional
 
 import cassandra.auth
 from cassandra.cluster import NoHostAvailable, PreparedStatement
-from datayoga_core import utils, write_utils
+from datayoga_core import write_utils
 from datayoga_core.block import Block as DyBlock
+from datayoga_core.connection import Connection
 from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
@@ -19,7 +20,7 @@ class Block(DyBlock, metaclass=ABCMeta):
         logger.debug(f"Initializing {self.get_block_name()}")
 
         connection_name = self.properties["connection"]
-        connection_details = utils.get_connection_details(connection_name, context)
+        connection_details = Connection.get_connection_details(connection_name, context)
         if connection_details.get("type") != "cassandra":
             raise ValueError(f"{connection_name} is not a cassandra connection")
 

@@ -1,4 +1,4 @@
-name: Generate JSON Schema
+name: Generate JSON Schemas
 
 on:
   workflow_dispatch:
@@ -36,9 +36,10 @@ jobs:
           poetry build
           pip install dist/*.whl
 
-      - name: Generate DataYoga Job Schema
+      - name: Generate DataYoga Job and Connections Schemas
         run: |
           python -c "import json; from datayoga_core.job import Job; schema = Job.get_json_schema(); open('schemas/job.schema.json', 'w').write(json.dumps(schema))"
+          python -c "import json; from datayoga_core.connection import Connection; schema = Connection.get_json_schema(); open('schemas/coonnections.schema.json', 'w').write(json.dumps(schema))"
 
       - name: Prettify JSON Schema files
         run: prettier --write "schemas/**/*.json"
@@ -47,6 +48,7 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git pull
           git add .
           if ! git diff --cached --exit-code; then
             git commit -m "update json schemas"

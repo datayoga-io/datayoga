@@ -12,7 +12,7 @@ Write data using an HTTP request
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**connection**<br/>(The connection to use for the HTTP request)|`string`|Logical connection name as defined in the connections.yaml<br/>|yes|
+|**connection**<br/>(The connection to use for the HTTP request)|`string`|Logical connection name as defined in the connections.dy.yaml<br/>|yes|
 |**endpoint**|||yes|
 |**method**<br/>(HTTP Method)|`string`|HTTP method to be used for the request<br/>Enum: `"GET"`, `"PUT"`, `"POST"`, `"DELETE"`<br/>|yes|
 |[**payload**](#payload)<br/>(Request Payload)|`object`|Data to be sent in the request body<br/>|no|

@@ -6,7 +6,7 @@
     "connection": {
       "type": "string",
       "title": "The connection to use for the HTTP request",
-      "description": "Logical connection name as defined in the connections.yaml",
+      "description": "Logical connection name as defined in the connections.dy.yaml",
       "examples": ["api_connection", "external_service"]
     },
     "endpoint": {
