@@ -48,5 +48,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git diff --cached --exit-code || git commit -m "update json schemas"
-          git push --force
+          if ! git diff --cached --exit-code; then
+            git commit -m "update json schemas"
+            git push
+          fi

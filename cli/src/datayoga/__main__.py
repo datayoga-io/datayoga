@@ -109,7 +109,7 @@ def run(
         sys.exit(1)
 
     # validate the job
-    job_file = path.join(directory, "jobs", job_name.replace(".", os.sep) + ".yaml")
+    job_file = path.join(directory, "jobs", job_name.replace(".", os.sep) + ".dy.yaml")
     try:
         job_settings = utils.read_yaml(job_file)
         logger.debug(f"job_settings: {job_settings}")

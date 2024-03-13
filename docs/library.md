@@ -72,7 +72,7 @@ import datayoga_core as dy
 from datayoga_core.job import Job
 from datayoga_core.utils import read_yaml
 
-job_settings = read_yaml("example.yaml")
+job_settings = read_yaml("example.dy.yaml")
 job = dy.compile(job_settings)
 
 assert job.transform({"fname": "jane", "lname": "smith", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999", "gender": "F"})[0] == {"first_name": "jane", "last_name": "smith", "country": "1 - USA", "full_name": "jane smith", "greeting": "Hello Ms. jane smith"}

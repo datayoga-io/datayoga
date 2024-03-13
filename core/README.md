@@ -16,7 +16,7 @@ This demonstrates how to transform data using a DataYoga job.
 
 ### Create a Job
 
-Use this `example.yaml`:
+Use this `example.dy.yaml`:
 
 ```yaml
 steps:
@@ -65,7 +65,7 @@ from datayoga_core.job import Job
 from datayoga_core.result import Result, Status
 from datayoga_core.utils import read_yaml
 
-job_settings = read_yaml("example.yaml")
+job_settings = read_yaml("example.dy.yaml")
 job = dy.compile(job_settings)
 
 assert job.transform([{"fname": "jane", "lname": "smith", "country_code": 1, "country_name": "usa", "credit_card": "1234-5678-0000-9999", "gender": "F"}]).processed == [
