@@ -1,14 +1,14 @@
 input:
   uses: files.read_csv
   with:
-    file: examples/test.csv
+    file: test.csv
 steps:
   - uses: add_field
     with:
       fields:
         - field: full_name
           language: jmespath
-          expression: concat([fname, ' ' , lname])
+          expression: concat([fname, ' ', lname])
   - uses: map
     with:
       expression:
