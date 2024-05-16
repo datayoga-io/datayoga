@@ -3,9 +3,9 @@ parent: Blocks
 grand_parent: Reference
 ---
 
-# relational\.write
+# relational\.lookup
 
-Lookup in a relational table
+Lookup values in a relational table
 
 
 **Properties**
