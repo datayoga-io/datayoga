@@ -1,0 +1,71 @@
+{
+  "title": "relational.write",
+  "description": "Lookup in a relational table",
+  "type": "object",
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "load_snowflake",
+      "type": "relational.write",
+      "properties": {
+        "connection": "eu_datalake",
+        "table": "employees",
+        "schema": "dbo",
+        "load_strategy": "APPEND"
+      }
+    }
+  ],
+  "properties": {
+    "condition": {
+      "type": "string",
+      "title": "The lookup condition",
+      "description": "Use any valid SQL syntax. Use the alias `lookup` for the lookup table and `incoming` for the base table",
+      "examples": ["lookup.account_number = incoming.i_acct_no"]
+    },
+    "query": {
+      "type": "string",
+      "title": "Query string to use as an override to the built in query",
+      "description": "Use any valid SQL syntax. Use the alias `lookup` for the lookup table and `incoming` for the base table",
+      "examples": [
+        "select country_code,country_name from countries where is_active=1"
+      ]
+    },
+    "schema": {
+      "type": "string",
+      "title": "The table schema of the lookup table",
+      "description": "If not specified, no specific schema will be used when connecting to the database.",
+      "examples": ["dbo"]
+    },
+    "table": {
+      "type": "string",
+      "title": "The lookup table name",
+      "description": "Lookup table name",
+      "examples": ["countries"]
+    },
+    "order_by": {
+      "type": "array",
+      "title": "List of keys to use for ordering. Applicable for multiple matches",
+      "items": {
+        "type": ["string"],
+        "title": "name of column"
+      },
+      "examples": [["country_name"]]
+    },
+    "fields": {
+      "type": "array",
+      "title": "Columns to add to the output from the lookup table",
+      "items": {
+        "type": ["string", "object"],
+        "title": "name of column"
+      },
+      "examples": [["fname", { "lname": "last_name" }, "address", "gender"]]
+    },
+    "multiple_match_policy": {
+      "type": "string",
+      "enum": ["first", "last", "all"],
+      "description": "How to handle multiple matches in the lookup table",
+      "default": ""
+    }
+  },
+  "required": []
+}
