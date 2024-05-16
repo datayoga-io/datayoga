@@ -1,6 +1,6 @@
 {
   "title": "relational.lookup",
-  "description": "Lookup in a relational table",
+  "description": "Lookup values in a relational table",
   "type": "object",
   "additionalProperties": false,
   "examples": [
