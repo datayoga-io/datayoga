@@ -1,5 +1,5 @@
 {
-  "title": "relational.write",
+  "title": "relational.lookup",
   "description": "Lookup in a relational table",
   "type": "object",
   "additionalProperties": false,
