@@ -199,27 +199,30 @@ class Block(DyBlock, metaclass=ABCMeta):
                 self.connection.commit()
 
         except (OperationalError, PendingRollbackError) as e:
-            if self.db_type == relational_utils.DbType.SQLSERVER:
-                self.handle_mssql_operational_error(e)
-
+            self.handle_operational_error(e)
             self.dispose_engine()
             raise ConnectionError(e)
         except DatabaseError as e:
-            if self.db_type == relational_utils.DbType.ORACLE:
-                self.handle_oracle_database_error(e)
-
+            self.handle_oracle_database_error(e)
             raise
 
-    def handle_mssql_operational_error(self, e):
-        """Handling specific MSSQL cases: Conversion failed (245) and Truncated data (2628)"""
-        if e.orig.args[0] in (245, 2628):
-            raise
+    def handle_operational_error(self, e):
+        """Handles operational errors based on the database type."""
+        if self.db_type == relational_utils.DbType.SQLSERVER:
+            # Conversion failed (245) and Truncated data (2628)
+            if e.orig.args[0] in (245, 2628):
+                raise
+        elif self.db_type == relational_utils.DbType.MYSQL:
+            # Incorrect datetime value (1292)
+            if e.orig.args[0] == 1292:
+                raise
 
     def handle_oracle_database_error(self, e):
-        """Handling specific OracleDB cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
-        if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
-            self.dispose_engine()
-            raise ConnectionError(e)
+        """Handles specific Oracle cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
+        if self.db_type == relational_utils.DbType.ORACLE:
+            if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
+                self.dispose_engine()
+                raise ConnectionError(e)
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
         if records:
