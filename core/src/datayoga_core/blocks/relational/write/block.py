@@ -10,7 +10,7 @@ from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.exc import (DatabaseError, OperationalError,
                             PendingRollbackError)
 from sqlalchemy.sql.expression import ColumnCollection
@@ -74,14 +74,8 @@ class Block(DyBlock, metaclass=ABCMeta):
                 self.delete_stmt = self.tbl.delete().where(sa.and_(*conditions))
                 self.upsert_stmt = self.generate_upsert_stmt()
 
-        except OperationalError as e:
-            self.dispose_engine()
-            raise ConnectionError(e)
-        except DatabaseError as e:
-            # Handling specific OracleDB errors: Network failure and Database restart
-            if self.db_type == relational_utils.DbType.ORACLE:
-                self.handle_oracle_database_error(e)
-            raise
+        except (OperationalError, PendingRollbackError, DatabaseError) as e:
+            self._handle_connection_error(e)
 
     def dispose_engine(self):
         with suppress(Exception):
@@ -197,32 +191,8 @@ class Block(DyBlock, metaclass=ABCMeta):
             self.connection.execute(statement, records)
             if not self.connection._is_autocommit_isolation():
                 self.connection.commit()
-
-        except (OperationalError, PendingRollbackError) as e:
-            self.handle_operational_error(e)
-            self.dispose_engine()
-            raise ConnectionError(e)
-        except DatabaseError as e:
-            self.handle_oracle_database_error(e)
-            raise
-
-    def handle_operational_error(self, e):
-        """Handles operational errors based on the database type."""
-        if self.db_type == relational_utils.DbType.SQLSERVER:
-            # Conversion failed (245) and Truncated data (2628)
-            if e.orig.args[0] in (245, 2628):
-                raise
-        elif self.db_type == relational_utils.DbType.MYSQL:
-            # Incorrect datetime value (1292)
-            if e.orig.args[0] == 1292:
-                raise
-
-    def handle_oracle_database_error(self, e):
-        """Handles specific Oracle cases: Network failure (DPY-4011) and Database restart (ORA-01089)"""
-        if self.db_type == relational_utils.DbType.ORACLE:
-            if "DPY-4011" in f"{e}" or "ORA-01089" in f"{e}":
-                self.dispose_engine()
-                raise ConnectionError(e)
+        except (OperationalError, PendingRollbackError, DatabaseError) as e:
+            self._handle_connection_error(e)
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
         if records:
@@ -246,3 +216,20 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     def stop(self):
         self.dispose_engine()
+
+    def _is_connection_valid(self) -> bool:
+        """Checks if the current database connection is still valid."""
+        try:
+            # Execute a simple query to check if the connection is still valid
+            self.connection.scalar(select(1))
+            return True
+        except (OperationalError, PendingRollbackError, DatabaseError):
+            return False
+
+    def _handle_connection_error(self, error: Exception):
+        """Handles connection errors by disposing the engine if necessary and raising ConnectionError."""
+        if not self._is_connection_valid():
+            self.dispose_engine()
+            raise ConnectionError(error)
+        else:
+            raise

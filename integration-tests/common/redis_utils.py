@@ -85,6 +85,21 @@ def add_to_emp_stream(redis_client: Redis):
             ],
             "__$$opcode": "u"
         },
+        # gender length is invalid
+        {
+            "_id": 11,
+            "fname": "jane",
+            "lname": "doe",
+            "country_code": 972,
+            "country_name": "israel",
+            "credit_card": "1000-2000-3000-4000",
+            "gender": "FF",
+            "addresses": [
+                {"id": 33, "country_code": "IL", "address": "my address 33"},
+                {"id": 44, "country_code": "US", "address": "my address 44"}
+            ],
+            "__$$opcode": "u"
+        },
         {
             "_id": 12,
             "fname": "john",
