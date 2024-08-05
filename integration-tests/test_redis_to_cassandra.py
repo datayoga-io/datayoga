@@ -40,7 +40,7 @@ def prepare_db():
 def test_total_records(prepare_db):
     session = cassandra_utils.get_cassandra_session(["localhost"])
     total_employees = session.execute(f"select count(*) as total from {TABLE}").one()
-    assert total_employees.total == 3
+    assert total_employees.total == 4
 
 
 def test_filtered_record(prepare_db):
