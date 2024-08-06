@@ -85,7 +85,7 @@ def add_to_emp_stream(redis_client: Redis):
             ],
             "__$$opcode": "u"
         },
-        # gender length is too long, should be failed (except from Cassandra)
+        # gender length is too long, should fail (except from Cassandra)
         {
             "_id": 11,
             "fname": "jane",
