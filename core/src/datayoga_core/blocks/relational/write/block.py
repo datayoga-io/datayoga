@@ -27,6 +27,7 @@ class Block(DyBlock, metaclass=ABCMeta):
 
         self.context = context
         self.engine = None
+        self.connection = None
         self.setup_engine()
 
     def setup_engine(self):
@@ -228,7 +229,7 @@ class Block(DyBlock, metaclass=ABCMeta):
 
     def _handle_connection_error(self, error: Exception):
         """Handles connection errors by disposing the engine if necessary and raising ConnectionError."""
-        if not self._is_connection_valid():
+        if self.connection is not None and not self._is_connection_valid():
             self.dispose_engine()
             raise ConnectionError(error)
         else:
