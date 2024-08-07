@@ -173,8 +173,10 @@ class Block(DyBlock, metaclass=ABCMeta):
             statement = text(statement)
 
         logger.debug(f"Executing {statement} on {records}")
+        connected = False
         try:
             with self.engine.connect() as connection:
+                connected = True
                 try:
                     connection.execute(statement, records)
                     if not connection._is_autocommit_isolation():
@@ -182,7 +184,8 @@ class Block(DyBlock, metaclass=ABCMeta):
                 except Exception:
                     raise
         except Exception as e:
-            raise ConnectionError(e) from e
+            if not connected:
+                raise ConnectionError(e) from e
 
     def execute_upsert(self, records: List[Dict[str, Any]]):
         """Upserts records into the table."""
