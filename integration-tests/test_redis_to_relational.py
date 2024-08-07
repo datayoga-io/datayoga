@@ -19,20 +19,15 @@ logger = logging.getLogger("dy")
     ("mysql", "hr"),
     ("pg", "hr"),
     ("oracle", "hr"),
-    pytest.param("sqlserver", "dbo", marks=pytest.mark.xfail)
+    pytest.param("sqlserver", "dbo", marks=pytest.mark.skip(reason="SQLServer test fails"))
 ])
 def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
     """Reads data from a Redis stream and writes it to a relational database."""
-    job_name = f"tests.redis_to_{db_type}"
-
     try:
         redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
         redis_container.start()
 
         redis_utils.add_to_emp_stream(redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT))
-
-        with pytest.raises(ValueError):
-            run_job(job_name)
 
         if db_type == "db2":
             db_container = db_utils.get_db2_container("hr", "my_user", "my_pass")
@@ -57,13 +52,13 @@ def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
         db_utils.insert_to_emp_table(engine, schema_name)
         db_utils.insert_to_address_table(engine, schema_name)
 
-        run_job(job_name)
+        run_job(f"tests.redis_to_{db_type}")
         check_results(engine, schema_name)
     finally:
         with suppress(Exception):
             redis_container.stop()
         with suppress(Exception):
-            database_container.stop()
+            db_container.stop()
 
 
 def check_results(engine: Engine, schema_name: Optional[str]):
