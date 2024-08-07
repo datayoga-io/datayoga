@@ -54,6 +54,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
             query=query_args),
         echo=connection_details.get("debug", False),
         connect_args=connect_args,
+        pool_pre_ping=True,
         **extra)
 
     return engine, db_type

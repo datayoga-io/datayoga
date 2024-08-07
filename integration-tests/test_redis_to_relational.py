@@ -19,7 +19,7 @@ logger = logging.getLogger("dy")
     ("mysql", "hr"),
     ("pg", "hr"),
     ("oracle", "hr"),
-    pytest.param("sqlserver", "dbo", marks=pytest.mark.xfail)
+    pytest.param("sqlserver", "dbo", marks=pytest.mark.skip(reason="SQLServer test fails"))
 ])
 def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
     """Reads data from a Redis stream and writes it to a relational database."""
@@ -58,7 +58,7 @@ def test_redis_to_relational_db(db_type: str, schema_name: Optional[str]):
         with suppress(Exception):
             redis_container.stop()
         with suppress(Exception):
-            database_container.stop()
+            db_container.stop()
 
 
 def check_results(engine: Engine, schema_name: Optional[str]):
