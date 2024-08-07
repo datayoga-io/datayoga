@@ -94,10 +94,7 @@ def add_to_emp_stream(redis_client: Redis):
             "country_name": "israel",
             "credit_card": "1000-2000-3000-4000",
             "gender": "FF",
-            "addresses": [
-                {"id": 33, "country_code": "IL", "address": "my address 33"},
-                {"id": 44, "country_code": "US", "address": "my address 44"}
-            ],
+            "addresses": [],
             "__$$opcode": "u"
         },
         {
