@@ -28,6 +28,20 @@ DEFAULT_DRIVERS = {
 
 
 def get_engine(connection_name: str, context: Context, autocommit: bool = True) -> Tuple[sa.engine.Engine, DbType]:
+    """Creates an SQLAlchemy engine based on the connection details specified in the context.
+
+    Args:
+        connection_name (str): The name of the connection to retrieve details for.
+        context (Context): The context object providing necessary configurations and settings.
+        autocommit (bool, optional): Indicates whether to set the engine's isolation level to autocommit.
+            Defaults to True.
+
+    Raises:
+        ValueError: If the connection details are invalid or missing required fields.
+
+    Returns:
+        Tuple[sa.engine.Engine, DbType]: A tuple containing the created SQLAlchemy engine and the database type.
+    """
     connection_details = Connection.get_connection_details(connection_name, context)
 
     db_type = DbType(connection_details.get("type", "").lower())
