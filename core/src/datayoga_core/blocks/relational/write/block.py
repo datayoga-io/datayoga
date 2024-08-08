@@ -187,6 +187,8 @@ class Block(DyBlock, metaclass=ABCMeta):
             if not connected:
                 raise ConnectionError(e) from e
 
+            raise
+
     def execute_upsert(self, records: List[Dict[str, Any]]):
         """Upserts records into the table."""
         if records:
