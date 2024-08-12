@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional
 
 from datayoga_core.blocks.relational.utils import DEFAULT_DRIVERS, DbType
-from sqlalchemy import (Column, Integer, String, Table, create_engine, inspect,
-                        text)
+from sqlalchemy import (Column, DateTime, Integer, String, Table,
+                        create_engine, inspect, text)
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
 from testcontainers.core.generic import (ADDITIONAL_TRANSIENT_ERRORS,
@@ -107,7 +107,8 @@ def create_emp_table(engine: Engine, schema_name: Optional[str]):
         Column("full_name", String(50)),
         Column("country", String(50)),
         Column("address", String(50)),
-        Column("gender", String(1))
+        Column("gender", String(1)),
+        Column("date_of_birth", DateTime())
     ]
     Table("emp", base.metadata, *columns, schema=schema_name)
 

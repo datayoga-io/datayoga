@@ -18,6 +18,7 @@ steps:
         country: concat([country_code, ' - ', upper(country_name)])
         gender: gender
         addresses: addresses
+        date_of_birth: date_of_birth
       language: jmespath
   - uses: relational.write
     with:
@@ -31,6 +32,7 @@ steps:
         - full_name
         - country
         - gender
+        - date_of_birth
   - uses: relational.write
     with:
       connection: psql-hr
