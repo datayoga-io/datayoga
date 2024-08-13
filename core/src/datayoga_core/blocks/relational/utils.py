@@ -5,6 +5,8 @@ from typing import Tuple
 import sqlalchemy as sa
 from datayoga_core.connection import Connection
 from datayoga_core.context import Context
+from sqlalchemy.engine.interfaces import DBAPIConnection
+from sqlalchemy.pool import ConnectionPoolEntry
 
 logger = logging.getLogger("dy")
 
@@ -71,7 +73,27 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
         pool_pre_ping=True,
         **extra)
 
+    if db_type == DbType.ORACLE:
+        # add NLS_DATE_FORMAT for Oracle to explicitly set the date format to ISO
+        sa.event.listen(engine, "connect", alter_session_on_oracle_connect)
+
     return engine, db_type
+
+
+def alter_session_on_oracle_connect(dbapi_connection: DBAPIConnection, connection_record: ConnectionPoolEntry):
+    """SQLAlchemy event listener to alter the Oracle session settings upon connection.
+
+    This callback function is intended to be used with SQLAlchemy's `connect` event.
+    It alters the Oracle session settings by setting the `NLS_DATE_FORMAT` for the session
+    to ensure that dates are formatted as 'YYYY-MM-DD HH24:MI:SS'.
+
+    Args:
+        dbapi_connection (DBAPIConnection): The raw DB-API connection object provided by the Oracle driver.
+        connection_record (ConnectionPoolEntry): A record associated with the connection, managed by SQLAlchemy.
+    """
+    cursor = dbapi_connection.cursor()
+    cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'")
+    cursor.close()
 
 
 def construct_table_reference(table: sa.Table, with_brackets: bool = False) -> str:

@@ -1,3 +1,4 @@
+import datetime
 import logging
 from contextlib import suppress
 from typing import Optional
@@ -77,7 +78,9 @@ def check_results(engine: Engine, schema_name: Optional[str]):
     assert second_employee is not None
     assert second_employee["full_name"] == "Jane Doe"
     assert second_employee["country"] == "972 - ISRAEL"
+    assert second_employee["date_of_birth"] == datetime.datetime(2011, 11, 13, 0, 0)
     assert second_employee["gender"] == "F"
+
     # address was not in the inserted record. verify that additional columns are set to null
     assert second_employee["address"] is None
 
