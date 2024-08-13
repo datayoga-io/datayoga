@@ -80,9 +80,8 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
     return engine, db_type
 
 
-def alter_session_on_oracle_connect(dbapi_connection: DBAPIConnection, connection_record: ConnectionPoolEntry) -> None:
-    """
-    SQLAlchemy event listener to alter the Oracle session settings upon connection.
+def alter_session_on_oracle_connect(dbapi_connection: DBAPIConnection, connection_record: ConnectionPoolEntry):
+    """SQLAlchemy event listener to alter the Oracle session settings upon connection.
 
     This callback function is intended to be used with SQLAlchemy's `connect` event.
     It alters the Oracle session settings by setting the `NLS_DATE_FORMAT` for the session
@@ -91,9 +90,6 @@ def alter_session_on_oracle_connect(dbapi_connection: DBAPIConnection, connectio
     Args:
         dbapi_connection (DBAPIConnection): The raw DB-API connection object provided by the Oracle driver.
         connection_record (ConnectionPoolEntry): A record associated with the connection, managed by SQLAlchemy.
-
-    Returns:
-        None
     """
     cursor = dbapi_connection.cursor()
     cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'")
