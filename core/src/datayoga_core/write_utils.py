@@ -9,7 +9,7 @@ logger = logging.getLogger("dy")
 
 
 def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-    """Validate that the specified keys exist in the records."""
+    """Validates that the specified keys exist in the records."""
     rejected_records: List[Result] = []
     valid_records = []
     key_set = set(keys)
