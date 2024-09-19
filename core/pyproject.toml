@@ -42,12 +42,12 @@ azure-eventhub = { version = "^5.11.2", optional = true }
 azure-eventhub-checkpointstoreblob-aio = { version = "^1.1.4", optional = true }
 aiohttp = { version = "^3.8.4", optional = true }
 cassandra-driver = { version = "^3.25.0", optional = true }
-fastparquet = { version = "^2023.2.0", optional = true, platform = "python>=3.8" }
+fastparquet = { version = "^2023.2.0", markers = "python_version >= '3.8'" }
 ibm_db_sa = { version = "^0.4.0", optional = true }
+mysql-connector-python = { version = "^8.0.33", optional = true }
 oracledb = { version = "^1.2.2", optional = true }
 psycopg2-binary = { version = "^2.9.5", optional = true }
 pymssql = { version = "^2.2.7", optional = true }
-PyMySQL = { version = "^1.0.2", optional = true }
 redis = { version = "^4.3.5", optional = true }
 SQLAlchemy = { version = "^2.0.4", optional = true }
 
@@ -56,7 +56,7 @@ azure = ["azure-eventhub", "azure-eventhub-checkpointstoreblob-aio"]
 db2 = ["ibm_db_sa"]
 cassandra = ["cassandra-driver"]
 http = ["aiohttp"]
-mysql = ["PyMySQL", "SQLAlchemy"]
+mysql = ["mysql-connector-python", "SQLAlchemy"]
 oracle = ["oracledb", "SQLAlchemy"]
 parquet = ["fastparquet"]
 pg = ["psycopg2-binary", "SQLAlchemy"]
@@ -69,10 +69,10 @@ test = [
         "fastparquet",
         "ibm_db_sa",
         "mock",
+        "mysql-connector-python",
         "oracledb",
         "psycopg2-binary",
         "pymssql",
-        "PyMySQL",
         "pytest",
         "pytest-aioresponses",
         "pytest-asyncio",

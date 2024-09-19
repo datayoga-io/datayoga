@@ -22,7 +22,7 @@ class DbType(str, Enum):
 
 DEFAULT_DRIVERS = {
     DbType.DB2: "ibm_db_sa",
-    DbType.MYSQL: "mysql+pymysql",
+    DbType.MYSQL: "mysql+mysqlconnector",
     DbType.ORACLE: "oracle+oracledb",
     DbType.PSQL: "postgresql",
     DbType.SQLSERVER: "mssql+pymssql"
@@ -52,7 +52,7 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
     connect_args = connection_details.get("connect_args", {})
     extra = {}
 
-    if autocommit:
+    if autocommit and db_type != DbType.MYSQL:
         extra["isolation_level"] = None if db_type == DbType.DB2 else "AUTOCOMMIT"
 
     if db_type == DbType.ORACLE and connection_details.get("oracle_thick_mode", False):
@@ -72,6 +72,9 @@ def get_engine(connection_name: str, context: Context, autocommit: bool = True) 
         connect_args=connect_args,
         pool_pre_ping=True,
         **extra)
+
+    if db_type == DbType.MYSQL:
+        engine = engine.execution_options(autocommit=autocommit)
 
     if db_type == DbType.ORACLE:
         # add NLS_DATE_FORMAT for Oracle to explicitly set the date format to ISO

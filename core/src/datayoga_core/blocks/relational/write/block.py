@@ -33,12 +33,6 @@ class Block(DyBlock, metaclass=ABCMeta):
             return
 
         self.engine, self.db_type = relational_utils.get_engine(self.properties["connection"], self.context)
-
-        # Disable the new MySQL 8.0.17+ default behavior of requiring an alias for ON DUPLICATE KEY UPDATE
-        # This behavior is not supported by pymysql driver
-        if self.engine.driver == "pymysql":
-            self.engine.dialect._requires_alias_for_on_duplicate_key = False
-
         self.schema = self.properties.get("schema")
         self.table = self.properties.get("table")
         self.opcode_field = self.properties.get("opcode_field")
