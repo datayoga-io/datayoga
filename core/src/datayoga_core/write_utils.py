@@ -9,8 +9,7 @@ logger = logging.getLogger("dy")
 
 
 def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[List[Dict[str, Any]], List[Result]]:
-
-    # validate that the specified keys exist in the records
+    """Validate that the specified keys exist in the records."""
     rejected_records: List[Result] = []
     valid_records = []
     key_set = set(keys)
@@ -26,9 +25,11 @@ def validate_records(records: List[Dict[str, Any]], keys: List[str]) -> Tuple[Li
     return valid_records, rejected_records
 
 
-def group_records_by_opcode(records: List[Dict[str, Any]],
-                            opcode_field: str) -> Dict[str, List[Dict[str, Any]]]:
-    # group records by their opcode, reject records with unsupported opcode or with missing keys
+def group_records_by_opcode(
+    records: List[Dict[str, Any]],
+    opcode_field: str
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Groups records by their opcode, reject records with unsupported opcode or with missing keys."""
     groups = defaultdict(list)
     for record in records:
         groups[record.get(opcode_field, "")].append(record)
@@ -36,15 +37,17 @@ def group_records_by_opcode(records: List[Dict[str, Any]],
 
 
 def get_column_mapping(mapping: List[Union[Dict[str, str], str]]) -> List[Dict[str, str]]:
+    """Returns a list of dictionaries with the column and key names."""
     return [{"column": next(iter(item.keys())), "key": next(iter(item.values()))} if isinstance(item, dict)
             else {"column": item, "key": item} for item in mapping] if mapping else []
 
 
-def map_record(record: Dict[str, Any],
-               keys: List[Union[Dict[str, str], str]],
-               mapping: Optional[List[Union[Dict[str, str], str]]] = None):
-    # map the record based on the mapping definitions
-    # add nulls for missing mapping fields
+def map_record(
+    record: Dict[str, Any],
+    keys: List[Union[Dict[str, str], str]],
+    mapping: Optional[List[Union[Dict[str, str], str]]] = None
+):
+    """Maps the record based on the mapping definitions, adds nulls for missing mapping fields."""
     mapping = mapping or []
     mapped_record = {}
     for item in keys + mapping:

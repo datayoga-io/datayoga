@@ -42,12 +42,12 @@ azure-eventhub = { version = "^5.11.2", optional = true }
 azure-eventhub-checkpointstoreblob-aio = { version = "^1.1.4", optional = true }
 aiohttp = { version = "^3.8.4", optional = true }
 cassandra-driver = { version = "^3.25.0", optional = true }
-fastparquet = { version = "^2023.2.0", optional = true, platform = "python>=3.8" }
+fastparquet = { version = "^2023.2.0", optional = true, markers = "python_version >= '3.8'" }
 ibm_db_sa = { version = "^0.4.0", optional = true }
 oracledb = { version = "^1.2.2", optional = true }
 psycopg2-binary = { version = "^2.9.5", optional = true }
 pymssql = { version = "^2.2.7", optional = true }
-PyMySQL = { version = "^1.0.2", optional = true }
+PyMySQL = { version = "^1.1.1", optional = true }
 redis = { version = "^4.3.5", optional = true }
 SQLAlchemy = { version = "^2.0.4", optional = true }
 
