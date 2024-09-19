@@ -91,8 +91,7 @@ def create_pymysql_dialect_configuration(engine: Engine) -> Callable[[DBAPIConne
         engine (Engine): The SQLAlchemy engine to configure.
 
     Returns:
-        Callable[[DBAPIConnection, ConnectionPoolEntry], None]:
-        A function that configures PyMySQL dialect settings.
+        Callable[[DBAPIConnection, ConnectionPoolEntry], None]: A function that configures PyMySQL dialect settings.
     """
     def configure_pymysql_dialect(dbapi_connection: DBAPIConnection, connection_record: ConnectionPoolEntry):
         """Configures settings specific to PyMySQL on each connection.
