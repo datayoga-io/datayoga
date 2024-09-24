@@ -33,6 +33,7 @@ class Block(DyProducer):
         read_pending = True
         while True:
             # Read pending messages (fetched by us before but not acknowledged) in the first time, then consume new messages
+            messages_batch = []
             streams = self.redis_client.xreadgroup(self.consumer_group, self.requesting_consumer, {
                 self.stream: "0" if read_pending else ">"}, None, 100 if self.snapshot else 0)
 
@@ -41,7 +42,10 @@ class Block(DyProducer):
                 for key, value in stream[1]:
                     payload = orjson.loads(value[next(iter(value))])
                     payload[self.MSG_ID_FIELD] = key
-                    yield [payload]
+                    messages_batch.append(payload)
+
+                if messages_batch:
+                    yield messages_batch
 
             # Quit after consuming pending current messages in case of snapshot
             if self.snapshot and not read_pending:
