@@ -16,6 +16,10 @@ from sqlalchemy.sql.expression import ColumnCollection
 logger = logging.getLogger("dy")
 
 
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+
 class Block(DyBlock, metaclass=ABCMeta):
     _engine_fields = ("business_key_columns", "mapping_columns", "columns",
                       "delete_stmt", "upsert_stmt", "tbl", "connection", "engine")
