@@ -11,6 +11,7 @@ from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
 from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import ColumnCollection
 
 logger = logging.getLogger("dy")
@@ -175,6 +176,20 @@ class Block(DyBlock, metaclass=ABCMeta):
                     connection.execute(statement, records)
                     if not connection._is_autocommit_isolation():
                         connection.commit()
+                except OperationalError as e:
+                    if self.db_type == relational_utils.DbType.MYSQL:
+                        mysql_conn_errors = (
+                            2002,  # CR_CONNECTION_ERROR
+                            2003,  # CR_CONN_HOST_ERROR
+                            2006,  # CR_SERVER_GONE_ERROR
+                            2013,  # CR_SERVER_LOST
+                            2055,  # CR_SERVER_LOST_EXTENDED
+                        )
+
+                        if e.orig and e.orig.args[0] in mysql_conn_errors:
+                            connected = False
+
+                    raise
                 except Exception:
                     raise
         except Exception as e:
