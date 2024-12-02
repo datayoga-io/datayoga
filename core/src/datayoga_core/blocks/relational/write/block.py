@@ -186,7 +186,7 @@ class Block(DyBlock, metaclass=ABCMeta):
                             2055,  # CR_SERVER_LOST_EXTENDED
                         )
 
-                        if e.orig and e.orig.args[0] in mysql_conn_errors:
+                        if e.orig.args[0] in mysql_conn_errors:
                             connected = False
 
                     raise
