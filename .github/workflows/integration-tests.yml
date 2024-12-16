@@ -23,7 +23,7 @@ jobs:
       - name: Install system and Oracle dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y freetds-dev libkrb5-dev libaio1
+          sudo apt-get install -y freetds-dev libkrb5-dev libaio
 
       - name: Build and Install CLI
         run: |
