@@ -8,7 +8,10 @@
       "type": "string",
       "const": "redis"
     },
-    "host": { "description": "Redis DB host", "type": "string" },
+    "host": {
+      "description": "Redis DB host",
+      "type": "string"
+    },
     "port": {
       "description": "Redis DB port",
       "type": "integer",
@@ -38,6 +41,29 @@
     "cacert": {
       "description": "CA certificate file to verify with",
       "type": "string"
+    },
+    "socket_timeout": {
+      "description": "Socket timeout in seconds",
+      "type": "number",
+      "minimum": 0,
+      "default": 10.0
+    },
+    "socket_connect_timeout": {
+      "description": "Socket connection timeout in seconds",
+      "type": "number",
+      "minimum": 0,
+      "default": 2.0
+    },
+    "socket_keepalive": {
+      "description": "Enable/disable TCP keepalive",
+      "type": "boolean",
+      "default": true
+    },
+    "health_check_interval": {
+      "description": "Interval for health checks in seconds",
+      "type": "number",
+      "minimum": 0,
+      "default": 60
     }
   },
   "additionalProperties": false,
@@ -45,15 +71,18 @@
   "dependentRequired": {
     "key": ["cert"],
     "cert": ["key"],
-    "key_password": ["key"],
-    "user": ["password"]
+    "key_password": ["key"]
   },
   "examples": [
     {
       "cache": {
         "type": "redis",
         "host": "localhost",
-        "port": 6379
+        "port": 6379,
+        "socket_timeout": 10.0,
+        "socket_connect_timeout": 2.0,
+        "socket_keepalive": true,
+        "health_check_interval": 60
       }
     }
   ]
