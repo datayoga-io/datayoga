@@ -14,7 +14,6 @@ import datayoga_core as dy
 import jsonschema
 from datayoga_core import prometheus, utils
 from datayoga_core.connection import Connection
-from pkg_resources import DistributionNotFound, get_distribution
 
 from datayoga import cli_helpers
 
@@ -34,10 +33,16 @@ logger.addHandler(ch)
 
 
 def get_dy_distribution() -> str:
+    # support python 3.7 and up. pkg_resources has changed in newer versions
     try:
-        return get_distribution("datayoga").version
-    except DistributionNotFound:
-        return "0.0.0"
+        from importlib import metadata
+        return metadata.version("datayoga")
+    except (ImportError, Exception):
+        try:
+            import pkg_resources
+            return pkg_resources.get_distribution("datayoga").version
+        except pkg_resources.DistributionNotFound:
+            return "0.0.0"
 
 
 @click.group(name="datayoga", help="DataYoga command line tool")
