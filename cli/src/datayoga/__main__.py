@@ -33,7 +33,15 @@ logger.addHandler(ch)
 
 
 def get_dy_distribution() -> str:
-    # support python 3.7 and up. pkg_resources has changed in newer versions
+    """Get the installed version of datayoga package.
+
+    Attempts to retrieve version using importlib.metadata (Python 3.8+),
+    falling back to pkg_resources for earlier versions. Returns '0.0.0'
+    if the package is not found.
+
+    Returns:
+        str: The version string of datayoga package, or '0.0.0' if not found.
+    """
     try:
         from importlib import metadata
         return metadata.version("datayoga")
