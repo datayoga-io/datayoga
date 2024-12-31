@@ -1,6 +1,7 @@
 import pytest
 from datayoga_core import utils
 from datayoga_core.blocks.add_field.block import Block
+from datayoga_core.result import Status
 
 
 @pytest.mark.asyncio
@@ -122,3 +123,48 @@ async def test_add_field_with_dot():
     ]) == utils.all_success([
         {"fname": "john", "lname": "doe", "name.full_name": "john doe"}
     ])
+
+
+@pytest.mark.asyncio
+async def test_single_record_failure():
+    """Test case showing that JSON parse failures on some records shouldn't fail the entire batch."""
+    block = Block({
+        "field": "parsed",
+        "language": "jmespath",
+        "expression": "json_parse(JSON_FORMAT)"
+    })
+    block.init()
+
+    test_data = [
+        {"JSON_FORMAT": '{"valid": "json1"}'},
+        {"JSON_FORMAT": "{invalid_json1"},
+        {"JSON_FORMAT": '{"valid": "json2"}'},
+        {"JSON_FORMAT": "{invalid_json2"},
+        {"JSON_FORMAT": '{"valid": "json3"}'},
+        {"JSON_FORMAT": '{"name": "test"}'}
+    ]
+
+    result = await block.run(test_data)
+
+    # Check counts
+    assert len(result.processed) == 4  # Should have 4 successful records
+    assert len(result.rejected) == 2   # Should have 2 rejected records
+    assert len(result.filtered) == 0
+
+    # Check processed records
+    for i, record in enumerate(result.processed):
+        assert record.status == Status.SUCCESS
+        if i == 0:
+            assert record.payload["parsed"] == {"valid": "json1"}
+        elif i == 1:
+            assert record.payload["parsed"] == {"valid": "json2"}
+        elif i == 2:
+            assert record.payload["parsed"] == {"valid": "json3"}
+        elif i == 3:
+            assert record.payload["parsed"] == {"name": "test"}
+
+    # Check rejected records
+    for record in result.rejected:
+        assert record.status == Status.REJECTED
+        assert "invalid_json" in record.payload["JSON_FORMAT"]
+        assert record.message  # Should contain JSON parse error
