@@ -1,5 +1,7 @@
 from abc import abstractmethod
-from typing import Any, AsyncGenerator, Dict, List
+from typing import Any, Dict, Generator, List
+
+from datayoga_core.result import JobResult
 
 from .block import Block
 
@@ -13,7 +15,7 @@ class Message:
 class Producer(Block):
 
     @abstractmethod
-    async def produce(self) -> AsyncGenerator[List[Message], None]:
+    def produce(self) -> Generator[List[Message], JobResult, None]:
         """Produces data
 
         Returns:

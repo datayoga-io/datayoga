@@ -14,7 +14,13 @@
       "if": {
         "properties": {
           "type": {
-            "enum": ["cassandra", "mysql", "postgresql", "sqlserver"]
+            "enum": [
+              "cassandra",
+              "mysql",
+              "postgresql",
+              "sqlserver",
+              "snowflake"
+            ]
           }
         }
       },

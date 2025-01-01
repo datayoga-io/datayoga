@@ -1,0 +1,32 @@
+{
+  "title": "relational.read",
+  "description": "Read a table from an SQL-compatible data store",
+  "type": "object",
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "read_snowflake",
+      "type": "relational.read",
+      "properties": {
+        "connection": "eu_datalake",
+        "table": "employees",
+        "schema": "dbo"
+      }
+    }
+  ],
+  "properties": {
+    "connection": {
+      "type": "string",
+      "title": "The connection to use for loading",
+      "description": "Logical connection name as defined in the connections.dy.yaml",
+      "examples": ["europe_db", "target", "eu_dwh"]
+    },
+    "stream_name": {
+      "type": "string",
+      "title": "The table name",
+      "description": "Table name",
+      "examples": ["employees"]
+    }
+  },
+  "required": ["connection", "stream_name"]
+}

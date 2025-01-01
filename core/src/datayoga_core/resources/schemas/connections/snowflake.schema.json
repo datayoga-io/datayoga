@@ -1,0 +1,38 @@
+{
+  "title": "MySQL",
+  "description": "Schema for configuring MySQL database connection parameters",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "Connection type",
+      "type": "string",
+      "const": "snowflake"
+    },
+    "account": { "description": "account", "type": "string" },
+    "database": { "description": "DB name", "type": "string" },
+    "user": { "description": "DB user", "type": "string" },
+    "password": { "description": "DB password", "type": "string" },
+    "connect_args": {
+      "description": "Additional arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "query_args": {
+      "description": "Additional query string arguments to use when connecting to the DB",
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": ["type", "account", "database", "user"],
+  "examples": [
+    {
+      "hr": {
+        "type": "snowflake",
+        "account": "nh5533.uae-north.azure",
+        "database": "hr",
+        "user": "myuser",
+        "password": "mypass"
+      }
+    }
+  ]
+}

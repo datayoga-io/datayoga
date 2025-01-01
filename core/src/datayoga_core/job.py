@@ -165,14 +165,15 @@ class Job:
 
         return result
 
-    async def run(self):
-        async for records in self.producer.produce():
-            prometheus.incoming_records.inc(len(records))
+    def run(self):
+        if self.producer:
+            records_iterator = self.producer.produce()
+            for records in records_iterator:
+                prometheus.incoming_records.inc(len(records))
 
-            logger.debug(f"Retrieved records:\n\t{records}")
-            await self.root.process(records)
-
-        await self.shutdown()
+                logger.debug(f"Retrieved records:\n\t{records}")
+                result = self.transform([record.value for record in records])
+                records_iterator.send(result)
 
     async def shutdown(self):
         # wait for in-flight records to finish
