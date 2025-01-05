@@ -58,11 +58,20 @@ def map_record(
 
         source_path = utils.split_field(source)
         obj = record
+        found = True
         for key in source_path:
             key = utils.unescape_field(key)
-            if key in obj:
-                obj = obj[key]
 
-        mapped_record[target] = obj if obj != record else None
+            if obj is None:
+                found = False
+                break
+
+            if isinstance(obj, dict) and key in obj:
+                obj = obj[key]
+            else:
+                found = False
+                break
+
+        mapped_record[target] = obj if found else None
 
     return mapped_record
