@@ -174,11 +174,11 @@ class Block(DyBlock, metaclass=ABCMeta):
         """Processes records using the given execute method.
 
         Args:
-            records: List of records to process.
-            execute_method: Method to execute records (e.g., execute_upsert or execute_delete).
+            records (List[Dict[str, Any]]): List of records to process.
+            execute_method (Callable[[List[Dict[str, Any]]], None]) Method to execute records (e.g., execute_upsert or execute_delete).
 
         Returns:
-            Tuple of (processed_records, rejected_records).
+            Tuple[List[Result], List[Result]]: Processed and rejected records.
         """
         processed_records: List[Result] = []
         rejected_records: List[Result] = []
