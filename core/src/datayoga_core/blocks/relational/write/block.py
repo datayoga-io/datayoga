@@ -1,7 +1,7 @@
 import logging
 from abc import ABCMeta
 from contextlib import suppress
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import sqlalchemy as sa
 from datayoga_core import utils, write_utils
@@ -67,32 +67,36 @@ class Block(DyBlock, metaclass=ABCMeta):
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
         """Runs the block with provided data and return the result."""
         logger.debug(f"Running {self.get_block_name()}")
+        processed_records: List[Result] = []
         rejected_records: List[Result] = []
 
         self.setup_engine()
 
         if self.opcode_field:
+            # Reject records with unknown opcodes
             opcode_groups = write_utils.group_records_by_opcode(data, opcode_field=self.opcode_field)
-            # reject any records with unknown or missing Opcode
-            for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}:
-                rejected_records.extend([
-                    Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
-                    for record in opcode_groups[opcode]
-                ])
+            rejected_records.extend([
+                Result(status=Status.REJECTED, payload=record, message=f"unknown opcode '{opcode}'")
+                for opcode in set(opcode_groups.keys()) - {o.value for o in OpCode}
+                for record in opcode_groups[opcode]
+            ])
 
             records_to_upsert = opcode_groups[OpCode.CREATE] + opcode_groups[OpCode.UPDATE]
             records_to_delete = opcode_groups[OpCode.DELETE]
-            if self.foreach:
-                self.execute_upsert(utils.explode_records(records_to_upsert, self.foreach))
-                self.execute_delete(utils.explode_records(records_to_delete, self.foreach))
-            else:
-                self.execute_upsert(records_to_upsert)
-                self.execute_delete(records_to_delete)
 
-            return BlockResult(
-                processed=[Result(Status.SUCCESS, payload=record)
-                           for opcode in OpCode for record in opcode_groups[opcode.value]],
-                rejected=rejected_records)
+            if self.foreach:
+                records_to_upsert = utils.explode_records(records_to_upsert, self.foreach)
+                records_to_delete = utils.explode_records(records_to_delete, self.foreach)
+
+            upsert_processed, upsert_rejected = self.process_records(records_to_upsert, self.execute_upsert)
+            delete_processed, delete_rejected = self.process_records(records_to_delete, self.execute_delete)
+
+            processed_records.extend(upsert_processed)
+            processed_records.extend(delete_processed)
+            rejected_records.extend(upsert_rejected)
+            rejected_records.extend(delete_rejected)
+
+            return BlockResult(processed=processed_records, rejected=rejected_records)
         else:
             logger.debug(f"Inserting {len(data)} record(s) to {self.table} table")
             self.execute(self.tbl.insert(), data)
@@ -161,6 +165,43 @@ class Block(DyBlock, metaclass=ABCMeta):
                 ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
                 ", ".join([f"target.{column} = {sa.bindparam(column)}" for column in self.mapping_columns])
             ))
+
+    def process_records(
+        self,
+        records: List[Dict[str, Any]],
+        execute_method: Callable[[List[Dict[str, Any]]], None]
+    ) -> Tuple[List[Result], List[Result]]:
+        """Processes records using the given execute method.
+
+        Args:
+            records (List[Dict[str, Any]]): List of records to process.
+            execute_method (Callable[[List[Dict[str, Any]]], None]) Method to execute records (e.g., execute_upsert or execute_delete).
+
+        Returns:
+            Tuple[List[Result], List[Result]]: Processed and rejected records.
+        """
+        processed_records: List[Result] = []
+        rejected_records: List[Result] = []
+
+        try:
+            execute_method(records)
+            processed_records.extend([Result(Status.SUCCESS, payload=record) for record in records])
+        except Exception as batch_error:
+            logger.warning(f"Batch operation failed: {batch_error} - operations will be retried individually")
+            for record in records:
+                try:
+                    execute_method([record])
+                    processed_records.append(Result(Status.SUCCESS, payload=record))
+                except Exception as individual_error:
+                    rejected_records.append(
+                        Result(
+                            status=Status.REJECTED,
+                            payload=record,
+                            message=str(individual_error)
+                        )
+                    )
+
+        return processed_records, rejected_records
 
     def execute(self, statement: Any, records: List[Dict[str, Any]]):
         """Executes a SQL statement with given records."""
