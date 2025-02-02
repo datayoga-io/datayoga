@@ -187,7 +187,7 @@ class Block(DyBlock, metaclass=ABCMeta):
             execute_method(records)
             processed_records.extend([Result(Status.SUCCESS, payload=record) for record in records])
         except Exception as batch_error:
-            logger.warning(f"Batch operation failed: {batch_error}")
+            logger.warning(f"Batch operation failed: {batch_error} - operations will be retried individually")
             for record in records:
                 try:
                     execute_method([record])
