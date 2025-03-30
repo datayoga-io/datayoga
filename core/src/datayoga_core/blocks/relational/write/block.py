@@ -113,11 +113,16 @@ class Block(DyBlock, metaclass=ABCMeta):
                 set_={col: getattr(insert_stmt.excluded, col) for col in self.columns})
 
         if self.db_type == relational_utils.DbType.MYSQL:
-            from sqlalchemy.dialects.mysql import insert
-
-            insert_stmt = insert(self.tbl).values({col: "?" for col in self.columns})
-            return insert_stmt.on_duplicate_key_update(ColumnCollection(
-                columns=[(x.name, x) for x in [insert_stmt.inserted[column] for column in self.columns]]))
+            return sa.sql.text("""
+                    INSERT INTO %s (%s)
+                    VALUES (%s)
+                    ON DUPLICATE KEY UPDATE %s
+                    """ % (
+                relational_utils.construct_table_reference(self.tbl),
+                ", ".join([f"`{column}`" for column in self.columns]),
+                ", ".join([f"{sa.bindparam(column)}" for column in self.columns]),
+                ", ".join([f"`{column}` = VALUES(`{column}`)" for column in self.columns])
+            ))
 
         if self.db_type == relational_utils.DbType.SQLSERVER:
             return sa.sql.text("""
