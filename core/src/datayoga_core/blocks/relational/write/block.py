@@ -10,7 +10,6 @@ from datayoga_core.blocks.relational import utils as relational_utils
 from datayoga_core.context import Context
 from datayoga_core.opcode import OpCode
 from datayoga_core.result import BlockResult, Result, Status
-from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
 logger = logging.getLogger("dy")
@@ -210,7 +209,7 @@ class Block(DyBlock, metaclass=ABCMeta):
     def execute(self, statement: Any, records: List[Dict[str, Any]]):
         """Executes a SQL statement with given records."""
         if isinstance(statement, str):
-            statement = text(statement)
+            statement = sa.sql.text(statement)
 
         logger.debug(f"Executing {statement} on {records}")
         connected = False
