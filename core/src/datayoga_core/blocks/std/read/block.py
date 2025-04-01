@@ -17,7 +17,7 @@ class Block(DyProducer):
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.batch_size = int(self.properties.get("batch_size", 1000))
-        logger.info(f"!Using batch size: {self.batch_size}")
+        logger.info(f"Using batch size: {self.batch_size}")
 
     async def process_batch(self, records: List[Dict[str, Any]]) -> AsyncGenerator[List[Message], None]:
         """Process records and yield batches according to batch_size"""
