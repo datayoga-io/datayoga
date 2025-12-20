@@ -90,6 +90,10 @@ test = [
 url = "https://datayoga.io"
 [tool.poetry.scripts]
 
+[tool.poetry.group.dev.dependencies]
+redis = "5.0.8"
+testcontainers = ">=3.7.0,<4.0.0"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
