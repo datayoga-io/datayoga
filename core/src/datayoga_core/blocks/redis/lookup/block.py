@@ -57,7 +57,8 @@ class Block(DyBlock, metaclass=ABCMeta):
                     condition_result = self.when_expression.search(record)
                     should_lookup = bool(condition_result)
                     if not should_lookup:
-                        logger.debug(f"Skipping lookup for record {idx} due to when condition")
+                        logger.debug(
+                            f"Skipping lookup for record {idx} due to when condition evaluated as {condition_result!r}")
                 except Exception as e:
                     logger.warning(f"Error evaluating when condition for record {idx}: {e}. Skipping lookup.")
                     should_lookup = False

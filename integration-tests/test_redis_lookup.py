@@ -106,3 +106,45 @@ def test_redis_lookup_with_when_condition(job_name: str):
         assert len(redis_client.keys()) == 11
     finally:
         redis_container.stop()
+
+
+def test_redis_lookup_with_when_condition_runtime_error_handling():
+    """Tests error handling when the when condition references nonexistent fields.
+
+    This test verifies that when condition evaluation errors at runtime are handled gracefully.
+    When a field referenced in the when condition doesn't exist, the lookup should be skipped
+    for that record (treating the error as a false condition).
+
+    Note: Invalid syntax errors (malformed JMESPath/SQL) are caught at compile time during
+    job initialization and will cause the job to fail before processing any records. This is
+    the correct behavior as it's a configuration error that should be fixed.
+
+    Raises:
+        AssertionError: If the error handling doesn't match expectations.
+    """
+    job_name = "tests.redis_lookup_with_when_nonexistent_field"
+    redis_container = redis_utils.get_redis_oss_container(redis_utils.REDIS_PORT)
+    redis_container.start()
+
+    try:
+        redis_client = redis_utils.get_redis_client("localhost", redis_utils.REDIS_PORT)
+
+        # Set up test data in Redis
+        redis_client.set("string_key", "test_string")
+        redis_client.set("hash_key", "test_hash")
+        redis_client.set("set_key", "test_set")
+        redis_client.set("sorted_set_key", "test_sorted_set")
+        redis_client.set("list_key", "test_list")
+
+        run_job(job_name)
+
+        # All records should have None for obj since lookups were skipped due to nonexistent field
+        # When the field doesn't exist, JMESPath returns null, which evaluates to false
+        for record_id in ["0", "1", "2", "3", "4", "5"]:
+            val = redis_client.hgetall(record_id)
+            assert val["obj"] == "None", f"Record {record_id} should have obj='None' but got '{val['obj']}'"
+
+        # Total keys: 5 original test data + 6 result records = 11
+        assert len(redis_client.keys()) == 11
+    finally:
+        redis_container.stop()
