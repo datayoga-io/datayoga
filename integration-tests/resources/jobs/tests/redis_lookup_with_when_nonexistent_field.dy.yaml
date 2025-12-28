@@ -1,0 +1,32 @@
+input:
+  uses: files.read_csv
+  with:
+    file: lookup_with_nulls.csv
+    batch_size: 10
+steps:
+  - uses: redis.lookup
+    with:
+      when:
+        expression: nonexistent_field != `null`
+        language: jmespath
+      connection: cache
+      cmd: GET
+      args:
+        - lfield
+      language: jmespath
+      field: obj
+  - uses: map
+    with:
+      expression:
+        id: id
+        lfield: lfield
+        branch_id: branch_id
+        obj: concat([obj])
+      language: jmespath
+  - uses: redis.write
+    with:
+      connection: cache
+      command: HSET
+      key:
+        expression: id
+        language: jmespath

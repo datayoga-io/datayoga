@@ -17,8 +17,16 @@ Lookup data from Redis using the given command and key
 |[**args**](#args)<br/>(Redis command arguments)|`string[]`|The list of expressions produces arguments<br/>|yes|
 |**language**|`string`|Language<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
 |**field**<br/>(Target field)|`string`|The field to write the result to<br/>|yes|
+|[**when**](#when)<br/>(Conditional execution)|`object`|Optional condition to determine whether to execute the lookup for each record<br/>|yes|
 
 **Additional Properties:** not allowed  
+**Example**
+
+```yaml
+when: {}
+
+```
+
 <a name="args"></a>
 ## args\[\]: Redis command arguments
 
@@ -28,4 +36,18 @@ The list of expressions produces arguments
 **Items**
 
 **Item Type:** `string`  
+<a name="when"></a>
+## when: Conditional execution
+
+Optional condition to determine whether to execute the lookup for each record
+
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**expression**<br/>(Condition expression)|`string`|Expression that evaluates to a boolean to determine if lookup should be executed<br/>|yes|
+|**language**<br/>(Expression language)|`string`|Language for the condition expression<br/>Enum: `"jmespath"`, `"sql"`<br/>|yes|
+
+**Additional Properties:** not allowed  
 

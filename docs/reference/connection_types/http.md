@@ -48,6 +48,7 @@ HTTP headers, including authorization token
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**Additional Properties**||||
 
 <a name="query_parameters"></a>
 ## query\_parameters: object
@@ -59,5 +60,6 @@ Default query parameters for all API endpoints
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**Additional Properties**||||
 
 
