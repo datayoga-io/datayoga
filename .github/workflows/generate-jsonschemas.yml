@@ -31,8 +31,6 @@ jobs:
 
       - name: Generate JSON Schemas
         run: ./scripts/generate-jsonschemas.sh
-        env:
-          PYTHONHASHSEED: "0"
 
       - name: Push to repo
         run: |
