@@ -20,17 +20,12 @@
         "uses": {
           "enum": [
             "add_field",
-            "filter",
-            "map",
-            "rename_field",
-            "remove_field",
-            "sequence",
-            "jinja_template",
             "parquet.read",
             "parquet.write",
             "redis.read_stream",
             "redis.lookup",
             "redis.write",
+            "filter",
             "relational.read",
             "relational.lookup",
             "relational.write",
@@ -39,8 +34,13 @@
             "http.receiver",
             "http.write",
             "cassandra.write",
+            "map",
             "azure.read_event_hub",
-            "files.read_csv"
+            "rename_field",
+            "remove_field",
+            "files.read_csv",
+            "sequence",
+            "jinja_template"
           ]
         }
       },
@@ -133,318 +133,6 @@
                         "expression": "country_code || ' - ' || UPPER(country_name)"
                       }
                     ]
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "uses": {
-                "description": "Block type",
-                "type": "string",
-                "const": "filter"
-              }
-            },
-            "required": ["uses"]
-          },
-          "then": {
-            "properties": {
-              "with": {
-                "title": "filter",
-                "description": "Filter records",
-                "type": "object",
-                "properties": {
-                  "expression": {
-                    "description": "Expression",
-                    "type": "string"
-                  },
-                  "language": {
-                    "description": "Language",
-                    "type": "string",
-                    "enum": ["jmespath", "sql"]
-                  }
-                },
-                "additionalProperties": false,
-                "required": ["expression", "language"],
-                "examples": [{ "language": "sql", "expression": "age>20" }]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "uses": {
-                "description": "Block type",
-                "type": "string",
-                "const": "map"
-              }
-            },
-            "required": ["uses"]
-          },
-          "then": {
-            "properties": {
-              "with": {
-                "title": "map",
-                "description": "Maps a record into a new output based on expressions",
-                "type": "object",
-                "properties": {
-                  "expression": {
-                    "description": "Expression",
-                    "type": ["object", "string"]
-                  },
-                  "language": {
-                    "description": "Language",
-                    "type": "string",
-                    "enum": ["jmespath", "sql"]
-                  }
-                },
-                "additionalProperties": false,
-                "required": ["expression", "language"],
-                "examples": [
-                  {
-                    "expression": {
-                      "first_name": "first_name",
-                      "last_name": "last_name",
-                      "greeting": "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
-                      "country": "country",
-                      "full_name": "full_name"
-                    },
-                    "language": "sql"
-                  },
-                  {
-                    "expression": "{\"CustomerId\": \"customer_id\", \"FirstName\": \"first_name\", \"LastName\": \"last_name\", \"Company\": \"company\", \"Location\": {\"Street\": \"address\", \"City\": \"city\", \"State\": \"state\", \"Country\": \"country\", \"PostalCode\": \"postal_code\"}, \"Phone\": \"phone\", \"Fax\": \"fax\", \"Email\": \"email\"}",
-                    "language": "jmespath"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "uses": {
-                "description": "Block type",
-                "type": "string",
-                "const": "rename_field"
-              }
-            },
-            "required": ["uses"]
-          },
-          "then": {
-            "properties": {
-              "with": {
-                "title": "rename_field",
-                "description": "Renames fields. All other fields remain unchanged",
-                "type": "object",
-                "oneOf": [
-                  {
-                    "description": "Rename multiple fields",
-                    "properties": {
-                      "fields": {
-                        "type": "array",
-                        "description": "Fields",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "from_field": {
-                              "description": "From field",
-                              "type": "string"
-                            },
-                            "to_field": {
-                              "description": "To field",
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": false,
-                          "required": ["from_field", "to_field"],
-                          "examples": [
-                            {
-                              "fields": [
-                                {
-                                  "from_field": "name.lname",
-                                  "to_field": "name.last_name"
-                                },
-                                {
-                                  "from_field": "name.fname",
-                                  "to_field": "name.first_name"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    "required": ["fields"],
-                    "additionalProperties": false
-                  },
-                  {
-                    "description": "Rename one field",
-                    "properties": {
-                      "from_field": {
-                        "description": "From field",
-                        "type": "string"
-                      },
-                      "to_field": {
-                        "description": "To field",
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": false,
-                    "required": ["from_field", "to_field"],
-                    "examples": [
-                      {
-                        "from_field": "name.lname",
-                        "to_field": "name.last_name"
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "uses": {
-                "description": "Block type",
-                "type": "string",
-                "const": "remove_field"
-              }
-            },
-            "required": ["uses"]
-          },
-          "then": {
-            "properties": {
-              "with": {
-                "title": "remove_field",
-                "description": "Remove fields",
-                "type": "object",
-                "oneOf": [
-                  {
-                    "description": "Remove multiple fields",
-                    "properties": {
-                      "fields": {
-                        "type": "array",
-                        "description": "Fields",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "field": {
-                              "description": "Field",
-                              "type": "string"
-                            }
-                          },
-                          "additionalProperties": false,
-                          "required": ["field"]
-                        }
-                      }
-                    },
-                    "required": ["fields"],
-                    "additionalProperties": false,
-                    "examples": [
-                      {
-                        "fields": [
-                          { "field": "credit_card" },
-                          { "field": "name.mname" }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "description": "Remove one field",
-                    "properties": {
-                      "field": { "description": "Field", "type": "string" }
-                    },
-                    "additionalProperties": false,
-                    "required": ["field"],
-                    "examples": [{ "field": "credit_card" }]
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "uses": {
-                "description": "Block type",
-                "type": "string",
-                "const": "sequence"
-              }
-            },
-            "required": ["uses"]
-          },
-          "then": {
-            "properties": {
-              "with": {
-                "title": "sequence",
-                "description": "Add a sequence number field to data",
-                "type": "object",
-                "additionalProperties": false,
-                "examples": [],
-                "required": [],
-                "properties": {
-                  "field": {
-                    "type": "string",
-                    "title": "Name of new sequence field"
-                  },
-                  "start": {
-                    "type": "number",
-                    "title": "Start entry",
-                    "default": 1,
-                    "examples": []
-                  },
-                  "increment": {
-                    "type": "number",
-                    "title": "Increment between sequences",
-                    "examples": []
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "uses": {
-                "description": "Block type",
-                "type": "string",
-                "const": "jinja_template"
-              }
-            },
-            "required": ["uses"]
-          },
-          "then": {
-            "properties": {
-              "with": {
-                "title": "jinja_template",
-                "description": "Apply Jinja template to a field",
-                "type": "object",
-                "properties": {
-                  "field": { "description": "Field", "type": "string" },
-                  "template": {
-                    "description": "Jinja Template",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false,
-                "required": ["field", "template"],
-                "examples": [
-                  {
-                    "field": "name.full_name",
-                    "template": "{{ name.fname }} {{ name.lname }}"
-                  },
-                  {
-                    "field": "name.fname_upper",
-                    "template": "{{ name.fname | upper }}"
                   }
                 ]
               }
@@ -677,6 +365,41 @@
                 },
                 "additionalProperties": false,
                 "required": ["connection", "key"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "uses": {
+                "description": "Block type",
+                "type": "string",
+                "const": "filter"
+              }
+            },
+            "required": ["uses"]
+          },
+          "then": {
+            "properties": {
+              "with": {
+                "title": "filter",
+                "description": "Filter records",
+                "type": "object",
+                "properties": {
+                  "expression": {
+                    "description": "Expression",
+                    "type": "string"
+                  },
+                  "language": {
+                    "description": "Language",
+                    "type": "string",
+                    "enum": ["jmespath", "sql"]
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["expression", "language"],
+                "examples": [{ "language": "sql", "expression": "age>20" }]
               }
             }
           }
@@ -1314,6 +1037,56 @@
               "uses": {
                 "description": "Block type",
                 "type": "string",
+                "const": "map"
+              }
+            },
+            "required": ["uses"]
+          },
+          "then": {
+            "properties": {
+              "with": {
+                "title": "map",
+                "description": "Maps a record into a new output based on expressions",
+                "type": "object",
+                "properties": {
+                  "expression": {
+                    "description": "Expression",
+                    "type": ["object", "string"]
+                  },
+                  "language": {
+                    "description": "Language",
+                    "type": "string",
+                    "enum": ["jmespath", "sql"]
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["expression", "language"],
+                "examples": [
+                  {
+                    "expression": {
+                      "first_name": "first_name",
+                      "last_name": "last_name",
+                      "greeting": "'Hello ' || CASE WHEN gender = 'F' THEN 'Ms.' WHEN gender = 'M' THEN 'Mr.' ELSE 'N/A' END || ' ' || full_name",
+                      "country": "country",
+                      "full_name": "full_name"
+                    },
+                    "language": "sql"
+                  },
+                  {
+                    "expression": "{\"CustomerId\": \"customer_id\", \"FirstName\": \"first_name\", \"LastName\": \"last_name\", \"Company\": \"company\", \"Location\": {\"Street\": \"address\", \"City\": \"city\", \"State\": \"state\", \"Country\": \"country\", \"PostalCode\": \"postal_code\"}, \"Phone\": \"phone\", \"Fax\": \"fax\", \"Email\": \"email\"}",
+                    "language": "jmespath"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "uses": {
+                "description": "Block type",
+                "type": "string",
                 "const": "azure.read_event_hub"
               }
             },
@@ -1358,6 +1131,152 @@
                   "event_hub_name",
                   "checkpoint_store_connection_string",
                   "checkpoint_store_container_name"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "uses": {
+                "description": "Block type",
+                "type": "string",
+                "const": "rename_field"
+              }
+            },
+            "required": ["uses"]
+          },
+          "then": {
+            "properties": {
+              "with": {
+                "title": "rename_field",
+                "description": "Renames fields. All other fields remain unchanged",
+                "type": "object",
+                "oneOf": [
+                  {
+                    "description": "Rename multiple fields",
+                    "properties": {
+                      "fields": {
+                        "type": "array",
+                        "description": "Fields",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "from_field": {
+                              "description": "From field",
+                              "type": "string"
+                            },
+                            "to_field": {
+                              "description": "To field",
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": false,
+                          "required": ["from_field", "to_field"],
+                          "examples": [
+                            {
+                              "fields": [
+                                {
+                                  "from_field": "name.lname",
+                                  "to_field": "name.last_name"
+                                },
+                                {
+                                  "from_field": "name.fname",
+                                  "to_field": "name.first_name"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "required": ["fields"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "description": "Rename one field",
+                    "properties": {
+                      "from_field": {
+                        "description": "From field",
+                        "type": "string"
+                      },
+                      "to_field": {
+                        "description": "To field",
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": ["from_field", "to_field"],
+                    "examples": [
+                      {
+                        "from_field": "name.lname",
+                        "to_field": "name.last_name"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "uses": {
+                "description": "Block type",
+                "type": "string",
+                "const": "remove_field"
+              }
+            },
+            "required": ["uses"]
+          },
+          "then": {
+            "properties": {
+              "with": {
+                "title": "remove_field",
+                "description": "Remove fields",
+                "type": "object",
+                "oneOf": [
+                  {
+                    "description": "Remove multiple fields",
+                    "properties": {
+                      "fields": {
+                        "type": "array",
+                        "description": "Fields",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "description": "Field",
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": false,
+                          "required": ["field"]
+                        }
+                      }
+                    },
+                    "required": ["fields"],
+                    "additionalProperties": false,
+                    "examples": [
+                      {
+                        "fields": [
+                          { "field": "credit_card" },
+                          { "field": "name.mname" }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "description": "Remove one field",
+                    "properties": {
+                      "field": { "description": "Field", "type": "string" }
+                    },
+                    "additionalProperties": false,
+                    "required": ["field"],
+                    "examples": [{ "field": "credit_card" }]
+                  }
                 ]
               }
             }
@@ -1434,6 +1353,87 @@
                 "additionalProperties": false,
                 "required": ["file"],
                 "examples": [{ "file": "archive.csv", "delimiter": ";" }]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "uses": {
+                "description": "Block type",
+                "type": "string",
+                "const": "sequence"
+              }
+            },
+            "required": ["uses"]
+          },
+          "then": {
+            "properties": {
+              "with": {
+                "title": "sequence",
+                "description": "Add a sequence number field to data",
+                "type": "object",
+                "additionalProperties": false,
+                "examples": [],
+                "required": [],
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "title": "Name of new sequence field"
+                  },
+                  "start": {
+                    "type": "number",
+                    "title": "Start entry",
+                    "default": 1,
+                    "examples": []
+                  },
+                  "increment": {
+                    "type": "number",
+                    "title": "Increment between sequences",
+                    "examples": []
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "uses": {
+                "description": "Block type",
+                "type": "string",
+                "const": "jinja_template"
+              }
+            },
+            "required": ["uses"]
+          },
+          "then": {
+            "properties": {
+              "with": {
+                "title": "jinja_template",
+                "description": "Apply Jinja template to a field",
+                "type": "object",
+                "properties": {
+                  "field": { "description": "Field", "type": "string" },
+                  "template": {
+                    "description": "Jinja Template",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["field", "template"],
+                "examples": [
+                  {
+                    "field": "name.full_name",
+                    "template": "{{ name.fname }} {{ name.lname }}"
+                  },
+                  {
+                    "field": "name.fname_upper",
+                    "template": "{{ name.fname | upper }}"
+                  }
+                ]
               }
             }
           }
