@@ -26,6 +26,26 @@
       "type": "string",
       "title": "Target field",
       "description": "The field to write the result to"
+    },
+    "when": {
+      "type": "object",
+      "title": "Conditional execution",
+      "description": "Optional condition to determine whether to execute the lookup for each record",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "Condition expression",
+          "description": "Expression that evaluates to a boolean to determine if lookup should be executed"
+        },
+        "language": {
+          "type": "string",
+          "title": "Expression language",
+          "description": "Language for the condition expression",
+          "enum": ["jmespath", "sql"]
+        }
+      },
+      "required": ["expression", "language"],
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,

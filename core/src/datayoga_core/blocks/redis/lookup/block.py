@@ -31,6 +31,13 @@ class Block(DyBlock, metaclass=ABCMeta):
         args = self.properties["args"]
         self.args_expressions = [expression.compile(self.properties["language"], c) for c in args]
 
+        # Compile the when condition if provided
+        when_config = self.properties.get("when")
+        if when_config:
+            self.when_expression = expression.compile(when_config["language"], when_config["expression"])
+        else:
+            self.when_expression = None
+
         logger.info(f"Using Redis connection '{self.properties.get('connection')}'")
 
     async def run(self, data: List[Dict[str, Any]]) -> BlockResult:
@@ -39,27 +46,50 @@ class Block(DyBlock, metaclass=ABCMeta):
         pipeline = self.redis_client.pipeline(transaction=False)
         block_result = BlockResult()
 
-        for record in data:
-            params = [self.cmd]
-            for expr in (c.search(record) for c in self.args_expressions):
-                params.extend(expr if isinstance(expr, list) else [expr])
+        # Track which records should be looked up
+        records_to_lookup = []
 
-            pipeline.execute_command(*params)
+        for idx, record in enumerate(data):
+            # Evaluate the when condition if present
+            should_lookup = True
+            if self.when_expression:
+                try:
+                    condition_result = self.when_expression.search(record)
+                    should_lookup = bool(condition_result)
+                    if not should_lookup:
+                        logger.debug(
+                            f"Skipping lookup for record {idx} due to when condition evaluated as {condition_result!r}")
+                except Exception as e:
+                    logger.warning(f"Error evaluating when condition for record {idx}: {e}. Skipping lookup.")
+                    should_lookup = False
+
+            if should_lookup:
+                params = [self.cmd]
+                for expr in (c.search(record) for c in self.args_expressions):
+                    params.extend(expr if isinstance(expr, list) else [expr])
+
+                pipeline.execute_command(*params)
+                records_to_lookup.append(record)
+            else:
+                # Record is skipped, add it to processed without lookup
+                block_result.processed.append(Result(Status.SUCCESS, payload=record))
 
         try:
-            results = pipeline.execute(raise_on_error=False)
-            for record, result in zip(data, results):
-                if isinstance(result, Exception):
-                    block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
-                    continue
+            # Execute pipeline only if there are records to lookup
+            if records_to_lookup:
+                results = pipeline.execute(raise_on_error=False)
+                for record, result in zip(records_to_lookup, results):
+                    if isinstance(result, Exception):
+                        block_result.rejected.append(Result(Status.REJECTED, message=f"{result}", payload=record))
+                        continue
 
-                obj = record
-                for field in self.field_path[:-1]:
-                    obj = obj.setdefault(field, {})
+                    obj = record
+                    for field in self.field_path[:-1]:
+                        obj = obj.setdefault(field, {})
 
-                obj[self.field_path[-1]] = result
+                    obj[self.field_path[-1]] = result
 
-                block_result.processed.append(Result(Status.SUCCESS, payload=record))
+                    block_result.processed.append(Result(Status.SUCCESS, payload=record))
         except redis.exceptions.ConnectionError as expr:
             raise ConnectionError(expr)
 
