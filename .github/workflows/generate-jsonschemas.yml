@@ -43,7 +43,7 @@ jobs:
           fi
           git commit -m "update json schemas"
           if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
-            echo "::error::Generated schemas are out of date. Fork PRs cannot auto-push. Please run generation locally and push."
+            echo "::error::Generated schemas are out of date. Fork PRs cannot auto-push. Please run: ./scripts/generate-jsonschemas.sh"
             exit 1
           fi
           git push
