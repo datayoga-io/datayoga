@@ -214,12 +214,13 @@ class Job:
     @staticmethod
     def get_json_schema(whitelisted_blocks: Optional[List[str]] = None) -> Dict[str, Any]:
         """"Compiles a complete json schema of the job and all possible blocks"""
-        block_schemas = []
         # we traverse the json schemas directly instead of 'walk_packages'
         # to avoid importing all of the block classes
         blocks_dir = (os.path.join(utils.get_bundled_dir(), "blocks") if utils.is_bundled() else
                       os.path.dirname(os.path.realpath(blocks.__file__)))
-        block_types = []
+
+        # First, collect all block types and their schema paths
+        block_info = []
         for schema_path in Path(blocks_dir).rglob("**/block.schema.json"):
             block_type = os.path.relpath(
                 os.path.dirname(schema_path),
@@ -228,28 +229,37 @@ class Job:
             block_type = block_type.replace(os.path.sep, ".")
 
             if not (whitelisted_blocks is not None and block_type not in whitelisted_blocks):
-                block_types.append(block_type)
-                # load schema file
-                schema = utils.read_json(f"{schema_path}")
-                # append to the array of allOf for the full schema
-                # we use allOf for better error reporting
-                block_schemas.append({
-                    "if": {
-                        "properties": {
-                            "uses": {
-                                "description": "Block type",
-                                "type": "string",
-                                "const": block_type
-                            },
+                block_info.append((block_type, schema_path))
+
+        # Sort by block_type for deterministic output
+        block_info.sort(key=lambda x: x[0])
+
+        # Now build the sorted lists
+        block_types = []
+        block_schemas = []
+        for block_type, schema_path in block_info:
+            block_types.append(block_type)
+            # load schema file
+            schema = utils.read_json(f"{schema_path}")
+            # append to the array of allOf for the full schema
+            # we use allOf for better error reporting
+            block_schemas.append({
+                "if": {
+                    "properties": {
+                        "uses": {
+                            "description": "Block type",
+                            "type": "string",
+                            "const": block_type
                         },
-                        "required": ["uses"]
                     },
-                    "then": {
-                        "properties": {
-                            "with": schema,
-                        }
+                    "required": ["uses"]
+                },
+                "then": {
+                    "properties": {
+                        "with": schema,
                     }
-                })
+                }
+            })
 
         job_schema = utils.read_json(
             os.path.join(
