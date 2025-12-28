@@ -47,7 +47,7 @@ hiredis = { version = "^2.2.2", optional = true }
 ibm_db_sa = { version = "^0.4.0", optional = true }
 oracledb = { version = "^1.2.2", optional = true }
 psycopg2-binary = { version = "^2.9.5", optional = true }
-pymssql = { version = "^2.2.7", optional = true }
+pymssql = { version = ">=2.2.7,<2.3.0", optional = true }
 PyMySQL = { version = "^1.1.1", optional = true }
 redis = { version = "^5.0.8", optional = true }
 SQLAlchemy = { version = "^2.0.4", optional = true }
@@ -89,6 +89,10 @@ test = [
 [tool.poetry.urls]
 url = "https://datayoga.io"
 [tool.poetry.scripts]
+
+[tool.poetry.group.dev.dependencies]
+redis = "5.0.8"
+testcontainers = ">=3.7.0,<4.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

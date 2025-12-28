@@ -1,6 +1,6 @@
 ---
 parent: Reference
-nav_order: 1
+nav_order: 2
 ---
 
 # Job
@@ -20,6 +20,13 @@ Job descriptor
 **Example**
 
 ```yaml
+input: &ref_0
+  uses: files.read_csv
+  with:
+    file: employees.csv
+    batch_size: 2500
+steps:
+  - *ref_0
 error_handling: ignore
 
 ```
@@ -94,5 +101,15 @@ Properties
 ## steps\[\]: array
 
 **Items**
+
+**Example**
+
+```yaml
+- uses: files.read_csv
+  with:
+    file: employees.csv
+    batch_size: 2500
+
+```
 
 

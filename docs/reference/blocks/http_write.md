@@ -62,6 +62,7 @@ Data to be sent in the request body
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**Additional Properties**||||
 
 <a name="extra_headers"></a>
 ## extra\_headers: Additional HTTP Headers
@@ -73,6 +74,7 @@ Extra headers to be included in the HTTP request
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**Additional Properties**||||
 
 <a name="extra_query_parameters"></a>
 ## extra\_query\_parameters: object
@@ -84,6 +86,7 @@ Extra query parameters to be included in the HTTP request
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**Additional Properties**||||
 
 <a name="output"></a>
 ## output: object
