@@ -1371,7 +1371,15 @@
             "properties": {
               "with": {
                 "description": "Read from the standard input",
-                "title": "std.read"
+                "properties": {
+                  "batch_size": {
+                    "default": 1000,
+                    "description": "Number of records to process in a single batch",
+                    "type": "integer"
+                  }
+                },
+                "title": "std.read",
+                "type": "object"
               }
             }
           }
