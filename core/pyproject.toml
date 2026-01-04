@@ -11,7 +11,7 @@ classifiers = [
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Database"
 ]
 
@@ -22,9 +22,9 @@ cryptography = ">=39.0.1"
 Jinja2 = "^3.1.2"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
-orjson = "^3.8.7"
+orjson = "^3.9.15"
 prometheus-client = "^0.16.0"
-python = "^3.7"
+python = "^3.8"
 PyYAML = "^6.0"
 sqlglot = "^10.4.3"
 
