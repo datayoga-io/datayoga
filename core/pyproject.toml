@@ -66,6 +66,8 @@ sqlserver = ["pymssql", "SQLAlchemy"]
 
 test = [
         "aiohttp",
+        "azure-eventhub",
+        "azure-eventhub-checkpointstoreblob-aio",
         "cassandra-driver",
         "fastparquet",
         "ibm_db_sa",
