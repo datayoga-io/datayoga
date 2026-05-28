@@ -21,12 +21,16 @@ async def test_http_receiver_batches_incoming_requests():
     block.init()
 
     received = []
+    gen = block.produce()
 
     async def consumer():
-        async for batch in block.produce():
-            received.append(batch)
-            if sum(len(b) for b in received) >= 60:
-                return
+        try:
+            async for batch in gen:
+                received.append(batch)
+                if sum(len(b) for b in received) >= 60:
+                    return
+        finally:
+            await gen.aclose()
 
     consumer_task = asyncio.create_task(consumer())
     await asyncio.sleep(0.2)  # let server start
