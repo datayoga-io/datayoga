@@ -237,6 +237,7 @@ class Job:
         # Now build the sorted lists
         block_types = []
         block_schemas = []
+        # Lazy import: schema_utils -> utils -> block creates a circular import at module load.
         from datayoga_core.schema_utils import resolve_inherits
         for block_type, schema_path in block_info:
             block_types.append(block_type)

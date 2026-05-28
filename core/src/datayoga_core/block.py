@@ -56,6 +56,7 @@ class Block(metaclass=ABCMeta):
             os.path.dirname(os.path.realpath(sys.modules[self.__module__].__file__)),
             "block.schema.json")
         logger.debug(f"loading schema from {json_schema_file}")
+        # Lazy import: schema_utils -> utils -> block creates a circular import at module load.
         from datayoga_core.schema_utils import resolve_inherits
         return resolve_inherits(utils.read_json(json_schema_file))
 

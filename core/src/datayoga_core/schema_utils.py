@@ -10,12 +10,12 @@ from __future__ import annotations
 
 import copy
 from os import path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from datayoga_core import utils
 
 
-def resolve_inherits(schema: Dict[str, Any], schemas_dir: str = None) -> Dict[str, Any]:
+def resolve_inherits(schema: Dict[str, Any], schemas_dir: Optional[str] = None) -> Dict[str, Any]:
     """Merge any fragments listed in $inherit into the schema's properties.
 
     Args:
@@ -26,9 +26,13 @@ def resolve_inherits(schema: Dict[str, Any], schemas_dir: str = None) -> Dict[st
     Returns:
         The mutated schema with $inherit removed and fragment properties merged.
     """
-    inherits: List[str] = schema.get("$inherit") or []
-    if not inherits:
+    inherits = schema.get("$inherit")
+    if inherits is None or inherits == []:
         return schema
+    if not isinstance(inherits, list) or not all(isinstance(name, str) for name in inherits):
+        raise TypeError(
+            f"$inherit must be a list of fragment names (strings), got {inherits!r}"
+        )
 
     if schemas_dir is None:
         schemas_dir = utils.get_resource_path("schemas")
@@ -41,6 +45,12 @@ def resolve_inherits(schema: Dict[str, Any], schemas_dir: str = None) -> Dict[st
                 f"Schema fragment '{fragment_name}' not found at {fragment_path}"
             )
         fragment = utils.read_json(fragment_path)
+        if fragment.get("$inherit"):
+            raise ValueError(
+                f"Schema fragment '{fragment_name}' itself contains $inherit; "
+                "nested inheritance is not supported. Inline the parent fragment's "
+                "properties or restructure the hierarchy."
+            )
         merged_properties.update(copy.deepcopy(fragment.get("properties", {})))
 
     # Local properties take precedence over inherited ones.

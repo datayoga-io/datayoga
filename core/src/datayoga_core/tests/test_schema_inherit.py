@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 import pytest
@@ -60,3 +59,35 @@ def test_unknown_fragment_raises():
     schema = {"type": "object", "$inherit": ["nope"], "properties": {}}
     with pytest.raises(FileNotFoundError):
         resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
+
+
+def test_inherit_string_value_raises_type_error():
+    schema = {"type": "object", "$inherit": "batchable", "properties": {}}
+    with pytest.raises(TypeError):
+        resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
+
+
+def test_inherit_non_string_items_raises_type_error():
+    schema = {"type": "object", "$inherit": ["batchable", 123], "properties": {}}
+    with pytest.raises(TypeError):
+        resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
+
+
+def test_inherit_empty_list_returns_unchanged():
+    schema = {"type": "object", "$inherit": [], "properties": {"foo": {}}}
+    resolved = resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
+    # Early-return path: schema is returned as-is (no mutation, no key removal).
+    assert resolved is schema
+
+
+def test_nested_inherit_raises_value_error(tmp_path):
+    # Build a fragment dir with a fragment that has its own $inherit.
+    (tmp_path / "parent.schema.json").write_text(
+        '{"properties": {"x": {"type": "string"}}}'
+    )
+    (tmp_path / "child.schema.json").write_text(
+        '{"$inherit": ["parent"], "properties": {"y": {"type": "string"}}}'
+    )
+    schema = {"$inherit": ["child"], "type": "object", "properties": {}}
+    with pytest.raises(ValueError, match="nested inheritance is not supported"):
+        resolve_inherits(schema, schemas_dir=str(tmp_path))
