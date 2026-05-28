@@ -37,6 +37,24 @@ done
 rm -rf ./docs/reference/blocks
 mkdir ./docs/reference/blocks
 
+# Pick a Python that can import datayoga_core via PYTHONPATH=core/src.
+if [ -x "./core/.venv/bin/python" ]; then
+  DOC_PYTHON="./core/.venv/bin/python"
+elif [ -x "./venv/bin/python" ]; then
+  DOC_PYTHON="./venv/bin/python"
+else
+  DOC_PYTHON="python3"
+fi
+
+# Track temp files so we can clean them up on exit.
+RESOLVED_TMP_FILES=()
+cleanup_resolved_tmps() {
+  for tmp in "${RESOLVED_TMP_FILES[@]}"; do
+    [ -f "${tmp}" ] && rm -f "${tmp}"
+  done
+}
+trap cleanup_resolved_tmps EXIT
+
 blocks_dir="./core/src/datayoga_core/blocks"
 for schema in $(find ${blocks_dir} -name '*.schema.json' | sort)
 do
@@ -46,7 +64,21 @@ do
   block_package="$(echo ${block_package} | cut -c2- | sed 's/\//_/g')"
   [ ! -z "${block_package}" ] && block_package="${block_package}_"
 
-  npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+  # Resolve $inherit fragments so jsonschema2mk sees the inherited properties
+  # (batch_size, flush_ms, etc.). jsonschema2mk does not understand our custom
+  # $inherit extension, so we materialize a resolved copy first.
+  resolved_tmp="$(mktemp --suffix=.schema.json)"
+  RESOLVED_TMP_FILES+=("${resolved_tmp}")
+  PYTHONPATH=core/src "${DOC_PYTHON}" -c "
+import json, sys
+from datayoga_core.schema_utils import resolve_inherits
+from datayoga_core import utils
+schema = utils.read_json('${schema}')
+resolved = resolve_inherits(schema)
+sys.stdout.write(json.dumps(resolved))
+" > "${resolved_tmp}"
+
+  npx jsonschema2mk --schema "${resolved_tmp}" --extension yaml-examples \
     --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
     "./docs/reference/blocks/${block_package}${doc_name}"
 done

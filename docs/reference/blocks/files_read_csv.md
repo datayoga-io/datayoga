@@ -12,6 +12,7 @@ Read data from CSV
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
+|**batch\_size**|`integer`|Maximum number of records yielded per downstream batch.<br/>Default: `1000`<br/>Minimum: `1`<br/>|no|
 |**file**|`string`|Filename. Can contain a regexp or glob expression<br/>|yes|
 |**encoding**|`string`|Encoding to use for reading the file<br/>Default: `"utf-8"`<br/>|no|
 |[**fields**](#fields)<br/>(List of columns to use)|`string[]`|List of columns to use for extract<br/>Minimal Length: `1`<br/>|no|
