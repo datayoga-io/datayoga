@@ -15,6 +15,7 @@ async def _drain(producer):
 
 @pytest.mark.asyncio
 async def test_std_read_batches_to_batch_size():
+    """2500 stdin records with batch_size=1000 yield batches of [1000, 1000, 500]."""
     payload = [{"i": i} for i in range(2500)]
     fake_stdin = [orjson.dumps(payload).decode()]
 

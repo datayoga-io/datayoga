@@ -54,6 +54,7 @@ async def _drain(producer: Producer):
 
 @pytest.mark.asyncio
 async def test_rechunks_one_large_chunk():
+    """One 5000-record chunk + batch_size=1000 yields five batches of 1000."""
     chunks = [[_msg(i) for i in range(5000)]]
     p = FakeProducer({"batch_size": 1000}, chunks=chunks)
     batches = await _drain(p)
@@ -62,6 +63,7 @@ async def test_rechunks_one_large_chunk():
 
 @pytest.mark.asyncio
 async def test_accumulates_small_chunks_and_flushes_on_eos():
+    """Small chunks (200+300+400=900) are accumulated; the partial batch flushes on EOS."""
     chunks = [[_msg(i) for i in range(200)],
               [_msg(i) for i in range(200, 500)],
               [_msg(i) for i in range(500, 900)]]
@@ -72,6 +74,7 @@ async def test_accumulates_small_chunks_and_flushes_on_eos():
 
 @pytest.mark.asyncio
 async def test_partial_final_batch_on_eos():
+    """1500 records + batch_size=1000 yields [1000, 500] — the trailing partial fires on EOS."""
     chunks = [[_msg(i) for i in range(1500)]]
     p = FakeProducer({"batch_size": 1000}, chunks=chunks)
     batches = await _drain(p)
@@ -80,6 +83,7 @@ async def test_partial_final_batch_on_eos():
 
 @pytest.mark.asyncio
 async def test_empty_chunks_are_ignored():
+    """Empty chunks from produce_chunks() don't produce empty batches."""
     chunks = [[], [_msg(1), _msg(2)], [], [_msg(3)]]
     p = FakeProducer({"batch_size": 10}, chunks=chunks)
     batches = await _drain(p)
@@ -88,6 +92,7 @@ async def test_empty_chunks_are_ignored():
 
 @pytest.mark.asyncio
 async def test_flush_ms_emits_partial_on_inactivity():
+    """With flush_ms set, a partial batch is emitted on source inactivity, not held to EOS."""
     # one chunk of 2 records, then a 300ms wait before EOS; flush_ms=100 should
     # flush the partial batch of 2 well before EOS.
     chunks = [[_msg(1), _msg(2)], [_msg(3)]]
@@ -109,6 +114,7 @@ async def test_flush_ms_emits_partial_on_inactivity():
 
 @pytest.mark.asyncio
 async def test_no_flush_ms_holds_records_until_eos():
+    """Without flush_ms, accumulated records stay buffered until batch_size or EOS."""
     chunks = [[_msg(1)], [_msg(2)]]
     sleeps = [0, 0.1]
     p = FakeProducer({"batch_size": 100}, chunks=chunks, sleep_before=sleeps)
@@ -118,6 +124,7 @@ async def test_no_flush_ms_holds_records_until_eos():
 
 @pytest.mark.asyncio
 async def test_consumer_cancellation_cleans_up_pump():
+    """Closing the producer generator cancels the pump cleanly (no orphaned task warnings)."""
     chunks = [[_msg(i)] for i in range(1000)]
     p = FakeProducer({"batch_size": 10, "flush_ms": 50}, chunks=chunks,
                      sleep_before=[0.05] * 1000)

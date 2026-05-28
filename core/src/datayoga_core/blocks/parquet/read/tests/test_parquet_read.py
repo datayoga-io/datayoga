@@ -25,6 +25,7 @@ def parquet_path(tmp_path) -> Path:
 
 @pytest.mark.asyncio
 async def test_parquet_batches_to_batch_size(parquet_path):
+    """2500 rows across three row groups, batch_size=1000 -> [1000, 1000, 500]."""
     block = Block({"file": str(parquet_path), "batch_size": 1000})
     block.init()
     batches = await _drain(block)
@@ -36,6 +37,7 @@ async def test_parquet_batches_to_batch_size(parquet_path):
 
 @pytest.mark.asyncio
 async def test_parquet_rechunks_across_row_groups(parquet_path):
+    """Batches honor batch_size regardless of underlying row-group boundaries."""
     # row groups are [1000, 1000, 500]; batch_size=750 should give batches of
     # [750, 750, 750, 250] regardless of row group boundaries.
     block = Block({"file": str(parquet_path), "batch_size": 750})

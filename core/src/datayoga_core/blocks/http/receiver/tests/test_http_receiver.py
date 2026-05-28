@@ -15,6 +15,7 @@ def _free_port():
 
 @pytest.mark.asyncio
 async def test_http_receiver_batches_incoming_requests():
+    """60 POSTs with batch_size=50 + flush_ms=200 yield at least one full batch of 50."""
     port = _free_port()
     block = Block({"host": "127.0.0.1", "port": port,
                    "batch_size": 50, "flush_ms": 200})

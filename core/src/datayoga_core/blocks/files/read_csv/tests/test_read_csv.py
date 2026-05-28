@@ -23,6 +23,7 @@ def csv_path(tmp_path) -> Path:
 
 @pytest.mark.asyncio
 async def test_csv_batches_to_batch_size(csv_path):
+    """2500 CSV rows with batch_size=1000 yields batches of [1000, 1000, 500]."""
     block = Block({"file": str(csv_path), "batch_size": 1000})
     block.init()
     batches = await _drain(block)
@@ -33,6 +34,7 @@ async def test_csv_batches_to_batch_size(csv_path):
 
 @pytest.mark.asyncio
 async def test_csv_default_batch_size(csv_path):
+    """Without batch_size in properties, the default 1000 is applied."""
     block = Block({"file": str(csv_path)})
     block.init()
     batches = await _drain(block)

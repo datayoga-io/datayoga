@@ -53,6 +53,7 @@ def _mk_block(properties, fake_result):
 
 @pytest.mark.asyncio
 async def test_relational_read_yields_batches_not_rows():
+    """2500 rows with batch_size=1000 yield [1000, 1000, 500], not 2500 single-row batches."""
     rows = [_Row({"i": i}) for i in range(2500)]
     fake_result = _fake_result(rows)
     block = _mk_block({"batch_size": 1000}, fake_result)
@@ -62,6 +63,7 @@ async def test_relational_read_yields_batches_not_rows():
 
 @pytest.mark.asyncio
 async def test_relational_read_fetch_size_independent_of_batch_size():
+    """fetch_size controls driver round-trips; batch_size controls downstream batches; both are decoupled."""
     rows = [_Row({"i": i}) for i in range(5000)]
     fake_result = _fake_result(rows)
     block = _mk_block({"batch_size": 1000, "fetch_size": 2500}, fake_result)
@@ -76,6 +78,7 @@ async def test_relational_read_fetch_size_independent_of_batch_size():
 
 @pytest.mark.asyncio
 async def test_relational_read_default_fetch_size_is_10000():
+    """When fetch_size is omitted, the driver-level fetchmany is called with 10000."""
     rows = [_Row({"i": i}) for i in range(500)]
     fake_result = _fake_result(rows)
     block = _mk_block({}, fake_result)

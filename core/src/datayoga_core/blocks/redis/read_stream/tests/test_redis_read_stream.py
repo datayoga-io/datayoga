@@ -18,6 +18,7 @@ def _mk_block(properties, redis_client):
 
 @pytest.mark.asyncio
 async def test_redis_uses_count_equal_to_batch_size():
+    """xreadgroup is called with count=batch_size (closes #377)."""
     redis = MagicMock()
     payload_a = (b"1-0", {b"data": b'{"i": 1}'})
     payload_b = (b"2-0", {b"data": b'{"i": 2}'})
@@ -38,6 +39,7 @@ async def test_redis_uses_count_equal_to_batch_size():
 
 @pytest.mark.asyncio
 async def test_redis_yields_records_as_a_batch_not_one_by_one():
+    """A 5-record xreadgroup response yields one batch of 5, not five batches of 1."""
     redis = MagicMock()
     pages = [(f"{i}-0".encode(), {b"data": f'{{"i": {i}}}'.encode()}) for i in range(5)]
     redis.xreadgroup.side_effect = [
