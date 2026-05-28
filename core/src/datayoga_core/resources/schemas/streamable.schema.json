@@ -1,0 +1,19 @@
+{
+  "title": "streamable",
+  "description": "Streaming producer mixin: declares batch_size and flush_ms for producers reading from continuous sources.",
+  "type": "object",
+  "properties": {
+    "batch_size": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of records yielded per downstream batch.",
+      "default": 1000
+    },
+    "flush_ms": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+      "default": 1000
+    }
+  }
+}

@@ -237,10 +237,11 @@ class Job:
         # Now build the sorted lists
         block_types = []
         block_schemas = []
+        from datayoga_core.schema_utils import resolve_inherits
         for block_type, schema_path in block_info:
             block_types.append(block_type)
             # load schema file
-            schema = utils.read_json(f"{schema_path}")
+            schema = resolve_inherits(utils.read_json(f"{schema_path}"))
             # append to the array of allOf for the full schema
             # we use allOf for better error reporting
             block_schemas.append({
