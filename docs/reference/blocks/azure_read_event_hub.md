@@ -17,12 +17,13 @@ Read from Azure Event Hub
 |**event\_hub\_name**|`string`|The name of the Azure Event Hub.<br/>|yes|
 |**checkpoint\_store\_connection\_string**|`string`|The connection string for the Azure Storage account used as the checkpoint store.<br/>|yes|
 |**checkpoint\_store\_container\_name**|`string`|The name of the container within the checkpoint store to store the checkpoints.<br/>|yes|
-|**batch\_size**|`integer`|The maximum number of events to receive in each batch.<br/>Default: `300`<br/>|no|
+|**max\_batch\_size**|`integer`|Maximum number of events to receive in each SDK callback. Renamed from the previous batch_size which used to mean this. Defaults to 300.<br/>Default: `300`<br/>Minimum: `1`<br/>|no|
 
+**Additional Properties:** not allowed  
 **Example**
 
 ```yaml
-batch_size: 300
+max_batch_size: 300
 
 ```
 

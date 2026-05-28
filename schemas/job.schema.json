@@ -111,11 +111,13 @@
           "then": {
             "properties": {
               "with": {
+                "additionalProperties": false,
                 "description": "Read from Azure Event Hub",
                 "properties": {
                   "batch_size": {
-                    "default": 300,
-                    "description": "The maximum number of events to receive in each batch.",
+                    "default": 1000,
+                    "description": "Maximum number of records yielded per downstream batch.",
+                    "minimum": 1,
                     "type": "integer"
                   },
                   "checkpoint_store_connection_string": {
@@ -137,6 +139,18 @@
                   "event_hub_name": {
                     "description": "The name of the Azure Event Hub.",
                     "type": "string"
+                  },
+                  "flush_ms": {
+                    "default": 1000,
+                    "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+                    "minimum": 1,
+                    "type": ["integer", "null"]
+                  },
+                  "max_batch_size": {
+                    "default": 300,
+                    "description": "Maximum number of events to receive in each SDK callback. Renamed from the previous batch_size which used to mean this. Defaults to 300.",
+                    "minimum": 1,
+                    "type": "integer"
                   }
                 },
                 "required": [
@@ -258,9 +272,9 @@
                 "properties": {
                   "batch_size": {
                     "default": 1000,
-                    "description": "Number of records to read per batch",
+                    "description": "Maximum number of records yielded per downstream batch.",
                     "minimum": 1,
-                    "type": "number"
+                    "type": "integer"
                   },
                   "delimiter": {
                     "default": ",",
@@ -366,6 +380,18 @@
                 "description": "Receives HTTP requests and process the data.",
                 "examples": [{ "host": "localhost", "port": 8080 }],
                 "properties": {
+                  "batch_size": {
+                    "default": 1000,
+                    "description": "Maximum number of records yielded per downstream batch.",
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "flush_ms": {
+                    "default": 1000,
+                    "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+                    "minimum": 1,
+                    "type": ["integer", "null"]
+                  },
                   "host": {
                     "default": "0.0.0.0",
                     "description": "Host to listen",
@@ -696,6 +722,12 @@
                 "description": "Read data from parquet",
                 "examples": [{ "file": "data.parquet" }],
                 "properties": {
+                  "batch_size": {
+                    "default": 1000,
+                    "description": "Maximum number of records yielded per downstream batch.",
+                    "minimum": 1,
+                    "type": "integer"
+                  },
                   "file": {
                     "description": "Filename. Can contain a regexp or glob expression",
                     "type": "string"
@@ -825,9 +857,21 @@
                 "additionalProperties": false,
                 "description": "Read from Redis stream",
                 "properties": {
+                  "batch_size": {
+                    "default": 1000,
+                    "description": "Maximum number of records yielded per downstream batch.",
+                    "minimum": 1,
+                    "type": "integer"
+                  },
                   "connection": {
                     "description": "Connection name",
                     "type": "string"
+                  },
+                  "flush_ms": {
+                    "default": 1000,
+                    "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+                    "minimum": 1,
+                    "type": ["integer", "null"]
                   },
                   "snapshot": {
                     "default": false,
@@ -1022,6 +1066,12 @@
                   }
                 ],
                 "properties": {
+                  "batch_size": {
+                    "default": 1000,
+                    "description": "Maximum number of records yielded per downstream batch.",
+                    "minimum": 1,
+                    "type": "integer"
+                  },
                   "columns": {
                     "examples": [["fname", { "lname": "last_name" }]],
                     "items": {
@@ -1036,6 +1086,12 @@
                     "examples": ["europe_db", "target", "eu_dwh"],
                     "title": "The connection to use for loading",
                     "type": "string"
+                  },
+                  "fetch_size": {
+                    "default": 10000,
+                    "description": "Driver-level rows fetched per round-trip. Defaults to 10000.",
+                    "minimum": 1,
+                    "type": "integer"
                   },
                   "schema": {
                     "description": "If left blank, the default schema of this connection will be used as defined in the connections.dy.yaml",
@@ -1370,11 +1426,13 @@
           "then": {
             "properties": {
               "with": {
+                "additionalProperties": false,
                 "description": "Read from the standard input",
                 "properties": {
                   "batch_size": {
                     "default": 1000,
-                    "description": "Number of records to process in a single batch",
+                    "description": "Maximum number of records yielded per downstream batch.",
+                    "minimum": 1,
                     "type": "integer"
                   }
                 },

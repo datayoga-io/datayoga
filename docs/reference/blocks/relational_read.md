@@ -16,6 +16,7 @@ Read a table from an SQL-compatible data store
 |**schema**<br/>(The table schema of the table)|`string`|If left blank, the default schema of this connection will be used as defined in the connections.dy.yaml<br/>|no|
 |**table**<br/>(The table name)|`string`|Table name<br/>|yes|
 |[**columns**](#columns)<br/>(Optional subset of columns to load)|`array`||no|
+|**fetch\_size**|`integer`|Driver-level rows fetched per round-trip. Defaults to 10000.<br/>Default: `10000`<br/>Minimum: `1`<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
