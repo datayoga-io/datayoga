@@ -2,6 +2,7 @@
   "title": "redis.read_stream",
   "description": "Read from Redis stream",
   "type": "object",
+  "$inherit": ["streamable"],
   "properties": {
     "connection": { "description": "Connection name", "type": "string" },
     "stream_name": {
