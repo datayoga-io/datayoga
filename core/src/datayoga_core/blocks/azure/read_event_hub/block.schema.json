@@ -2,6 +2,7 @@
   "title": "azure.read_event_hub",
   "description": "Read from Azure Event Hub",
   "type": "object",
+  "$inherit": ["streamable"],
   "properties": {
     "event_hub_connection_string": {
       "type": "string",
@@ -23,12 +24,14 @@
       "type": "string",
       "description": "The name of the container within the checkpoint store to store the checkpoints."
     },
-    "batch_size": {
+    "max_batch_size": {
       "type": "integer",
-      "description": "The maximum number of events to receive in each batch.",
+      "minimum": 1,
+      "description": "Maximum number of events to receive in each SDK callback. Renamed from the previous batch_size which used to mean this. Defaults to 300.",
       "default": 300
     }
   },
+  "additionalProperties": false,
   "required": [
     "event_hub_connection_string",
     "event_hub_consumer_group_name",
