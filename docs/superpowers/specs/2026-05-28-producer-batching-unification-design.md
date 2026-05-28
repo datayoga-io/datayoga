@@ -292,9 +292,9 @@ class Block(DyProducer):
             yield chunk
 ```
 
-**Migration:** Users with `batch_size: 300` in YAML thinking it controls SDK callbacks must rename to `max_batch_size: 300`. No backward-compat shim. Called out in CHANGELOG.
+**Migration:** Users with `batch_size: 300` in YAML thinking it controls SDK callbacks must rename to `max_batch_size: 300`. No backward-compat shim. The literal `batch_size: 300` still validates after the rename but now means pipeline batch size, not SDK callback size — that semantic shift is documented in the PR description.
 
-The schema for `azure/read_event_hub` also gains `additionalProperties: false` (it doesn't have it today). Without this, an old `batch_size: 300` in YAML would silently be ignored as an unknown property after the rename. With it, validation fails loudly with a clear error.
+The schema for `azure/read_event_hub` also gains `unevaluatedProperties: false` (it had no `additionalProperties` declaration before). Typos like `batch_sz: 300` now fail validation loudly with a clear error.
 
 **`http/receiver`** (streaming)
 
