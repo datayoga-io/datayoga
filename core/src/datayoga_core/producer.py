@@ -44,30 +44,47 @@ class Producer(Block):
         yield  # pragma: no cover
 
     async def produce(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
-        """Re-chunks `produce_chunks()` output to exact batch_size batches.
+        """Re-chunks `produce_chunks()` output into batches of up to `batch_size`.
+
+        Each batch is exactly `batch_size` except for the last batch on
+        end-of-stream and any partial batch flushed by `flush_ms` inactivity.
 
         Reads `batch_size` and `flush_ms` from properties lazily so subclasses
         don't need to remember to call `super().init()`.
+
+        Source errors raised by `produce_chunks()` propagate to the caller (the
+        job aborts) rather than being treated as a silent end-of-stream. The
+        background pump uses a bounded queue so source reads cannot outpace
+        downstream consumption — the existing backpressure is preserved.
         """
         batch_size = int(self.properties.get("batch_size", self.DEFAULT_BATCH_SIZE))
         flush_ms = self.properties.get("flush_ms", self.DEFAULT_FLUSH_MS)
         timeout = (flush_ms / 1000) if flush_ms else None
 
-        queue: asyncio.Queue = asyncio.Queue()
+        # maxsize=1 keeps the pump exactly one chunk ahead of the consumer,
+        # which restores the natural backpressure the old yield-driven model had.
+        queue: asyncio.Queue = asyncio.Queue(maxsize=1)
         EOS = object()
+        pump_error: List[BaseException] = []  # length 0 or 1
 
         async def pump():
-            """Drains produce_chunks() into the queue; signals EOS on exit."""
+            """Drains produce_chunks() into the queue; signals EOS on exit and captures errors."""
+            cancelled = False
             try:
                 async for chunk in self.produce_chunks():
                     if chunk:
                         await queue.put(chunk)
             except asyncio.CancelledError:
+                cancelled = True
                 raise
-            except Exception as exc:
-                logger.exception("produce_chunks raised; ending stream: %s", exc)
+            except BaseException as exc:
+                pump_error.append(exc)
             finally:
-                await queue.put(EOS)
+                # Skip the EOS put when cancelled — the consumer's finally is
+                # awaiting us, the queue may be full (maxsize=1), and putting
+                # would deadlock. The consumer won't read EOS anyway.
+                if not cancelled:
+                    await queue.put(EOS)
 
         pump_task = asyncio.create_task(pump())
         buffer: List[Dict[str, Any]] = []
@@ -84,6 +101,10 @@ class Producer(Block):
                 if item is EOS:
                     if buffer:
                         yield buffer
+                    if pump_error:
+                        # Re-raise the source error so the job fails loudly
+                        # instead of treating a truncated read as success.
+                        raise pump_error[0]
                     return
 
                 buffer.extend(item)

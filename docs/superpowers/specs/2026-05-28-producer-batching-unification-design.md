@@ -53,13 +53,14 @@ class Producer(Block):
 
     async def produce(self) -> AsyncGenerator[List[Message], None]:
         """Public entry point. Reads chunks from produce_chunks() and re-emits
-        in exact batch_size slices, with optional time-based flush."""
+        in batches of up to batch_size (smaller on EOS or flush_ms), with
+        bounded backpressure and source-error propagation."""
         ...
 ```
 
 Subclasses override `produce_chunks` instead of `produce`. They emit chunks of any size — whatever's natural to the source (a Parquet row group, a `fetchmany` result, an `xreadgroup` response, an Event Hub callback batch, a single record).
 
-The base class accumulates chunks and re-emits them in exact `batch_size` slices, flushing whatever's left on end-of-stream.
+The base class accumulates chunks and re-emits them in batches of up to `batch_size`, flushing whatever's left on end-of-stream and (for streaming sources) on `flush_ms` inactivity.
 
 ### `batch_size` and `flush_ms` are read lazily
 

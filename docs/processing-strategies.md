@@ -66,7 +66,7 @@ The Rate limit strategy defines the number of requests per given time interval. 
 
 ## Producer Batching
 
-Every producer block (any block that reads from a source — `std/read`, `files/read_csv`, `parquet/read`, `relational/read`, `redis/read_stream`, `azure/read_event_hub`, `http/receiver`) accepts a `batch_size` property. The producer base class re-chunks the source's output into batches of exactly `batch_size` records, regardless of how the source delivers them (per row, per row group, per `fetchmany`, per network message).
+Every producer block (any block that reads from a source — `std/read`, `files/read_csv`, `parquet/read`, `relational/read`, `redis/read_stream`, `azure/read_event_hub`, `http/receiver`) accepts a `batch_size` property. The producer base class re-chunks the source's output into batches of up to `batch_size` records, regardless of how the source delivers them (per row, per row group, per `fetchmany`, per network message). The last batch on end-of-stream and any partial batch flushed by `flush_ms` may be smaller.
 
 ```yaml
 input:
