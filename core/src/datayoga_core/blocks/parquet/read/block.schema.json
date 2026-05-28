@@ -2,6 +2,7 @@
   "title": "parquet.read",
   "description": "Read data from parquet",
   "type": "object",
+  "$inherit": ["batchable"],
   "properties": {
     "file": {
       "description": "Filename. Can contain a regexp or glob expression",
