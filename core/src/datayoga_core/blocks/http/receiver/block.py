@@ -3,13 +3,12 @@ from abc import ABCMeta
 from asyncio import Queue
 from contextlib import suppress
 from itertools import count
-from typing import AsyncGenerator, List, Optional
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 import orjson
 from aiohttp.web import (BaseRequest, HTTPInternalServerError, HTTPOk,
                          Response, Server, ServerRunner, TCPSite)
 from datayoga_core.context import Context
-from datayoga_core.producer import Message
 from datayoga_core.producer import Producer as DyProducer
 
 logger = logging.getLogger("dy")
@@ -18,20 +17,21 @@ logger = logging.getLogger("dy")
 class Block(DyProducer, metaclass=ABCMeta):
     port: int
     host: str
+    DEFAULT_FLUSH_MS = 1000
 
     def init(self, context: Optional[Context] = None):
         logger.debug(f"Initializing {self.get_block_name()}")
         self.port = int(self.properties.get("port", 8080))
         self.host = self.properties.get("host", "0.0.0.0")
 
-    async def produce(self) -> AsyncGenerator[List[Message], None]:
-        queue = Queue(maxsize=1000)
+    async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
+        queue: Queue = Queue(maxsize=1000)
 
         async def handler(request: BaseRequest) -> Response:
             try:
                 queue.put_nowait(orjson.loads(await request.read()))
                 return HTTPOk()
-            except Exception:  # noqa
+            except Exception:
                 logger.exception("Got exception while parsing request:")
                 return HTTPInternalServerError()
 
@@ -43,11 +43,13 @@ class Block(DyProducer, metaclass=ABCMeta):
 
         try:
             counter = iter(count())
-
             while True:
-                data = await queue.get()
-                yield [{self.MSG_ID_FIELD: f"{next(counter)}", **data}]
-
+                first = await queue.get()
+                chunk = [{self.MSG_ID_FIELD: f"{next(counter)}", **first}]
+                while not queue.empty():
+                    record = queue.get_nowait()
+                    chunk.append({self.MSG_ID_FIELD: f"{next(counter)}", **record})
+                yield chunk
         finally:
             with suppress(Exception):
                 await srv.stop()

@@ -2,6 +2,7 @@
   "title": "http.receiver",
   "description": "Receives HTTP requests and process the data.",
   "type": "object",
+  "$inherit": ["streamable"],
   "properties": {
     "host": {
       "description": "Host to listen",
