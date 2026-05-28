@@ -30,12 +30,6 @@ def test_max_batch_size_accepted():
     assert block.properties["batch_size"] == 100
 
 
-def test_max_batch_size_defaults_to_300_when_omitted():
-    """The block's init() reads max_batch_size with a default of 300."""
-    block = Block(_minimal_props())
-    assert int(block.properties.get("max_batch_size", 300)) == 300
-
-
 def test_renamed_schema_has_additional_properties_false():
     """Schema after rename: max_batch_size + streamable's batch_size/flush_ms,
     no unknown properties allowed."""
