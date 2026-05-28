@@ -21,7 +21,6 @@ Read from Azure Event Hub
 |**checkpoint\_store\_container\_name**|`string`|The name of the container within the checkpoint store to store the checkpoints.<br/>|yes|
 |**max\_batch\_size**|`integer`|Maximum number of events to receive in each SDK callback. Renamed from the previous batch_size which used to mean this. Defaults to 300.<br/>Default: `300`<br/>Minimum: `1`<br/>|no|
 
-**Additional Properties:** not allowed  
 **Example**
 
 ```yaml

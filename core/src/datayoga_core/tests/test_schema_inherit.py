@@ -1,100 +1,118 @@
+"""Tests for the $ref pre-resolver in `schema_utils.resolve_refs`.
+
+Block schemas use standard JSON Schema composition (`allOf` + `$ref` to
+local fragment files). We pre-resolve those refs at load time so the
+in-memory schema is self-contained.
+"""
+import json
 from pathlib import Path
 
 import pytest
-from datayoga_core.schema_utils import resolve_inherits
+from datayoga_core.schema_utils import resolve_refs
 
-SCHEMAS_DIR = (
-    Path(__file__).resolve().parent.parent / "resources" / "schemas"
-)
-
-
-def test_inherit_merges_fragment_properties():
-    """A schema with $inherit:[batchable] picks up batch_size from the fragment."""
-    schema = {
-        "title": "demo",
-        "type": "object",
-        "$inherit": ["batchable"],
-        "properties": {"foo": {"type": "string"}},
-        "additionalProperties": False,
-    }
-    resolved = resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-    assert "$inherit" not in resolved
-    assert "batch_size" in resolved["properties"]
-    assert resolved["properties"]["batch_size"]["default"] == 1000
-    assert resolved["properties"]["foo"] == {"type": "string"}
-    assert resolved["additionalProperties"] is False
+SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "resources" / "schemas"
+BATCHABLE = SCHEMAS_DIR / "batchable.schema.json"
 
 
-def test_inherit_local_property_wins_over_fragment():
-    """When local schema redefines an inherited property, the local version takes precedence."""
+def test_resolve_refs_inlines_local_ref(tmp_path):
+    """A {'$ref': 'localfile.json'} node is replaced inline with the file's contents."""
+    fragment = {"type": "object", "properties": {"x": {"type": "integer"}}}
+    frag_path = tmp_path / "frag.schema.json"
+    frag_path.write_text(json.dumps(fragment))
+
     schema = {
         "type": "object",
-        "$inherit": ["batchable"],
-        "properties": {
-            "batch_size": {"type": "integer", "minimum": 1, "default": 50}
-        },
+        "allOf": [{"$ref": "frag.schema.json"}],
+        "properties": {"y": {"type": "string"}},
     }
-    resolved = resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-    assert resolved["properties"]["batch_size"]["default"] == 50
+    schema_path = tmp_path / "host.schema.json"
+    resolved = resolve_refs(schema, schema_path=str(schema_path))
+
+    assert resolved["allOf"][0] == fragment
+    assert "$ref" not in json.dumps(resolved)
 
 
-def test_inherit_streamable_brings_both_props():
-    """$inherit:[streamable] exposes both batch_size and flush_ms on the schema."""
-    schema = {"type": "object", "$inherit": ["streamable"], "properties": {}}
-    resolved = resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-    assert "batch_size" in resolved["properties"]
-    assert "flush_ms" in resolved["properties"]
-
-
-def test_schema_without_inherit_unchanged():
-    """Schemas without $inherit pass through resolve_inherits unmodified."""
-    schema = {
-        "type": "object",
-        "properties": {"foo": {"type": "string"}},
-        "additionalProperties": False,
-    }
-    resolved = resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
+def test_resolve_refs_no_ref_passthrough(tmp_path):
+    """Schemas with no `$ref` come out structurally equal."""
+    schema = {"type": "object", "properties": {"x": {"type": "string"}}}
+    resolved = resolve_refs(schema, schema_path=str(tmp_path / "host.schema.json"))
     assert resolved == schema
 
 
-def test_unknown_fragment_raises():
-    """$inherit referencing a missing fragment file raises FileNotFoundError."""
-    schema = {"type": "object", "$inherit": ["nope"], "properties": {}}
+def test_resolve_refs_resolves_transitively(tmp_path):
+    """A fragment that itself contains `$ref` is resolved all the way."""
+    leaf = {"type": "object", "properties": {"leaf_prop": {"type": "integer"}}}
+    (tmp_path / "leaf.schema.json").write_text(json.dumps(leaf))
+
+    middle = {"allOf": [{"$ref": "leaf.schema.json"}]}
+    (tmp_path / "middle.schema.json").write_text(json.dumps(middle))
+
+    schema = {"allOf": [{"$ref": "middle.schema.json"}]}
+    resolved = resolve_refs(schema, schema_path=str(tmp_path / "host.schema.json"))
+
+    # middle's $ref to leaf was resolved as part of the resolution of host's $ref to middle
+    assert resolved == {"allOf": [{"allOf": [leaf]}]}
+
+
+def test_resolve_refs_missing_file_raises(tmp_path):
+    """A `$ref` pointing at a missing local file raises FileNotFoundError."""
+    schema = {"allOf": [{"$ref": "does_not_exist.schema.json"}]}
+    with pytest.raises(FileNotFoundError, match="does_not_exist.schema.json"):
+        resolve_refs(schema, schema_path=str(tmp_path / "host.schema.json"))
+
+
+def test_resolve_refs_detects_circular(tmp_path):
+    """A → B → A cycle raises ValueError, not infinite recursion."""
+    (tmp_path / "a.schema.json").write_text('{"allOf": [{"$ref": "b.schema.json"}]}')
+    (tmp_path / "b.schema.json").write_text('{"allOf": [{"$ref": "a.schema.json"}]}')
+
+    schema = {"allOf": [{"$ref": "a.schema.json"}]}
+    with pytest.raises(ValueError, match="Circular"):
+        resolve_refs(schema, schema_path=str(tmp_path / "host.schema.json"))
+
+
+def test_resolve_refs_ignores_non_local_refs(tmp_path):
+    """`$ref` values like '#/$defs/x' or 'http://...' are left untouched."""
+    schema = {
+        "allOf": [
+            {"$ref": "#/$defs/internal"},
+            {"$ref": "https://json-schema.org/draft/2019-09/schema"},
+        ],
+        "$defs": {"internal": {"type": "integer"}},
+    }
+    resolved = resolve_refs(schema, schema_path=str(tmp_path / "host.schema.json"))
+    assert resolved == schema
+
+
+def test_resolve_refs_against_real_fragment():
+    """resolve_refs against the actual batchable fragment in the repo works."""
+    # Simulate loading a block schema whose path is at depth blocks/X/Y/.
+    schema = {
+        "$schema": "https://json-schema.org/draft/2019-09/schema",
+        "type": "object",
+        "allOf": [{"$ref": "../../../resources/schemas/batchable.schema.json"}],
+        "properties": {"connection": {"type": "string"}},
+        "unevaluatedProperties": False,
+    }
+    # Pick any real block path so the relative $ref resolves.
+    block_path = (
+        Path(__file__).resolve().parent.parent
+        / "blocks" / "std" / "read" / "block.schema.json"
+    )
+    resolved = resolve_refs(schema, schema_path=str(block_path))
+    # The batchable fragment is inlined inside allOf
+    assert resolved["allOf"][0]["properties"]["batch_size"]["default"] == 1000
+
+
+def test_resolve_refs_default_base_dir():
+    """When schema_path is None, refs resolve against resources/schemas/."""
+    schema = {"allOf": [{"$ref": "batchable.schema.json"}]}
+    resolved = resolve_refs(schema)
+    assert resolved["allOf"][0]["properties"]["batch_size"]["default"] == 1000
+
+
+def test_resolve_refs_default_base_dir_with_missing_file():
+    """Without schema_path, refs pointing at unknown files in the resources dir raise."""
+    schema = {"allOf": [{"$ref": "nope.schema.json"}]}
     with pytest.raises(FileNotFoundError):
-        resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-
-
-def test_inherit_string_value_raises_type_error():
-    """$inherit must be a list; passing a string raises TypeError loudly."""
-    schema = {"type": "object", "$inherit": "batchable", "properties": {}}
-    with pytest.raises(TypeError):
-        resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-
-
-def test_inherit_non_string_items_raises_type_error():
-    """Non-string items in the $inherit list raise TypeError."""
-    schema = {"type": "object", "$inherit": ["batchable", 123], "properties": {}}
-    with pytest.raises(TypeError):
-        resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-
-
-def test_inherit_empty_list_returns_unchanged():
-    """An empty $inherit list is a no-op; the schema is returned as-is."""
-    schema = {"type": "object", "$inherit": [], "properties": {"foo": {}}}
-    resolved = resolve_inherits(schema, schemas_dir=str(SCHEMAS_DIR))
-    # Early-return path: schema is returned as-is (no mutation, no key removal).
-    assert resolved is schema
-
-
-def test_nested_inherit_raises_value_error(tmp_path):
-    """A fragment that itself contains $inherit raises ValueError (no nested inheritance)."""
-    # Build a fragment dir with a fragment that has its own $inherit.
-    (tmp_path / "parent.schema.json").write_text(
-        '{"properties": {"x": {"type": "string"}}}'
-    )
-    (tmp_path / "child.schema.json").write_text(
-        '{"$inherit": ["parent"], "properties": {"y": {"type": "string"}}}'
-    )
-    schema = {"$inherit": ["child"], "type": "object", "properties": {}}
-    with pytest.raises(ValueError, match="nested inheritance is not supported"):
-        resolve_inherits(schema, schemas_dir=str(tmp_path))
+        resolve_refs(schema)

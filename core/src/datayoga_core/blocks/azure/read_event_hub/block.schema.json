@@ -1,8 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "azure.read_event_hub",
   "description": "Read from Azure Event Hub",
   "type": "object",
-  "$inherit": ["streamable"],
+  "allOf": [{ "$ref": "../../../resources/schemas/streamable.schema.json" }],
   "properties": {
     "event_hub_connection_string": {
       "type": "string",
@@ -31,7 +32,7 @@
       "default": 300
     }
   },
-  "additionalProperties": false,
+  "unevaluatedProperties": false,
   "required": [
     "event_hub_connection_string",
     "event_hub_consumer_group_name",

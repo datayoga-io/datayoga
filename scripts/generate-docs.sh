@@ -47,7 +47,6 @@ cleanup_resolved_tmps() {
 trap cleanup_resolved_tmps EXIT
 
 blocks_dir="./core/src/datayoga_core/blocks"
-schemas_dir="./core/src/datayoga_core/resources/schemas"
 for schema in $(find ${blocks_dir} -name '*.schema.json' | sort)
 do
   doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
@@ -56,36 +55,63 @@ do
   block_package="$(echo ${block_package} | cut -c2- | sed 's/\//_/g')"
   [ ! -z "${block_package}" ] && block_package="${block_package}_"
 
-  # Resolve $inherit fragments so jsonschema2mk sees the inherited properties
-  # (batch_size, flush_ms, etc.). jsonschema2mk does not understand our custom
-  # $inherit extension, so we materialize a resolved copy first.
+  # Materialize a docs-friendly copy of the schema:
+  #   1. Resolve local-file $ref nodes by inlining the referenced JSON.
+  #   2. Flatten allOf-contributed properties into the top-level `properties`
+  #      so jsonschema2mk renders a single property table per block.
   # Self-contained Python (stdlib only) so this works in CI without installing
-  # datayoga_core's runtime dependencies.
+  # datayoga_core's runtime dependencies. Pre-resolve at doc-gen time only;
+  # the on-disk schemas remain standard JSON Schema.
   resolved_tmp="$(mktemp --suffix=.schema.json)"
   RESOLVED_TMP_FILES+=("${resolved_tmp}")
-  python3 - "${schema}" "${schemas_dir}" > "${resolved_tmp}" <<'PYEOF'
+  python3 - "${schema}" > "${resolved_tmp}" <<'PYEOF'
 import json
 import os
 import sys
 
-schema_path, schemas_dir = sys.argv[1], sys.argv[2]
-with open(schema_path) as f:
-    schema = json.load(f)
-inherits = schema.get("$inherit") or []
-if inherits:
-    if not isinstance(inherits, list) or not all(isinstance(n, str) for n in inherits):
-        raise SystemExit(f"$inherit must be a list of strings, got {inherits!r}")
+
+def resolve_node(node, base_dir, visited):
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and not ref.startswith("#") and "://" not in ref and ref.endswith(".json"):
+            target = os.path.normpath(os.path.join(base_dir, ref))
+            if target in visited:
+                raise SystemExit(f"Circular $ref at {target}")
+            if not os.path.isfile(target):
+                raise SystemExit(f"$ref target not found: {ref} -> {target}")
+            with open(target) as f:
+                fragment = json.load(f)
+            visited.add(target)
+            try:
+                return resolve_node(fragment, os.path.dirname(target), visited)
+            finally:
+                visited.discard(target)
+        return {k: resolve_node(v, base_dir, visited) for k, v in node.items()}
+    if isinstance(node, list):
+        return [resolve_node(item, base_dir, visited) for item in node]
+    return node
+
+
+def flatten_allof_properties(schema):
+    """Inline `allOf[*].properties` into the top-level `properties`, removing
+    the allOf. Docs-only transformation so jsonschema2mk renders one table."""
+    if not isinstance(schema, dict) or "allOf" not in schema:
+        return schema
     merged = {}
-    for name in inherits:
-        fragment_path = os.path.join(schemas_dir, f"{name}.schema.json")
-        with open(fragment_path) as f:
-            fragment = json.load(f)
-        if fragment.get("$inherit"):
-            raise SystemExit(f"Nested $inherit in fragment '{name}' is not supported")
-        merged.update(fragment.get("properties", {}))
+    for member in schema.get("allOf", []):
+        if isinstance(member, dict):
+            merged.update(member.get("properties", {}))
     merged.update(schema.get("properties", {}))
     schema["properties"] = merged
-    schema.pop("$inherit", None)
+    schema.pop("allOf", None)
+    return schema
+
+
+schema_path = sys.argv[1]
+with open(schema_path) as f:
+    schema = json.load(f)
+schema = resolve_node(schema, os.path.dirname(os.path.abspath(schema_path)), set())
+schema = flatten_allof_properties(schema)
 json.dump(schema, sys.stdout)
 PYEOF
 

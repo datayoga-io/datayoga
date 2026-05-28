@@ -14,7 +14,6 @@ Read from the standard input
 |----|----|-----------|--------|
 |**batch\_size**|`integer`|Maximum number of records yielded per downstream batch.<br/>Default: `1000`<br/>Minimum: `1`<br/>||
 
-**Additional Properties:** not allowed  
 **Example**
 
 ```yaml

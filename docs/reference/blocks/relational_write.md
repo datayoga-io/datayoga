@@ -24,15 +24,6 @@ Write into a SQL-compatible data store
 |[**inactive\_record\_mapping**](#inactive_record_mapping)<br/>(Used for \`TYPE2\` load\_strategy\. The columns mapping to use to close out an active record)|`array`|A list of columns to use. Use any valid SQL expression for the source. If 'target' is omitted, will default to the name of the source column<br/>Default: <br/>|no|
 
 **Additional Properties:** not allowed  
-   
-
-**No properties.**
-
-   
-**Not [required1]:** 
-**No properties.**
-
-
 **Example**
 
 ```yaml

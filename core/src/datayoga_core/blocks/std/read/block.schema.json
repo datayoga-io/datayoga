@@ -1,8 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "std.read",
   "description": "Read from the standard input",
   "type": "object",
-  "$inherit": ["batchable"],
+  "allOf": [{ "$ref": "../../../resources/schemas/batchable.schema.json" }],
   "properties": {},
-  "additionalProperties": false
+  "unevaluatedProperties": false
 }

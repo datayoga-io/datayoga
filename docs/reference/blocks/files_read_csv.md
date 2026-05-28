@@ -20,7 +20,6 @@ Read data from CSV
 |**delimiter**|`string`|Delimiter to use for splitting the csv records<br/>Default: `","`<br/>Minimal Length: `1`<br/>Maximal Length: `1`<br/>|no|
 |**quotechar**|`string`|A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '<br/>Default: `"\""`<br/>Minimal Length: `1`<br/>Maximal Length: `1`<br/>|no|
 
-**Additional Properties:** not allowed  
 **Example**
 
 ```yaml

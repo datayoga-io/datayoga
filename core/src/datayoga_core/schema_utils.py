@@ -1,62 +1,88 @@
 """Schema composition helpers.
 
-Producers and other blocks can declare `"$inherit": ["batchable"]` at the
-top of their block.schema.json to pull in shared property definitions from
-the fragments in resources/schemas/. `resolve_inherits` merges the
-fragments' `properties` into the local schema (local properties win), then
-removes the `$inherit` key. Schemas without `$inherit` are returned as-is.
+Producer block schemas use standard JSON Schema composition via `$ref` +
+`allOf` (with `unevaluatedProperties: false` to allow inherited properties).
+At validation time we want to keep the simple `jsonschema.validate(instance,
+schema)` code path, so we resolve any local-file `$ref`s into the schema
+ahead of time. The on-disk schemas remain standard JSON Schema; only the
+in-memory form is flattened.
+
+Example: a block schema like
+
+    {"allOf": [{"$ref": "../../../resources/schemas/batchable.schema.json"}],
+     "properties": {...},
+     "unevaluatedProperties": false}
+
+becomes
+
+    {"allOf": [<contents of batchable.schema.json>],
+     "properties": {...},
+     "unevaluatedProperties": false}
+
+after `resolve_refs(schema, schema_path)`.
 """
 from __future__ import annotations
 
 import copy
 from os import path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set
 
 from datayoga_core import utils
 
 
-def resolve_inherits(schema: Dict[str, Any], schemas_dir: Optional[str] = None) -> Dict[str, Any]:
-    """Merge any fragments listed in $inherit into the schema's properties.
+def resolve_refs(schema: Dict[str, Any], schema_path: Optional[str] = None) -> Dict[str, Any]:
+    """Return a copy of `schema` with local-file `$ref`s inlined recursively.
 
     Args:
-        schema: The schema to resolve. Mutated in place and also returned.
-        schemas_dir: Directory containing the fragment files. Defaults to
+        schema: The schema to resolve.
+        schema_path: Filesystem path the schema was loaded from. Used to
+            resolve relative `$ref` paths. If None, refs are resolved against
             the bundled/non-bundled resources/schemas directory.
 
     Returns:
-        The mutated schema with $inherit removed and fragment properties merged.
+        A new schema with all local-file $refs replaced by the referenced
+        document's contents. Non-local refs (http://, #fragments) and
+        non-existent files pass through unchanged or raise depending on form.
+
+    Raises:
+        FileNotFoundError: A local-file $ref points at a file that doesn't exist.
+        ValueError: A circular $ref chain is detected.
     """
-    inherits = schema.get("$inherit")
-    if inherits is None or inherits == []:
-        return schema
-    if not isinstance(inherits, list) or not all(isinstance(name, str) for name in inherits):
-        raise TypeError(
-            f"$inherit must be a list of fragment names (strings), got {inherits!r}"
-        )
+    if schema_path is not None:
+        base_dir = path.dirname(path.abspath(schema_path))
+    else:
+        base_dir = utils.get_resource_path("schemas")
 
-    if schemas_dir is None:
-        schemas_dir = utils.get_resource_path("schemas")
+    return _resolve_node(schema, base_dir, visited=set())
 
-    merged_properties: Dict[str, Any] = {}
-    for fragment_name in inherits:
-        fragment_path = path.join(schemas_dir, f"{fragment_name}.schema.json")
-        if not path.isfile(fragment_path):
-            raise FileNotFoundError(
-                f"Schema fragment '{fragment_name}' not found at {fragment_path}"
-            )
-        fragment = utils.read_json(fragment_path)
-        if fragment.get("$inherit"):
-            raise ValueError(
-                f"Schema fragment '{fragment_name}' itself contains $inherit; "
-                "nested inheritance is not supported. Inline the parent fragment's "
-                "properties or restructure the hierarchy."
-            )
-        merged_properties.update(copy.deepcopy(fragment.get("properties", {})))
 
-    # Local properties take precedence over inherited ones.
-    local_properties = schema.get("properties", {})
-    merged_properties.update(local_properties)
+def _resolve_node(node: Any, base_dir: str, visited: Set[str]) -> Any:
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and _is_local_file_ref(ref):
+            target = path.normpath(path.join(base_dir, ref))
+            if target in visited:
+                raise ValueError(f"Circular $ref detected resolving '{ref}' at {target}")
+            if not path.isfile(target):
+                raise FileNotFoundError(
+                    f"$ref target not found: '{ref}' resolved to {target}"
+                )
+            fragment = utils.read_json(target)
+            visited.add(target)
+            try:
+                resolved = _resolve_node(fragment, path.dirname(target), visited)
+            finally:
+                visited.discard(target)
+            return resolved
+        return {k: _resolve_node(v, base_dir, visited) for k, v in node.items()}
+    if isinstance(node, list):
+        return [_resolve_node(item, base_dir, visited) for item in node]
+    return copy.copy(node)
 
-    schema["properties"] = merged_properties
-    schema.pop("$inherit", None)
-    return schema
+
+def _is_local_file_ref(ref: str) -> bool:
+    """A $ref is a local file ref if it looks like a path to a .json/.schema.json
+    file with no URI scheme and no in-document fragment."""
+    if ref.startswith("#") or "://" in ref:
+        return False
+    return ref.endswith(".json")

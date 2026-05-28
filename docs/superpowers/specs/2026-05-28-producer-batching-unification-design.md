@@ -120,44 +120,31 @@ Why a queue and not `asyncio.wait_for(anext(gen), timeout)`: cancelling `__anext
 
 `flush_ms = None` ⇒ `timeout = None` ⇒ `queue.get()` waits forever ⇒ no time-based flush. Bounded sources don't set `flush_ms` and aren't affected.
 
-### Schema fragments
+### Schema composition (standard JSON Schema)
 
-Two shared fragments in `core/src/datayoga_core/resources/schemas/`:
+Two shared fragments in `core/src/datayoga_core/resources/schemas/` declare the common properties:
 
-`batchable.schema.json`:
+- `batchable.schema.json` declares `batch_size`.
+- `streamable.schema.json` declares both `batch_size` and `flush_ms`.
 
-```json
-{
-  "type": "object",
-  "properties": {
-    "batch_size": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "Maximum number of records yielded per downstream batch",
-      "default": 1000
-    }
-  }
-}
-```
-
-`streamable.schema.json`:
+Each block schema uses standard JSON Schema composition: `allOf` + `$ref` to the fragment file, plus `unevaluatedProperties: false` (rather than `additionalProperties: false`) so the fragment-contributed properties are recognized as evaluated. Example:
 
 ```json
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "std.read",
   "type": "object",
-  "allOf": [{ "$ref": "batchable.schema.json" }],
-  "properties": {
-    "flush_ms": {
-      "type": ["integer", "null"],
-      "minimum": 1,
-      "description": "If set, flush a partial batch after this many ms of inactivity. null/omitted = wait until batch_size or end-of-stream.",
-      "default": 1000
-    }
-  }
+  "allOf": [{ "$ref": "../../../resources/schemas/batchable.schema.json" }],
+  "properties": {},
+  "unevaluatedProperties": false
 }
 ```
 
-Bounded producer schemas `$ref` `batchable`; streaming producer schemas `$ref` `streamable`. The fragments are the single source of truth for the description, validation, and default.
+At load time, `schema_utils.resolve_refs(schema, schema_path)` walks the schema, finds any local-file `$ref` (relative path, ends in `.json`, no URI scheme, no in-document fragment), and inlines the referenced file's contents in place. The resulting in-memory schema is self-contained — no remaining `$ref`s — so `Block.validate()` keeps using the simple `jsonschema.validate(instance, schema)` code path. The on-disk schemas remain standards-compliant; the resolution is purely a runtime detail to avoid threading a `RefResolver` through every validation site.
+
+`unevaluatedProperties: false` (introduced in draft 2019-09) is what makes composition + strict property validation work: with `additionalProperties: false`, a property contributed by an `allOf` member would be rejected as "additional" at the parent level. `unevaluatedProperties` is composition-aware.
+
+External tools that ARE `$ref`-aware (IDE schema validators, OpenAPI exporters) read the on-disk schemas correctly without our resolver. The `jsonschema2mk` docs generator is not `$ref`-aware, so `scripts/generate-docs.sh` pre-resolves `$ref` and flattens `allOf` properties for docs rendering only.
 
 ### Per-producer changes
 

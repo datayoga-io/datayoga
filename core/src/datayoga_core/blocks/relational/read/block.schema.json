@@ -1,9 +1,10 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "relational.read",
   "description": "Read a table from an SQL-compatible data store",
   "type": "object",
-  "$inherit": ["batchable"],
-  "additionalProperties": false,
+  "allOf": [{ "$ref": "../../../resources/schemas/batchable.schema.json" }],
+  "unevaluatedProperties": false,
   "examples": [
     {
       "id": "read_snowflake",

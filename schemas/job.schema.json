@@ -111,15 +111,31 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Streaming producer mixin: declares batch_size and flush_ms for producers reading from continuous sources.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "flush_ms": {
+                        "default": 1000,
+                        "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+                        "minimum": 1,
+                        "type": ["integer", "null"]
+                      }
+                    },
+                    "title": "streamable",
+                    "type": "object"
+                  }
+                ],
                 "description": "Read from Azure Event Hub",
                 "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
-                  },
                   "checkpoint_store_connection_string": {
                     "description": "The connection string for the Azure Storage account used as the checkpoint store.",
                     "type": "string"
@@ -140,12 +156,6 @@
                     "description": "The name of the Azure Event Hub.",
                     "type": "string"
                   },
-                  "flush_ms": {
-                    "default": 1000,
-                    "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
-                    "minimum": 1,
-                    "type": ["integer", "null"]
-                  },
                   "max_batch_size": {
                     "default": 300,
                     "description": "Maximum number of events to receive in each SDK callback. Renamed from the previous batch_size which used to mean this. Defaults to 300.",
@@ -161,7 +171,8 @@
                   "checkpoint_store_container_name"
                 ],
                 "title": "azure.read_event_hub",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }
@@ -266,16 +277,26 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Producer batching mixin: declares batch_size for producers that yield records in batches.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "batchable",
+                    "type": "object"
+                  }
+                ],
                 "description": "Read data from CSV",
                 "examples": [{ "delimiter": ";", "file": "archive.csv" }],
                 "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
-                  },
                   "delimiter": {
                     "default": ",",
                     "description": "Delimiter to use for splitting the csv records",
@@ -322,7 +343,8 @@
                 },
                 "required": ["file"],
                 "title": "files.read_csv",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }
@@ -376,22 +398,32 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Streaming producer mixin: declares batch_size and flush_ms for producers reading from continuous sources.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "flush_ms": {
+                        "default": 1000,
+                        "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+                        "minimum": 1,
+                        "type": ["integer", "null"]
+                      }
+                    },
+                    "title": "streamable",
+                    "type": "object"
+                  }
+                ],
                 "description": "Receives HTTP requests and process the data.",
                 "examples": [{ "host": "localhost", "port": 8080 }],
                 "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
-                  },
-                  "flush_ms": {
-                    "default": 1000,
-                    "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
-                    "minimum": 1,
-                    "type": ["integer", "null"]
-                  },
                   "host": {
                     "default": "0.0.0.0",
                     "description": "Host to listen",
@@ -404,7 +436,8 @@
                   }
                 },
                 "title": "http.receiver",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }
@@ -718,16 +751,26 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Producer batching mixin: declares batch_size for producers that yield records in batches.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "batchable",
+                    "type": "object"
+                  }
+                ],
                 "description": "Read data from parquet",
                 "examples": [{ "file": "data.parquet" }],
                 "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
-                  },
                   "file": {
                     "description": "Filename. Can contain a regexp or glob expression",
                     "type": "string"
@@ -735,7 +778,8 @@
                 },
                 "required": ["file"],
                 "title": "parquet.read",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }
@@ -854,24 +898,34 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Streaming producer mixin: declares batch_size and flush_ms for producers reading from continuous sources.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "flush_ms": {
+                        "default": 1000,
+                        "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
+                        "minimum": 1,
+                        "type": ["integer", "null"]
+                      }
+                    },
+                    "title": "streamable",
+                    "type": "object"
+                  }
+                ],
                 "description": "Read from Redis stream",
                 "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
-                  },
                   "connection": {
                     "description": "Connection name",
                     "type": "string"
-                  },
-                  "flush_ms": {
-                    "default": 1000,
-                    "description": "If set, flush a partial batch after this many ms of inactivity. null or omitted = wait until batch_size or end-of-stream.",
-                    "minimum": 1,
-                    "type": ["integer", "null"]
                   },
                   "snapshot": {
                     "default": false,
@@ -887,7 +941,8 @@
                 },
                 "required": ["connection", "stream_name"],
                 "title": "redis.read_stream",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }
@@ -1052,7 +1107,23 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Producer batching mixin: declares batch_size for producers that yield records in batches.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "batchable",
+                    "type": "object"
+                  }
+                ],
                 "description": "Read a table from an SQL-compatible data store",
                 "examples": [
                   {
@@ -1066,12 +1137,6 @@
                   }
                 ],
                 "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
-                  },
                   "columns": {
                     "examples": [["fname", { "lname": "last_name" }]],
                     "items": {
@@ -1108,7 +1173,8 @@
                 },
                 "required": ["connection", "table"],
                 "title": "relational.read",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }
@@ -1426,18 +1492,28 @@
           "then": {
             "properties": {
               "with": {
-                "additionalProperties": false,
-                "description": "Read from the standard input",
-                "properties": {
-                  "batch_size": {
-                    "default": 1000,
-                    "description": "Maximum number of records yielded per downstream batch.",
-                    "minimum": 1,
-                    "type": "integer"
+                "$schema": "https://json-schema.org/draft/2019-09/schema",
+                "allOf": [
+                  {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "description": "Producer batching mixin: declares batch_size for producers that yield records in batches.",
+                    "properties": {
+                      "batch_size": {
+                        "default": 1000,
+                        "description": "Maximum number of records yielded per downstream batch.",
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "batchable",
+                    "type": "object"
                   }
-                },
+                ],
+                "description": "Read from the standard input",
+                "properties": {},
                 "title": "std.read",
-                "type": "object"
+                "type": "object",
+                "unevaluatedProperties": false
               }
             }
           }

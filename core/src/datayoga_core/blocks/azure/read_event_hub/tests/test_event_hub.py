@@ -18,7 +18,7 @@ def _minimal_props(extra=None):
 
 
 def test_unknown_property_rejected_by_validation():
-    """additionalProperties: false catches typos like 'batch_sz'."""
+    """unevaluatedProperties: false catches typos like 'batch_sz'."""
     with pytest.raises(ValidationError):
         Block(_minimal_props({"batch_sz": 300}))
 
@@ -30,15 +30,18 @@ def test_max_batch_size_accepted():
     assert block.properties["batch_size"] == 100
 
 
-def test_renamed_schema_has_additional_properties_false():
-    """Schema after rename: max_batch_size + streamable's batch_size/flush_ms,
-    no unknown properties allowed."""
+def test_renamed_schema_uses_unevaluated_properties_with_streamable():
+    """Schema after rename: max_batch_size locally, streamable contributes
+    batch_size + flush_ms via allOf $ref, and unevaluatedProperties=false
+    rejects anything else."""
     block = Block(_minimal_props())
     schema = block.get_json_schema()
-    assert schema.get("additionalProperties") is False
+    assert schema.get("unevaluatedProperties") is False
     assert "max_batch_size" in schema["properties"]
-    assert "batch_size" in schema["properties"]
-    assert "flush_ms" in schema["properties"]
+    # batch_size and flush_ms come from the inlined streamable fragment via allOf
+    fragment_props = schema["allOf"][0]["properties"]
+    assert "batch_size" in fragment_props
+    assert "flush_ms" in fragment_props
 
 
 def test_batch_size_300_is_silently_repurposed():

@@ -17,7 +17,6 @@ Receives HTTP requests and process the data.
 |**host**|`string`|Host to listen<br/>Default: `"0.0.0.0"`<br/>||
 |**port**|`integer`|Port to listen<br/>Default: `8080`<br/>||
 
-**Additional Properties:** not allowed  
 **Example**
 
 ```yaml

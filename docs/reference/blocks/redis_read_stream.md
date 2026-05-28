@@ -18,7 +18,6 @@ Read from Redis stream
 |**stream\_name**<br/>(Source stream name)|`string`|Source stream name<br/>|yes|
 |**snapshot**<br/>(Snapshot current entries and quit)|`boolean`|Snapshot current entries and quit<br/>Default: `false`<br/>|no|
 
-**Additional Properties:** not allowed  
 **Example**
 
 ```yaml

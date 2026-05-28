@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "streamable",
   "description": "Streaming producer mixin: declares batch_size and flush_ms for producers reading from continuous sources.",
   "type": "object",
