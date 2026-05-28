@@ -1,7 +1,6 @@
 import pytest
-from jsonschema import ValidationError
-
 from datayoga_core.blocks.azure.read_event_hub.block import Block
+from jsonschema import ValidationError
 
 
 def _minimal_props(extra=None):

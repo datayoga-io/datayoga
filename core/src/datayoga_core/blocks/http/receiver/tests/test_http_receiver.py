@@ -2,7 +2,6 @@ import asyncio
 
 import aiohttp
 import pytest
-
 from datayoga_core.blocks.http.receiver.block import Block
 
 

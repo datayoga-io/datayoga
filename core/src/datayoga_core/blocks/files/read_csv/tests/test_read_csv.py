@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from datayoga_core.blocks.files.read_csv.block import Block
 
 

@@ -37,15 +37,6 @@ done
 rm -rf ./docs/reference/blocks
 mkdir ./docs/reference/blocks
 
-# Pick a Python that can import datayoga_core via PYTHONPATH=core/src.
-if [ -x "./core/.venv/bin/python" ]; then
-  DOC_PYTHON="./core/.venv/bin/python"
-elif [ -x "./venv/bin/python" ]; then
-  DOC_PYTHON="./venv/bin/python"
-else
-  DOC_PYTHON="python3"
-fi
-
 # Track temp files so we can clean them up on exit.
 RESOLVED_TMP_FILES=()
 cleanup_resolved_tmps() {
@@ -56,6 +47,7 @@ cleanup_resolved_tmps() {
 trap cleanup_resolved_tmps EXIT
 
 blocks_dir="./core/src/datayoga_core/blocks"
+schemas_dir="./core/src/datayoga_core/resources/schemas"
 for schema in $(find ${blocks_dir} -name '*.schema.json' | sort)
 do
   doc_name="$(awk -F/ '{ print $(NF-1) }' <<<${schema}).md"
@@ -67,16 +59,35 @@ do
   # Resolve $inherit fragments so jsonschema2mk sees the inherited properties
   # (batch_size, flush_ms, etc.). jsonschema2mk does not understand our custom
   # $inherit extension, so we materialize a resolved copy first.
+  # Self-contained Python (stdlib only) so this works in CI without installing
+  # datayoga_core's runtime dependencies.
   resolved_tmp="$(mktemp --suffix=.schema.json)"
   RESOLVED_TMP_FILES+=("${resolved_tmp}")
-  PYTHONPATH=core/src "${DOC_PYTHON}" -c "
-import json, sys
-from datayoga_core.schema_utils import resolve_inherits
-from datayoga_core import utils
-schema = utils.read_json('${schema}')
-resolved = resolve_inherits(schema)
-sys.stdout.write(json.dumps(resolved))
-" > "${resolved_tmp}"
+  python3 - "${schema}" "${schemas_dir}" > "${resolved_tmp}" <<'PYEOF'
+import json
+import os
+import sys
+
+schema_path, schemas_dir = sys.argv[1], sys.argv[2]
+with open(schema_path) as f:
+    schema = json.load(f)
+inherits = schema.get("$inherit") or []
+if inherits:
+    if not isinstance(inherits, list) or not all(isinstance(n, str) for n in inherits):
+        raise SystemExit(f"$inherit must be a list of strings, got {inherits!r}")
+    merged = {}
+    for name in inherits:
+        fragment_path = os.path.join(schemas_dir, f"{name}.schema.json")
+        with open(fragment_path) as f:
+            fragment = json.load(f)
+        if fragment.get("$inherit"):
+            raise SystemExit(f"Nested $inherit in fragment '{name}' is not supported")
+        merged.update(fragment.get("properties", {}))
+    merged.update(schema.get("properties", {}))
+    schema["properties"] = merged
+    schema.pop("$inherit", None)
+json.dump(schema, sys.stdout)
+PYEOF
 
   npx jsonschema2mk --schema "${resolved_tmp}" --extension yaml-examples \
     --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \

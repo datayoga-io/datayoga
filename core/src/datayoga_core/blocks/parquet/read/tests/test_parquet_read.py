@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from datayoga_core.blocks.parquet.read.block import Block
 
 

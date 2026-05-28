@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 import pytest
-
 from datayoga_core.blocks.relational.read.block import Block
 
 

@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 import orjson
 import pytest
-
 from datayoga_core.blocks.std.read.block import Block
 
 
@@ -24,7 +23,7 @@ async def test_std_read_batches_to_batch_size():
 
     with patch("datayoga_core.blocks.std.read.block.select.select",
                return_value=([object()], [], [])), \
-         patch("datayoga_core.blocks.std.read.block.sys.stdin", fake_stdin):
+            patch("datayoga_core.blocks.std.read.block.sys.stdin", fake_stdin):
         batches = await _drain(block)
 
     assert [len(b) for b in batches] == [1000, 1000, 500]

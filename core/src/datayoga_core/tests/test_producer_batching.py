@@ -2,7 +2,6 @@ import asyncio
 from typing import AsyncGenerator, List, Optional
 
 import pytest
-
 from datayoga_core.context import Context
 from datayoga_core.producer import Message, Producer
 

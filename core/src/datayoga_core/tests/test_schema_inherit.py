@@ -1,9 +1,7 @@
 from pathlib import Path
 
 import pytest
-
 from datayoga_core.schema_utils import resolve_inherits
-
 
 SCHEMAS_DIR = (
     Path(__file__).resolve().parent.parent / "resources" / "schemas"
