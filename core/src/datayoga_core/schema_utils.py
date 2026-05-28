@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import copy
 from os import path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from datayoga_core import utils
 
