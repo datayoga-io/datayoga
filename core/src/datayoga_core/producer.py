@@ -9,7 +9,10 @@ logger = logging.getLogger("dy")
 
 
 class Message:
+    """A message produced by a producer block."""
+
     def __init__(self, msg_id: str, value: Dict[str, Any]):
+        """Initializes a message with an id and a payload value."""
         self.msg_id = msg_id
         self.value = value
 
@@ -54,6 +57,7 @@ class Producer(Block):
         EOS = object()
 
         async def pump():
+            """Drains produce_chunks() into the queue; signals EOS on exit."""
             try:
                 async for chunk in self.produce_chunks():
                     if chunk:

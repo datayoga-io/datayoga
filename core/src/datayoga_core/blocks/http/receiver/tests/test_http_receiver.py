@@ -7,6 +7,7 @@ from datayoga_core.blocks.http.receiver.block import Block
 
 
 def _free_port():
+    """Returns an unused TCP port on localhost."""
     import socket
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
@@ -24,6 +25,7 @@ async def test_http_receiver_batches_incoming_requests():
     gen = block.produce()
 
     async def consumer():
+        """Drains the producer until 60 records have arrived, then closes the generator."""
         try:
             async for batch in gen:
                 received.append(batch)

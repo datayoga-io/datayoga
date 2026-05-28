@@ -11,9 +11,12 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyProducer):
+    """Producer block that reads messages from a Redis stream consumer group."""
+
     DEFAULT_FLUSH_MS = 1000
 
     def init(self, context: Optional[Context] = None):
+        """Connects to Redis and ensures the consumer group exists on the target stream."""
         logger.debug(f"Initializing {self.get_block_name()}")
         connection_details = Connection.get_connection_details(self.properties["connection"], context)
         self.redis_client = redis_utils.get_client(connection_details)
@@ -27,6 +30,7 @@ class Block(DyProducer):
             self.redis_client.xgroup_create(self.stream, self.consumer_group, 0)
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
+        """Reads pending then new stream messages via XREADGROUP, yielding each response as a chunk."""
         logger.debug(f"Running {self.get_block_name()}")
         batch_size = int(self.properties.get("batch_size", self.DEFAULT_BATCH_SIZE))
         read_pending = True
@@ -57,6 +61,7 @@ class Block(DyProducer):
             read_pending = False
 
     def ack(self, msg_ids: List[str]):
+        """Acknowledges the given message ids with XACK on the stream consumer group."""
         for msg_id in msg_ids:
             logger.info(f"Acking {msg_id} message in {self.stream} stream of {self.consumer_group} consumer group")
             self.redis_client.xack(self.stream, self.consumer_group, msg_id)

@@ -8,6 +8,7 @@ from datayoga_core.producer import Message, Producer
 
 
 def _msg(i: int) -> dict:
+    """Builds a record carrying the producer MSG_ID_FIELD and a numeric value."""
     return {Producer.MSG_ID_FIELD: str(i), "v": i}
 
 
@@ -15,6 +16,7 @@ class FakeProducer(Producer):
     """Producer driven by a scripted list of chunks plus optional sleeps."""
 
     def __init__(self, properties=None, *, chunks=None, sleep_before=None):
+        """Configures the scripted chunks and optional per-chunk sleep delays."""
         # schema for a FakeProducer; declare batch_size/flush_ms so validation passes
         self._test_schema = {
             "type": "object",
@@ -28,12 +30,15 @@ class FakeProducer(Producer):
         super().__init__(properties or {})
 
     def get_json_schema(self):
+        """Returns the in-memory test schema (avoids reading from disk)."""
         return self._test_schema
 
     def init(self, context: Optional[Context] = None):
+        """No-op init; FakeProducer doesn't need any setup."""
         pass
 
     async def produce_chunks(self) -> AsyncGenerator[List[Message], None]:
+        """Yields the scripted chunks, optionally sleeping before each one."""
         for i, chunk in enumerate(self._chunks):
             if i < len(self._sleep_before) and self._sleep_before[i]:
                 await asyncio.sleep(self._sleep_before[i])
@@ -41,6 +46,7 @@ class FakeProducer(Producer):
 
 
 async def _drain(producer: Producer):
+    """Collects all batches emitted by a producer until end-of-stream."""
     out = []
     async for batch in producer.produce():
         out.append(batch)

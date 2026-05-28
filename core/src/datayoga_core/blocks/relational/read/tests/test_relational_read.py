@@ -6,6 +6,7 @@ from datayoga_core.blocks.relational.read.block import Block
 
 
 async def _drain(producer):
+    """Collects all batches emitted by a producer until end-of-stream."""
     out = []
     async for batch in producer.produce():
         out.append(batch)
@@ -13,7 +14,7 @@ async def _drain(producer):
 
 
 def _fake_result(rows):
-    """Build a fake SQLAlchemy result that returns rows in fetchmany chunks."""
+    """Builds a fake SQLAlchemy result that returns rows in fetchmany chunks."""
     state = {"i": 0}
 
     def fetchmany(n):
@@ -29,14 +30,19 @@ def _fake_result(rows):
 
 
 class _Row:
+    """Stand-in for a SQLAlchemy Row exposing only `_asdict()`."""
+
     def __init__(self, d):
+        """Stores the underlying dict that `_asdict()` will return."""
         self._d = d
 
     def _asdict(self):
+        """Returns the stored dict, matching SQLAlchemy Row's API."""
         return self._d
 
 
 def _mk_block(properties, fake_result):
+    """Builds a relational/read Block without running its real init() (mocks engine/connection)."""
     block = Block.__new__(Block)
     block.properties = properties
     block.connection = MagicMock()

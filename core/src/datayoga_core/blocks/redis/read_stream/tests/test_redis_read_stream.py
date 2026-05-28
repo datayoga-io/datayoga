@@ -6,6 +6,7 @@ from datayoga_core.blocks.redis.read_stream.block import Block
 
 
 def _mk_block(properties, redis_client):
+    """Builds a redis/read_stream Block bypassing its real init() (mocks the Redis client)."""
     block = Block.__new__(Block)
     block.properties = properties
     block.redis_client = redis_client

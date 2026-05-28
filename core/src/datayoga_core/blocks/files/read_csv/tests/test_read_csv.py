@@ -6,6 +6,7 @@ from datayoga_core.blocks.files.read_csv.block import Block
 
 
 async def _drain(producer):
+    """Collects all batches emitted by a producer until end-of-stream."""
     out = []
     async for batch in producer.produce():
         out.append(batch)
@@ -14,6 +15,7 @@ async def _drain(producer):
 
 @pytest.fixture
 def csv_path(tmp_path) -> Path:
+    """Writes a 2500-row CSV with a single header row to a temp path."""
     p = tmp_path / "data.csv"
     rows = ["fname,lname"] + [f"first{i},last{i}" for i in range(2500)]
     p.write_text("\n".join(rows) + "\n", encoding="utf-8")

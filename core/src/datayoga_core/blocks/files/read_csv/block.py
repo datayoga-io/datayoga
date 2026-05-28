@@ -13,8 +13,10 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyProducer, metaclass=ABCMeta):
+    """Producer block that reads records from a CSV file."""
 
     def init(self, context: Optional[Context] = None):
+        """Initializes the block: resolves the CSV file path and reader options."""
         logger.debug(f"Initializing {self.get_block_name()}")
         csv_file = self.properties["file"]
         if os.path.isabs(csv_file) or context is None:
@@ -29,6 +31,7 @@ class Block(DyProducer, metaclass=ABCMeta):
         self.quotechar = self.properties.get("quotechar", "\"")
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
+        """Yields successive `batch_size`-sized chunks of CSV rows."""
         logger.debug("Reading CSV")
         batch_size = int(self.properties.get("batch_size", self.DEFAULT_BATCH_SIZE))
 

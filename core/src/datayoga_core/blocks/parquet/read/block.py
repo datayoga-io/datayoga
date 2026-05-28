@@ -12,8 +12,10 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyProducer, metaclass=ABCMeta):
+    """Producer block that reads records from a Parquet file."""
 
     def init(self, context: Optional[Context] = None):
+        """Initializes the block: resolves the Parquet file path."""
         logger.debug(f"Initializing {self.get_block_name()}")
         parquet_file = self.properties["file"]
         if os.path.isabs(parquet_file) or context is None:
@@ -23,6 +25,7 @@ class Block(DyProducer, metaclass=ABCMeta):
         logger.debug(f"file: {self.file}")
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
+        """Yields one chunk per Parquet row group; the base class re-chunks to `batch_size`."""
         logger.debug("Reading parquet")
         pf = ParquetFile(self.file)
         counter = iter(count())

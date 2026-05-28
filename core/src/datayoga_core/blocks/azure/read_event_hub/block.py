@@ -19,6 +19,7 @@ class Block(DyProducer):
     DEFAULT_FLUSH_MS = 1000
 
     def init(self, context: Optional[Context] = None):
+        """Constructs the Event Hub consumer client and the internal message queue."""
         logger.debug(f"Initializing {self.get_block_name()}")
         self.max_batch_size = int(self.properties.get("max_batch_size", 300))
         self.consumer_client = EventHubConsumerClient.from_connection_string(
@@ -33,6 +34,7 @@ class Block(DyProducer):
         self.messages: asyncio.Queue = asyncio.Queue()
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
+        """Starts the receive loop and yields one chunk per drained-queue snapshot."""
         logger.debug(f"Running {self.get_block_name()}")
         logger.debug("Starting event receiving process")
         asyncio.create_task(self.receive_batch())
@@ -45,6 +47,7 @@ class Block(DyProducer):
             yield chunk
 
     async def receive_batch(self):
+        """Runs the Azure SDK receive loop, dispatching each batch to `on_event_batch`."""
         await self.consumer_client.receive_batch(
             on_event_batch=self.on_event_batch,
             max_batch_size=self.max_batch_size,
@@ -52,6 +55,7 @@ class Block(DyProducer):
         )
 
     async def on_event_batch(self, partition_context: PartitionContext, events: List[EventData]):
+        """SDK callback: parses each event body as JSON and enqueues it for delivery."""
         logger.debug(f"Received batch of events from partition: {partition_context.partition_id}")
         for event in events:
             try:
@@ -64,6 +68,7 @@ class Block(DyProducer):
                 logger.error(e)
 
     async def complete_events(self, msg_ids: List[str]):
+        """Updates the partition checkpoint for each previously-delivered message id."""
         for msg_id in msg_ids:
             logger.debug(f"Acking {msg_id} event")
             event, partition_context = self.events.pop(msg_id, (None, None))
@@ -73,4 +78,5 @@ class Block(DyProducer):
                 logger.warning(f"Couldn't find event {msg_id} for acknowledging")
 
     def ack(self, msg_ids: List[str]):
+        """Schedules checkpoint updates for the given message ids."""
         asyncio.create_task(self.complete_events(msg_ids))

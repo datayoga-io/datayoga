@@ -7,6 +7,7 @@ from datayoga_core.blocks.std.read.block import Block
 
 
 async def _drain(producer):
+    """Collects all batches emitted by a producer until end-of-stream."""
     out = []
     async for batch in producer.produce():
         out.append(batch)

@@ -7,6 +7,7 @@ from datayoga_core.blocks.parquet.read.block import Block
 
 
 async def _drain(producer):
+    """Collects all batches emitted by a producer until end-of-stream."""
     out = []
     async for batch in producer.produce():
         out.append(batch)
@@ -15,6 +16,7 @@ async def _drain(producer):
 
 @pytest.fixture
 def parquet_path(tmp_path) -> Path:
+    """Writes a 2500-row Parquet file with three row groups (1000, 1000, 500)."""
     p = tmp_path / "data.parquet"
     df = pd.DataFrame({"i": list(range(2500))})
     from fastparquet import write as fp_write

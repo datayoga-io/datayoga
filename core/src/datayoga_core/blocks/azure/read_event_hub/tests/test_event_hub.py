@@ -5,6 +5,7 @@ from datayoga_core.blocks.azure.read_event_hub.block import Block
 
 
 def _minimal_props(extra=None):
+    """Returns a minimal set of properties accepted by the Event Hub block schema."""
     base = {
         "event_hub_connection_string": "Endpoint=sb://x/;SharedAccessKeyName=k;SharedAccessKey=v;EntityPath=eh",
         "event_hub_consumer_group_name": "$Default",

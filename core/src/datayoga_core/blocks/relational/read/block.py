@@ -11,9 +11,12 @@ logger = logging.getLogger("dy")
 
 
 class Block(DyProducer):
+    """Producer block that reads rows from a SQL-compatible relational database."""
+
     DEFAULT_FETCH_SIZE = 10000
 
     def init(self, context: Optional[Context] = None):
+        """Initializes the engine, autoloads the target table, and opens a connection."""
         self.engine, self.db_type = relational_utils.get_engine(
             self.properties["connection"],
             context,
@@ -33,6 +36,7 @@ class Block(DyProducer):
         self.connection = self.engine.connect()
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
+        """Yields each `fetchmany(fetch_size)` result as a chunk; the base class re-chunks to `batch_size`."""
         fetch_size = int(self.properties.get("fetch_size", self.DEFAULT_FETCH_SIZE))
         result = self.connection.execution_options(stream_results=True).execute(self.tbl.select())
         while True:
@@ -42,5 +46,6 @@ class Block(DyProducer):
             yield [utils.add_uid(dict(row._asdict())) for row in rows]
 
     def stop(self):
+        """Closes the database connection and disposes of the engine."""
         self.connection.close()
         self.engine.dispose()
