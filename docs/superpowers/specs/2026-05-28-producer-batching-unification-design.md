@@ -1,9 +1,9 @@
 # Producer batching unification
 
-**Status:** Design — pending implementation
+**Status:** Implemented in PR #401
 **Date:** 2026-05-28
 **Issue:** #400
-**Closes:** #294, #295, #296, #377 (as a side effect of the refactor)
+**Closes:** #293, #294, #295, #296, #377 (as a side effect of the refactor)
 
 ## Problem
 
@@ -70,27 +70,39 @@ The base class accumulates chunks and re-emits them in batches of up to `batch_s
 
 For streaming sources, partial batches must flush on inactivity, otherwise a low-traffic stream could hold records indefinitely.
 
-Implementation uses an internal queue + background pump task, mirroring the pattern already in `azure/read_event_hub`:
+Implementation uses an internal **bounded** queue + background pump task. The pump captures source errors and re-raises on the consumer side, so failures aren't silently treated as EOS:
 
 ```python
-async def produce(self) -> AsyncGenerator[List[Message], None]:
+async def produce(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
     batch_size = int(self.properties.get("batch_size", self.DEFAULT_BATCH_SIZE))
     flush_ms = self.properties.get("flush_ms", self.DEFAULT_FLUSH_MS)
-    timeout = (flush_ms / 1000) if flush_ms is not None else None
+    timeout = (flush_ms / 1000) if flush_ms else None
 
-    queue: asyncio.Queue[Optional[List[Message]]] = asyncio.Queue()
+    # maxsize=1 preserves the natural backpressure the old yield-driven model
+    # had: the pump can be at most one chunk ahead of the consumer.
+    queue: asyncio.Queue = asyncio.Queue(maxsize=1)
     EOS = object()
+    pump_error: List[BaseException] = []  # captured non-cancellation errors
 
     async def pump():
+        cancelled = False
         try:
             async for chunk in self.produce_chunks():
                 if chunk:
                     await queue.put(chunk)
+        except asyncio.CancelledError:
+            cancelled = True
+            raise
+        except BaseException as exc:
+            pump_error.append(exc)
         finally:
-            await queue.put(EOS)
+            # Skip the EOS put on cancellation — the consumer's finally is
+            # awaiting us and the queue may be full; putting would deadlock.
+            if not cancelled:
+                await queue.put(EOS)
 
     pump_task = asyncio.create_task(pump())
-    buffer: List[Message] = []
+    buffer: List[Dict[str, Any]] = []
     try:
         while True:
             try:
@@ -104,6 +116,8 @@ async def produce(self) -> AsyncGenerator[List[Message], None]:
             if item is EOS:
                 if buffer:
                     yield buffer
+                if pump_error:
+                    raise pump_error[0]  # propagate source error to caller
                 return
 
             buffer.extend(item)
@@ -112,11 +126,15 @@ async def produce(self) -> AsyncGenerator[List[Message], None]:
                 buffer = buffer[batch_size:]
     finally:
         pump_task.cancel()
-        with suppress(asyncio.CancelledError):
+        with suppress(asyncio.CancelledError, Exception):
             await pump_task
 ```
 
 Why a queue and not `asyncio.wait_for(anext(gen), timeout)`: cancelling `__anext__` on an async generator with side effects (open connections, partial reads) can leave it in a broken state. Cancelling the _pump task_ boundary is safe; the generator finishes its current chunk before the pump's `try/finally` runs.
+
+Why `maxsize=1` and the `cancelled` flag: an unbounded queue removes backpressure — the pump could pre-load an entire parquet or relational table into memory while the consumer is processing batch 1 (flagged by Copilot review). Bounding at 1 keeps memory flat at the cost of a deadlock when the consumer is cancelled mid-flow (the pump's `finally: put(EOS)` blocks against a full queue). The `cancelled` flag skips the EOS put on cancellation, since the consumer is gone and EOS doesn't need to be delivered.
+
+Why `pump_error`: catching all exceptions in the pump and letting it terminate via EOS would silently truncate input on a source failure (Redis disconnect, broken CSV, DB error) — the consumer would see clean end-of-stream against partial data. Capturing the exception and re-raising on the consumer side makes the job fail loudly instead (also flagged by Copilot review).
 
 `flush_ms = None` ⇒ `timeout = None` ⇒ `queue.get()` waits forever ⇒ no time-based flush. Bounded sources don't set `flush_ms` and aren't affected.
 
@@ -351,15 +369,15 @@ A `FakeProducer` whose `produce_chunks` yields scripted chunks. Cases:
 
 - Update `docs/reference/blocks/*_read.md` for each affected producer (`batch_size`, `flush_ms`, `fetch_size`, `max_batch_size` where applicable).
 - Add a section in `docs/processing-strategies.md` explaining the producer batching model: chunked subclass output, base-class re-chunking, `flush_ms` for streaming sources.
-- CHANGELOG entry calling out:
+- PR description carries the breaking-change note (no CHANGELOG file in this repo):
   - New `batch_size`/`flush_ms` on previously non-batching producers.
   - **Breaking:** `azure/read_event_hub.batch_size` renamed to `max_batch_size`; the name `batch_size` now means pipeline batch size.
 
 ## Risks and trade-offs
 
-1. **`Producer` ABC change.** `produce_chunks` is now the abstract method. Any external/downstream custom producer subclassing `Producer` and overriding `produce()` directly will break. Acceptable given datayoga's surface area; called out in CHANGELOG.
+1. **`Producer` ABC change.** `produce_chunks` is the new override hook (raises NotImplementedError by default; not formally `@abstractmethod` so legacy subclasses that still override `produce()` directly continue to validate). All 7 in-tree producers were migrated to override `produce_chunks`; external/downstream subclassers that override `produce()` directly continue to work but bypass the base-class batching. Called out in the PR description.
 
-2. **Event Hub silent-semantic-change risk.** The breaking rename is intentional. Adding `additionalProperties: false` to the Event Hub schema (which it lacks today) is part of this change so that old `batch_size: 300` configs fail validation loudly, not get silently ignored.
+2. **Event Hub silent-semantic-change risk.** The breaking rename is intentional. Adding `unevaluatedProperties: false` to the Event Hub schema (which lacked any `additionalProperties` declaration before) catches typos loudly. The literal `batch_size: 300` still validates after the rename but now means pipeline batch size, not SDK callback size — that semantic shift is documented in the PR description and the processing-strategies docs.
 
 3. **`flush_ms` semantics on Job shutdown.** When the producer is being cancelled (`Job.shutdown` → `Step.stop`), the pump's `try/finally` ensures `EOS` is queued. The `produce()` loop sees `EOS` and flushes the final partial batch. Verified by the `test_producer_batching` shutdown case.
 
