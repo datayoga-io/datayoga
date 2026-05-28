@@ -9,15 +9,15 @@
 
 Seven producer blocks each handle (or fail to handle) batching differently:
 
-| Producer | Bounded/Streaming | `batch_size` today | Behavior |
-|---|---|---|---|
-| `std/read` | bounded | yes, default 1000 *(on `batch_size_in_std_read_block` branch)* | custom `process_batch` accumulator |
-| `files/read_csv` | bounded | yes, default 1000 | own `islice(reader, batch_size)` loop |
-| `relational/read` | bounded | **no** — hardcoded `fetchmany(10000)` | yields one row at a time downstream (bug) |
-| `parquet/read` | bounded | **no** | yields one row at a time (bug) |
-| `redis/read_stream` | streaming | **no** | yields one record at a time (bug #377) |
-| `azure/read_event_hub` | streaming | yes, default 300, **but** controls *SDK callback batch size*, not pipeline batch size | drains internal queue in unbounded batches |
-| `http/receiver` | streaming | **no** | yields one record per HTTP request (bug) |
+| Producer               | Bounded/Streaming | `batch_size` today                                                                    | Behavior                                   |
+| ---------------------- | ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `std/read`             | bounded           | yes, default 1000 _(on `batch_size_in_std_read_block` branch)_                        | custom `process_batch` accumulator         |
+| `files/read_csv`       | bounded           | yes, default 1000                                                                     | own `islice(reader, batch_size)` loop      |
+| `relational/read`      | bounded           | **no** — hardcoded `fetchmany(10000)`                                                 | yields one row at a time downstream (bug)  |
+| `parquet/read`         | bounded           | **no**                                                                                | yields one row at a time (bug)             |
+| `redis/read_stream`    | streaming         | **no**                                                                                | yields one record at a time (bug #377)     |
+| `azure/read_event_hub` | streaming         | yes, default 300, **but** controls _SDK callback batch size_, not pipeline batch size | drains internal queue in unbounded batches |
+| `http/receiver`        | streaming         | **no**                                                                                | yields one record per HTTP request (bug)   |
 
 Four are actively buggy (yielding single records into the pipeline when batches are intended). One uses `batch_size` with a different semantic. Each producer that has implemented batching has done it differently.
 
@@ -115,7 +115,7 @@ async def produce(self) -> AsyncGenerator[List[Message], None]:
             await pump_task
 ```
 
-Why a queue and not `asyncio.wait_for(anext(gen), timeout)`: cancelling `__anext__` on an async generator with side effects (open connections, partial reads) can leave it in a broken state. Cancelling the *pump task* boundary is safe; the generator finishes its current chunk before the pump's `try/finally` runs.
+Why a queue and not `asyncio.wait_for(anext(gen), timeout)`: cancelling `__anext__` on an async generator with side effects (open connections, partial reads) can leave it in a broken state. Cancelling the _pump task_ boundary is safe; the generator finishes its current chunk before the pump's `try/finally` runs.
 
 `flush_ms = None` ⇒ `timeout = None` ⇒ `queue.get()` waits forever ⇒ no time-based flush. Bounded sources don't set `flush_ms` and aren't affected.
 
@@ -124,6 +124,7 @@ Why a queue and not `asyncio.wait_for(anext(gen), timeout)`: cancelling `__anext
 Two shared fragments in `core/src/datayoga_core/resources/schemas/`:
 
 `batchable.schema.json`:
+
 ```json
 {
   "type": "object",
@@ -139,6 +140,7 @@ Two shared fragments in `core/src/datayoga_core/resources/schemas/`:
 ```
 
 `streamable.schema.json`:
+
 ```json
 {
   "type": "object",
@@ -324,15 +326,15 @@ class Block(DyProducer):
 
 ### Defaults summary
 
-| Producer | `batch_size` | `flush_ms` | Other |
-|---|---|---|---|
-| `std/read` | 1000 | — | — |
-| `files/read_csv` | 1000 | — | — |
-| `relational/read` | 1000 | — | optional `fetch_size`, defaults to 10000 |
-| `parquet/read` | 1000 | — | — |
-| `redis/read_stream` | 1000 | 1000 | — |
-| `azure/read_event_hub` | 1000 | 1000 | `max_batch_size` 300 (renamed from old `batch_size`) |
-| `http/receiver` | 1000 | 1000 | — |
+| Producer               | `batch_size` | `flush_ms` | Other                                                |
+| ---------------------- | ------------ | ---------- | ---------------------------------------------------- |
+| `std/read`             | 1000         | —          | —                                                    |
+| `files/read_csv`       | 1000         | —          | —                                                    |
+| `relational/read`      | 1000         | —          | optional `fetch_size`, defaults to 10000             |
+| `parquet/read`         | 1000         | —          | —                                                    |
+| `redis/read_stream`    | 1000         | 1000       | —                                                    |
+| `azure/read_event_hub` | 1000         | 1000       | `max_batch_size` 300 (renamed from old `batch_size`) |
+| `http/receiver`        | 1000         | 1000       | —                                                    |
 
 ## Tests
 

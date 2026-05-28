@@ -16,6 +16,7 @@
 ## File Structure
 
 **Created:**
+
 - `core/src/datayoga_core/resources/schemas/batchable.schema.json` — fragment exposing `batch_size`
 - `core/src/datayoga_core/resources/schemas/streamable.schema.json` — fragment exposing `flush_ms` (combined with batchable)
 - `core/src/datayoga_core/schema_utils.py` — `$inherit` resolver used by Block + Job
@@ -36,6 +37,7 @@
 - `core/src/datayoga_core/blocks/relational/read/tests/test_relational_read.py`
 
 **Modified:**
+
 - `core/src/datayoga_core/producer.py` — adds `produce_chunks` and a default `produce()` that re-chunks
 - `core/src/datayoga_core/block.py` — `get_json_schema()` runs through `$inherit` resolver
 - `core/src/datayoga_core/job.py` — `get_json_schema()` loop runs each loaded schema through the resolver
@@ -64,6 +66,7 @@
 Adds the `$inherit` convention and the two shared fragments. After this task, schemas referencing `batchable` / `streamable` get the fragments' properties merged in at load time.
 
 **Files:**
+
 - Create: `core/src/datayoga_core/resources/schemas/batchable.schema.json`
 - Create: `core/src/datayoga_core/resources/schemas/streamable.schema.json`
 - Create: `core/src/datayoga_core/schema_utils.py`
@@ -198,6 +201,7 @@ def test_unknown_fragment_raises():
 - [ ] **Step 1.5: Run test to verify it fails**
 
 Run:
+
 ```bash
 cd core && python -m pytest src/datayoga_core/tests/test_schema_inherit.py -v
 ```
@@ -266,6 +270,7 @@ def resolve_inherits(schema: Dict[str, Any], schemas_dir: str = None) -> Dict[st
 - [ ] **Step 1.7: Run test to verify it passes**
 
 Run:
+
 ```bash
 cd core && python -m pytest src/datayoga_core/tests/test_schema_inherit.py -v
 ```
@@ -305,6 +310,7 @@ Note: the `from datayoga_core.schema_utils import resolve_inherits` line is insi
 Modify `core/src/datayoga_core/job.py`. Inside the `for block_type, schema_path in block_info:` loop (around line 240–243), apply the resolver to each loaded schema.
 
 Find this block:
+
 ```python
         for block_type, schema_path in block_info:
             block_types.append(block_type)
@@ -314,6 +320,7 @@ Find this block:
 ```
 
 Replace with:
+
 ```python
         from datayoga_core.schema_utils import resolve_inherits
         for block_type, schema_path in block_info:
@@ -353,6 +360,7 @@ git commit -m "Add \$inherit schema fragment resolver (#400)"
 Add `produce_chunks()` and a default `produce()` that re-chunks. Existing subclasses override `produce()` directly and are unaffected until migrated in later tasks.
 
 **Files:**
+
 - Create: `core/src/datayoga_core/tests/test_producer_batching.py`
 - Modify: `core/src/datayoga_core/producer.py`
 
@@ -492,6 +500,7 @@ async def test_consumer_cancellation_cleans_up_pump():
 - [ ] **Step 2.2: Run tests to verify they fail**
 
 Run:
+
 ```bash
 cd core && python -m pytest src/datayoga_core/tests/test_producer_batching.py -v
 ```
@@ -602,6 +611,7 @@ class Producer(Block):
 ```
 
 Key differences from the current file:
+
 - `produce()` is no longer `@abstractmethod` — it has a default implementation.
 - `produce_chunks()` is the new override hook (not formally `@abstractmethod` so legacy subclasses still validate).
 - `Message` class unchanged.
@@ -609,6 +619,7 @@ Key differences from the current file:
 - [ ] **Step 2.4: Run tests to verify they pass**
 
 Run:
+
 ```bash
 cd core && python -m pytest src/datayoga_core/tests/test_producer_batching.py -v
 ```
@@ -640,6 +651,7 @@ git commit -m "Producer base class re-chunks via produce_chunks (#400)"
 `std/read` already has `batch_size` and a custom `process_batch` accumulator. Replace it with a `produce_chunks` that yields one chunk; the base class re-chunks.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/std/read/block.py`
 - Modify: `core/src/datayoga_core/blocks/std/read/block.schema.json`
 
@@ -689,6 +701,7 @@ async def test_std_read_batches_to_batch_size():
 - [ ] **Step 3.2: Run test to verify it fails**
 
 Run:
+
 ```bash
 cd core && python -m pytest src/datayoga_core/blocks/std/read/tests/test_std_read.py -v
 ```
@@ -792,6 +805,7 @@ git commit -m "Migrate std/read to produce_chunks (#400, #296)"
 Replace the `produce()` override and `islice` loop with a `produce_chunks` that yields one chunk per `batch_size` rows. The base class re-chunks to the configured `batch_size`.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/files/read_csv/block.py`
 - Modify: `core/src/datayoga_core/blocks/files/read_csv/block.schema.json`
 
@@ -849,7 +863,7 @@ async def test_csv_default_batch_size(csv_path):
 cd core && python -m pytest src/datayoga_core/blocks/files/read_csv/tests/test_read_csv.py -v
 ```
 
-Expected: FAIL — current `produce()` works but the tests may pass coincidentally because `files/read_csv` already batches. That's fine; the test exists to *protect* the contract. Proceed to the migration anyway and confirm the test still passes afterward.
+Expected: FAIL — current `produce()` works but the tests may pass coincidentally because `files/read_csv` already batches. That's fine; the test exists to _protect_ the contract. Proceed to the migration anyway and confirm the test still passes afterward.
 
 - [ ] **Step 4.3: Migrate `files/read_csv` to `produce_chunks`**
 
@@ -1010,6 +1024,7 @@ git commit -m "Migrate files/read_csv to produce_chunks (#400)"
 Today `parquet/read` iterates each row of each row group and yields a single-record list per iteration. Migrate it to yield each row group as a single chunk; the base class re-chunks to `batch_size`.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/parquet/read/block.py`
 - Modify: `core/src/datayoga_core/blocks/parquet/read/block.schema.json`
 
@@ -1171,6 +1186,7 @@ git commit -m "Migrate parquet/read to produce_chunks, fix one-by-one yield (#40
 Today `relational/read` does `fetchmany(10000)` then yields one row at a time. Migrate to `produce_chunks` that yields each `fetchmany` result. Add an optional `fetch_size` property; default to 10000 to preserve today's DB round-trip count.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/relational/read/block.py`
 - Modify: `core/src/datayoga_core/blocks/relational/read/block.schema.json`
 
@@ -1426,6 +1442,7 @@ git commit -m "Migrate relational/read to produce_chunks, add fetch_size (#400, 
 The receiver currently yields one record per HTTP request. Migrate to drain the queue per chunk; `flush_ms` ensures partial batches flush during low-traffic periods.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/http/receiver/block.py`
 - Modify: `core/src/datayoga_core/blocks/http/receiver/block.schema.json`
 
@@ -1617,6 +1634,7 @@ git commit -m "Migrate http/receiver to produce_chunks (#400)"
 The redis stream producer yields one record at a time today. Migrate so it requests `count=batch_size` from `xreadgroup` and yields each response as a chunk; `flush_ms` flushes partial batches during low-volume periods.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/redis/read_stream/block.py`
 - Modify: `core/src/datayoga_core/blocks/redis/read_stream/block.schema.json`
 
@@ -1823,9 +1841,10 @@ git commit -m "Migrate redis/read_stream to batched xreadgroup (#400, #377)"
 
 ## Task 9: Migrate `azure/read_event_hub` (rename `batch_size` → `max_batch_size`)
 
-Today `batch_size` controls the SDK callback size, not the pipeline batch size. Rename to `max_batch_size`, add `additionalProperties: false`, and use the streamable fragment so the *new* `batch_size` means pipeline batch size.
+Today `batch_size` controls the SDK callback size, not the pipeline batch size. Rename to `max_batch_size`, add `additionalProperties: false`, and use the streamable fragment so the _new_ `batch_size` means pipeline batch size.
 
 **Files:**
+
 - Modify: `core/src/datayoga_core/blocks/azure/read_event_hub/block.py`
 - Modify: `core/src/datayoga_core/blocks/azure/read_event_hub/block.schema.json`
 
@@ -2070,6 +2089,7 @@ git commit -m "Migrate azure/read_event_hub; rename batch_size -> max_batch_size
 The aggregated `schemas/job.schema.json` and the per-block markdown in `docs/reference/blocks/` are generated by scripts. After the per-block schema changes, regenerate them.
 
 **Files:**
+
 - Modify: `schemas/job.schema.json`
 - Modify: `docs/reference/blocks/std_read.md`, `files_read_csv.md`, `parquet_read.md`, `relational_read.md`, `redis_read_stream.md`, `http_receiver.md`, `azure_read_event_hub.md` (autogenerated)
 
@@ -2109,6 +2129,7 @@ git commit -m "Regenerate JSON schemas and reference docs after producer batchin
 ## Task 11: Document the producer batching model in processing-strategies
 
 **Files:**
+
 - Modify: `docs/processing-strategies.md`
 
 - [ ] **Step 11.1: Add a section on producer batching**
@@ -2125,7 +2146,7 @@ input:
   uses: files.read_csv
   with:
     file: people.csv
-    batch_size: 500   # downstream steps process 500 records per call
+    batch_size: 500 # downstream steps process 500 records per call
 ```
 
 Default: `1000`.
@@ -2141,7 +2162,7 @@ input:
     connection: my_redis
     stream_name: events
     batch_size: 1000
-    flush_ms: 500   # emit a partial batch after 500ms of inactivity
+    flush_ms: 500 # emit a partial batch after 500ms of inactivity
 ```
 
 Default: `1000` ms. Set to `null` to disable time-based flushing (records are held until `batch_size` or end-of-stream).
@@ -2173,6 +2194,7 @@ cd core && python -m pytest src/datayoga_core/ -v
 ```
 
 Expected: all tests pass. Notably:
+
 - `test_producer_batching.py` (7 tests)
 - `test_schema_inherit.py` (5 tests)
 - `test_std_read.py`, `test_read_csv.py`, `test_parquet_read.py`, `test_relational_read.py`, `test_http_receiver.py`, `test_redis_read_stream.py`, `test_event_hub.py` (12 tests total)
