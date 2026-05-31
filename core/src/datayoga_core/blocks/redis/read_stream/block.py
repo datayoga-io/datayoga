@@ -30,7 +30,15 @@ class Block(DyProducer):
             self.redis_client.xgroup_create(self.stream, self.consumer_group, 0)
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
-        """Reads pending then new stream messages via XREADGROUP, yielding each response as a chunk."""
+        """Reads pending then new stream messages via XREADGROUP, yielding each response as a chunk.
+
+        Pending entries (id="0") are drained in a single unbounded XREADGROUP
+        call (count=None) — this matches pre-PR behavior. Paginating PEL via
+        count is not safe with a non-acking producer because XREADGROUP id="0"
+        always returns from the start of PEL, so a smaller count would just
+        re-read the same first page forever. New-message reads (id=">") use
+        count=batch_size to bound the Redis network response size.
+        """
         logger.debug(f"Running {self.get_block_name()}")
         batch_size = int(self.properties.get("batch_size", self.DEFAULT_BATCH_SIZE))
         read_pending = True
@@ -39,7 +47,7 @@ class Block(DyProducer):
             streams = self.redis_client.xreadgroup(
                 self.consumer_group, self.requesting_consumer,
                 {self.stream: "0" if read_pending else ">"},
-                count=batch_size,
+                count=None if read_pending else batch_size,
                 block=100 if self.snapshot else 0,
             )
 
@@ -58,6 +66,9 @@ class Block(DyProducer):
             if self.snapshot and not read_pending and not yielded_any:
                 return
 
+            # Flip unconditionally after the first pending-read call: count=None
+            # drained the entire PEL in that single call, so there's no more
+            # pending work to do this session.
             read_pending = False
 
     def ack(self, msg_ids: List[str]):
