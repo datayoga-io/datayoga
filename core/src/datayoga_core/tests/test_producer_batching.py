@@ -138,6 +138,42 @@ async def test_consumer_cancellation_cleans_up_pump():
     await asyncio.sleep(0.1)
 
 
+@pytest.mark.asyncio
+async def test_external_task_cancellation_cleans_up_pump():
+    """When the task iterating produce() is cancelled (e.g., Job.run is cancelled
+    by the runtime), the producer's pump task must clean up. This is the
+    Job-shutdown scenario: an external cancellation propagates through the
+    async-for loop into the producer generator's finally."""
+    chunks = [[_msg(i)] for i in range(10_000)]
+    p = FakeProducer({"batch_size": 5, "flush_ms": 50}, chunks=chunks,
+                     sleep_before=[0.01] * 10_000)
+
+    async def consume():
+        # Mirrors Job.run's iteration pattern.
+        async for batch in p.produce():
+            pass  # downstream processing would happen here
+
+    consumer_task = asyncio.create_task(consume())
+    await asyncio.sleep(0.05)  # let the producer ramp up — some batches arrive
+    consumer_task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await consumer_task
+    # Give the loop a moment to settle any pending finalizers.
+    await asyncio.sleep(0.1)
+
+    # No producer pump task should remain after cancellation. We identify the
+    # pump specifically by Producer.produce.<locals>.pump in its qualname,
+    # since the test's own name happens to contain "pump".
+    remaining = [t for t in asyncio.all_tasks() if not t.done()]
+    pump_tasks = [
+        t for t in remaining
+        if "Producer.produce" in (t.get_coro().__qualname__ or "")
+    ]
+    assert not pump_tasks, \
+        f"orphaned producer pump tasks after cancellation: " \
+        f"{[t.get_coro().__qualname__ for t in pump_tasks]}"
+
+
 class _BoomProducer(Producer):
     """Producer whose produce_chunks() raises after emitting some chunks."""
 

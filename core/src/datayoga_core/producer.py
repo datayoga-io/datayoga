@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from contextlib import suppress
-from typing import Any, AsyncGenerator, Dict, List
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 from .block import Block
 
@@ -28,8 +28,8 @@ class Producer(Block):
     the base-class batching and `produce_chunks` is not called.
     """
 
-    DEFAULT_BATCH_SIZE = 1000
-    DEFAULT_FLUSH_MS = None  # streaming subclasses override to enable timeout flush
+    DEFAULT_BATCH_SIZE: int = 1000
+    DEFAULT_FLUSH_MS: Optional[int] = None  # streaming subclasses override to enable timeout flush
 
     async def produce_chunks(self) -> AsyncGenerator[List[Dict[str, Any]], None]:
         """Yield natural-size chunks from the source.
