@@ -1,7 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "files.read_csv",
   "description": "Read data from CSV",
   "type": "object",
+  "allOf": [{ "$ref": "../../../resources/schemas/batchable.schema.json" }],
   "properties": {
     "file": {
       "description": "Filename. Can contain a regexp or glob expression",
@@ -39,12 +41,6 @@
       "maxLength": 1,
       "default": ","
     },
-    "batch_size": {
-      "description": "Number of records to read per batch",
-      "type": "number",
-      "minimum": 1,
-      "default": 1000
-    },
     "quotechar": {
       "description": "A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '",
       "type": "string",
@@ -53,7 +49,7 @@
       "default": "\""
     }
   },
-  "additionalProperties": false,
+  "unevaluatedProperties": false,
   "required": ["file"],
   "examples": [
     {

@@ -12,7 +12,7 @@ Read from the standard input
 
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
-|**batch\_size**|`integer`|Number of records to process in a single batch<br/>Default: `1000`<br/>||
+|**batch\_size**|`integer`|Maximum number of records yielded per downstream batch.<br/>Default: `1000`<br/>Minimum: `1`<br/>||
 
 **Example**
 

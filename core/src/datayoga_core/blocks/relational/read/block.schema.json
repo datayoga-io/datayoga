@@ -1,8 +1,10 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "relational.read",
   "description": "Read a table from an SQL-compatible data store",
   "type": "object",
-  "additionalProperties": false,
+  "allOf": [{ "$ref": "../../../resources/schemas/batchable.schema.json" }],
+  "unevaluatedProperties": false,
   "examples": [
     {
       "id": "read_snowflake",
@@ -41,6 +43,12 @@
         "title": "name of column"
       },
       "examples": [["fname", { "lname": "last_name" }]]
+    },
+    "fetch_size": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Driver-level rows fetched per round-trip. Defaults to 10000.",
+      "default": 10000
     }
   },
   "required": ["connection", "table"]

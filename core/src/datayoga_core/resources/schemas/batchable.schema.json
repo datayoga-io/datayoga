@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "batchable",
+  "description": "Producer batching mixin: declares batch_size for producers that yield records in batches.",
+  "type": "object",
+  "properties": {
+    "batch_size": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of records yielded per downstream batch.",
+      "default": 1000
+    }
+  }
+}

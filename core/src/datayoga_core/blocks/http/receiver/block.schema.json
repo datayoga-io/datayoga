@@ -1,7 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "http.receiver",
   "description": "Receives HTTP requests and process the data.",
   "type": "object",
+  "allOf": [{ "$ref": "../../../resources/schemas/streamable.schema.json" }],
   "properties": {
     "host": {
       "description": "Host to listen",
@@ -14,7 +16,7 @@
       "default": 8080
     }
   },
-  "additionalProperties": false,
+  "unevaluatedProperties": false,
   "examples": [
     {
       "host": "localhost",

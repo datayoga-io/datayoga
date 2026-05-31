@@ -1,0 +1,53 @@
+import pytest
+from datayoga_core.blocks.azure.read_event_hub.block import Block
+from jsonschema import ValidationError
+
+
+def _minimal_props(extra=None):
+    """Returns a minimal set of properties accepted by the Event Hub block schema."""
+    base = {
+        "event_hub_connection_string": "Endpoint=sb://x/;SharedAccessKeyName=k;SharedAccessKey=v;EntityPath=eh",
+        "event_hub_consumer_group_name": "$Default",
+        "event_hub_name": "eh",
+        "checkpoint_store_connection_string": "DefaultEndpointsProtocol=https;AccountName=a;AccountKey=k==",
+        "checkpoint_store_container_name": "chk",
+    }
+    if extra:
+        base.update(extra)
+    return base
+
+
+def test_unknown_property_rejected_by_validation():
+    """unevaluatedProperties: false catches typos like 'batch_sz'."""
+    with pytest.raises(ValidationError):
+        Block(_minimal_props({"batch_sz": 300}))
+
+
+def test_max_batch_size_accepted():
+    """The renamed SDK-level property is now max_batch_size."""
+    block = Block(_minimal_props({"max_batch_size": 500, "batch_size": 100}))
+    assert block.properties["max_batch_size"] == 500
+    assert block.properties["batch_size"] == 100
+
+
+def test_renamed_schema_uses_unevaluated_properties_with_streamable():
+    """Schema after rename: max_batch_size locally, streamable contributes
+    batch_size + flush_ms via allOf $ref, and unevaluatedProperties=false
+    rejects anything else."""
+    block = Block(_minimal_props())
+    schema = block.get_json_schema()
+    assert schema.get("unevaluatedProperties") is False
+    assert "max_batch_size" in schema["properties"]
+    # batch_size and flush_ms come from the inlined streamable fragment via allOf
+    fragment_props = schema["allOf"][0]["properties"]
+    assert "batch_size" in fragment_props
+    assert "flush_ms" in fragment_props
+
+
+def test_batch_size_300_is_silently_repurposed():
+    """A user upgrading from a pre-rename version with batch_size: 300 (which
+    used to mean SDK callback size) will see their YAML still validate, but
+    batch_size now means pipeline batch size. Documented as breaking change."""
+    block = Block(_minimal_props({"batch_size": 300}))
+    assert block.properties["batch_size"] == 300
+    assert "max_batch_size" not in block.properties

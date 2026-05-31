@@ -1,7 +1,9 @@
 {
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "title": "redis.read_stream",
   "description": "Read from Redis stream",
   "type": "object",
+  "allOf": [{ "$ref": "../../../resources/schemas/streamable.schema.json" }],
   "properties": {
     "connection": { "description": "Connection name", "type": "string" },
     "stream_name": {
@@ -16,6 +18,6 @@
       "default": false
     }
   },
-  "additionalProperties": false,
+  "unevaluatedProperties": false,
   "required": ["connection", "stream_name"]
 }

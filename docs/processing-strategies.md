@@ -64,6 +64,44 @@ Rate limit allows to set guards for the frequency of processing in a given time 
 
 The Rate limit strategy defines the number of requests per given time interval. For example, 5 requests a minute. When the limit is reached, processing for this Step will pause until the time period elapses to allow additional calls.
 
+## Producer Batching
+
+Every producer block (any block that reads from a source — `std/read`, `files/read_csv`, `parquet/read`, `relational/read`, `redis/read_stream`, `azure/read_event_hub`, `http/receiver`) accepts a `batch_size` property. The producer base class re-chunks the source's output into batches of up to `batch_size` records, regardless of how the source delivers them (per row, per row group, per `fetchmany`, per network message). The last batch on end-of-stream and any partial batch flushed by `flush_ms` may be smaller.
+
+```yaml
+input:
+  uses: files.read_csv
+  with:
+    file: people.csv
+    batch_size: 500 # downstream steps process 500 records per call
+```
+
+Default: `1000`.
+
+### Streaming producers and `flush_ms`
+
+Streaming producers (`redis/read_stream`, `azure/read_event_hub`, `http/receiver`) also accept `flush_ms`. If no new records arrive within that many milliseconds, any partial batch is flushed downstream instead of being held until `batch_size` is reached.
+
+```yaml
+input:
+  uses: redis.read_stream
+  with:
+    connection: my_redis
+    stream_name: events
+    batch_size: 1000
+    flush_ms: 500 # emit a partial batch after 500ms of inactivity
+```
+
+Default: `1000` ms. Set to `null` to disable time-based flushing (records are held until `batch_size` or end-of-stream).
+
+### `relational/read` and `fetch_size`
+
+`relational/read` exposes an extra `fetch_size` property that controls how many rows are pulled from the database driver per round-trip, independent of the pipeline `batch_size`. Default: `10000`. Tune lower for memory pressure with wide rows; tune higher if you want fewer DB round-trips and downstream processing is the bottleneck.
+
+### `azure/read_event_hub` migration note
+
+In earlier versions, `batch_size` on `azure/read_event_hub` controlled the SDK callback batch size, not the pipeline batch size. As of #400 it has been renamed to `max_batch_size` to match the SDK semantic, and `batch_size` now consistently means pipeline batch size as it does for every other producer.
+
 ## Mix and Match
 
 The processing strategies can be mixed to fit the specific use case. For example, reading records from a Stream one by one, pushing into a parallel processor to perform a transformation, batched and fanned out to multiple processes to load into a relational database in bulk

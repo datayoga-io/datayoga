@@ -28,6 +28,7 @@ python = "^3.8"
 PyYAML = "^6.0"
 sqlglot = "^10.4.3"
 
+hypothesis = { version = "^6.0", optional = true }
 mock = { version = "^4.0.3", optional = true }
 pytest = { version = "^7.1.2", optional = true }
 pytest-aioresponses = { version = "^0.2.0", optional = true }
@@ -66,8 +67,11 @@ sqlserver = ["pymssql", "SQLAlchemy"]
 
 test = [
         "aiohttp",
+        "azure-eventhub",
+        "azure-eventhub-checkpointstoreblob-aio",
         "cassandra-driver",
         "fastparquet",
+        "hypothesis",
         "ibm_db_sa",
         "mock",
         "oracledb",
