@@ -17,7 +17,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 certifi = ">=2024.7.4"
-pysqlite3-binary = { version = "^0.5.0", platform = "linux" }
+pysqlite3-binary = { version = "^0.5.0", markers = "sys_platform == 'linux' and platform_machine == 'x86_64'" }
 cryptography = ">=39.0.1"
 Jinja2 = "^3.1.2"
 jmespath = "^1.0.0"
@@ -66,6 +66,23 @@ parquet = ["fastparquet"]
 pg = ["psycopg2-binary", "SQLAlchemy"]
 redis = ["hiredis", "redis"]
 sqlserver = ["pymssql", "SQLAlchemy"]
+
+unit-test = [
+        "aiohttp",
+        "aioresponses",
+        "azure-eventhub",
+        "azure-eventhub-checkpointstoreblob-aio",
+        "fastparquet",
+        "hypothesis",
+        "mock",
+        "pytest",
+        "pytest-aioresponses",
+        "pytest-asyncio",
+        "pytest-mock",
+        "redis",
+        "requests-mock",
+        "SQLAlchemy"
+]
 
 test = [
         "aiohttp",
