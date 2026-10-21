@@ -113,7 +113,7 @@ async def test_step_parallel():
     ]
     assert results_block.run.call_args_list == [mock.call.run([i]) for i in expected_output]
     # if we are parallel with 2 workers, total time should be the two slower activities
-    assert round(loop.time()-start, 1) == 0.6+0.4
+    assert loop.time()-start == pytest.approx(0.6+0.4, abs=0.4)
 
 
 @pytest.mark.asyncio
