@@ -7,33 +7,46 @@ concurrency:
   cancel-in-progress: true
 jobs:
   unit-tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 10
-
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            python: "3.8"
+            sqlite-module: pysqlite3
+          - runner: ubuntu-latest
+            python: "3.11"
+            sqlite-module: pysqlite3
+          - runner: ubuntu-24.04-arm
+            python: "3.11"
+            sqlite-module: sqlite3
+    env:
+      TZ: UTC
     steps:
       - name: Check out repository code
         uses: actions/checkout@v6
 
-      # Setup Python (faster than using Python container)
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.8"
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y freetds-dev libkrb5-dev
+          python-version: ${{ matrix.python }}
 
       - name: Install dependencies
+        working-directory: core
         run: |
-          cd core
-          pip install wheel
-          CASS_DRIVER_NO_CYTHON=1 pip install cassandra-driver
-          pip install .
-          pip install .[test]
+          pip install poetry==1.8.5
+          poetry install --only main --extras unit-test
+          poetry run pip check
+
+      - name: Verify SQLite backend
+        working-directory: core
+        env:
+          EXPECTED_SQLITE_MODULE: ${{ matrix.sqlite-module }}
+        run: |
+          poetry run python -c 'import os; from datayoga_core.expression import sqlite3; print(sqlite3.__name__, sqlite3.sqlite_version); assert sqlite3.__name__ == os.environ["EXPECTED_SQLITE_MODULE"]'
 
       - name: Run tests
-        run: |
-          cd core
-          PYTHONPATH=src python -m pytest -s --log-cli-level=DEBUG
+        working-directory: core
+        run: poetry run python -m pytest -s --log-cli-level=DEBUG
