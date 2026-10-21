@@ -13,7 +13,7 @@ mkdir ./docs/reference
 nav_order=1
 for schema in ./core/src/datayoga_core/resources/schemas/*.schema.json
 do
-  npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+  npx -y jsonschema2mk@2.1.4 --schema ${schema} --extension yaml-examples \
     --extension front-matter --fm.parent "Reference" --fm.nav_order "${nav_order}" > \
   ./docs/reference/$(basename "${schema}" .schema.json).md
   nav_order=$((nav_order+1))
@@ -28,7 +28,7 @@ mkdir ./docs/reference/connection_types
 
 for schema in ./core/src/datayoga_core/resources/schemas/connections/*.schema.json
 do
-  npx jsonschema2mk --schema ${schema} --extension yaml-examples \
+  npx -y jsonschema2mk@2.1.4 --schema ${schema} --extension yaml-examples \
     --extension front-matter --fm.parent "Connection Types" --fm.grand_parent "Reference" > \
     ./docs/reference/connection_types/$(basename "${schema}" .schema.json).md
 done
@@ -115,7 +115,7 @@ schema = flatten_allof_properties(schema)
 json.dump(schema, sys.stdout)
 PYEOF
 
-  npx jsonschema2mk --schema "${resolved_tmp}" --extension yaml-examples \
+  npx -y jsonschema2mk@2.1.4 --schema "${resolved_tmp}" --extension yaml-examples \
     --extension front-matter --fm.parent "Blocks" --fm.grand_parent "Reference" > \
     "./docs/reference/blocks/${block_package}${doc_name}"
 done

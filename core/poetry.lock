@@ -3120,9 +3120,9 @@ parquet = ["fastparquet"]
 pg = ["SQLAlchemy", "psycopg2-binary"]
 redis = ["hiredis", "redis"]
 sqlserver = ["SQLAlchemy", "pymssql"]
-test = ["PyMySQL", "SQLAlchemy", "aiohttp", "azure-eventhub", "azure-eventhub-checkpointstoreblob-aio", "cassandra-driver", "fastparquet", "hypothesis", "ibm_db_sa", "mock", "oracledb", "psycopg2-binary", "pymssql", "pytest", "pytest-aioresponses", "pytest-asyncio", "pytest-describe", "pytest-mock", "pytest-timeout", "redis", "requests-mock", "testcontainers"]
+test = ["PyMySQL", "SQLAlchemy", "aiohttp", "aioresponses", "azure-eventhub", "azure-eventhub-checkpointstoreblob-aio", "cassandra-driver", "fastparquet", "hypothesis", "ibm_db_sa", "mock", "oracledb", "psycopg2-binary", "pymssql", "pytest", "pytest-aioresponses", "pytest-asyncio", "pytest-describe", "pytest-mock", "pytest-timeout", "redis", "requests-mock", "testcontainers"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e83f354f0562b870b584646a5f15c9052bb4422f4b6b8fd495aaea49d2c458a6"
+content-hash = "be0e4db4e16eb0e7304d4abbbfc3c4e7465590ecc37fbee201a0cf2972304abe"
