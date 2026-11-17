@@ -1,7 +1,7 @@
 FROM python:3.10
 
 RUN apt-get update
-RUN pip install poetry
+RUN pip install poetry==1.8.5
 
 RUN mkdir -p /opt/install/cli
 RUN mkdir -p /opt/install/core
