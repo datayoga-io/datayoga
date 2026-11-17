@@ -37,6 +37,8 @@ It supports both async processing, multi-threading, and multi-processing to enab
 
 ## Quickstart
 
+DataYoga requires Python 3.10 or newer.
+
 ```bash
 pip install datayoga
 ```

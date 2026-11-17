@@ -12,6 +12,8 @@ pip install --upgrade pip
 
 ## Install DataYoga CLI
 
+DataYoga requires Python 3.10 or newer.
+
 ```bash
 pip install datayoga
 ```

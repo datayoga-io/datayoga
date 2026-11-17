@@ -3705,4 +3705,4 @@ unit-test = ["SQLAlchemy", "aiohttp", "azure-eventhub", "azure-eventhub-checkpoi
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "14e74883d95fe0e9713dcf59b4adc5863c53e2d87ebac1a472c9878be7c00492"
+content-hash = "ade66a565f8796372bd6fc935cfd1cdf692ebf1d3c3edf60ecf54892692005a8"

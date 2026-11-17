@@ -6,12 +6,14 @@ nav_order: 10
 
 ## Introduction
 
-`datayoga-py` is the transformation engine used in `DataYoga`, a framework for building and generating data pipelines.
+`datayoga-core` is the transformation engine used in `DataYoga`, a framework for building and generating data pipelines.
 
 ## Installation
 
+`datayoga-core` requires Python 3.10 or newer.
+
 ```bash
-pip install datayoga-py
+pip install datayoga-core
 ```
 
 ## Quick Start
@@ -63,7 +65,7 @@ Use this `example.yaml`:
     language: sql
 ```
 
-### Transform Data using `datayoga-py`
+### Transform Data using `datayoga-core`
 
 Use this code snippet to transform a data record using the job defined [above](#create-a-job):
 
