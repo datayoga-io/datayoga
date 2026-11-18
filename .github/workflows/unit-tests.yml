@@ -14,13 +14,13 @@ jobs:
       matrix:
         include:
           - runner: ubuntu-latest
-            python: "3.8"
+            python: "3.10"
             sqlite-module: pysqlite3
           - runner: ubuntu-latest
-            python: "3.11"
+            python: "3.13"
             sqlite-module: pysqlite3
           - runner: ubuntu-24.04-arm
-            python: "3.11"
+            python: "3.13"
             sqlite-module: sqlite3
     env:
       TZ: UTC

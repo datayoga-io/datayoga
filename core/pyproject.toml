@@ -11,41 +11,42 @@ classifiers = [
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Topic :: Database"
 ]
 
 [tool.poetry.dependencies]
-certifi = ">=2024.7.4"
+certifi = ">=2026.10.18"
 pysqlite3-binary = { version = "^0.5.0", markers = "sys_platform == 'linux' and platform_machine == 'x86_64'" }
-cryptography = ">=39.0.1"
+# not needed in Pyodide (browser), which bundles its own older cryptography build
+cryptography = { version = ">=49.0.0", markers = "sys_platform != 'emscripten'" }
 Jinja2 = "^3.1.2"
 jmespath = "^1.0.0"
 jsonschema = "^4.4.0"
-orjson = "^3.9.15"
+orjson = "^3.11.6"
 prometheus-client = "^0.16.0"
-python = "^3.8"
+python = "^3.10"
 PyYAML = "^6.0"
 sqlglot = "^10.4.3"
 
 hypothesis = { version = "^6.0", optional = true }
 mock = { version = "^4.0.3", optional = true }
-pytest = { version = "^7.1.2", optional = true }
-# aioresponses 0.7.9 breaks on Python 3.8 (pulled in by pytest-aioresponses)
-aioresponses = { version = "<0.7.9", optional = true }
-pytest-aioresponses = { version = "^0.2.0", optional = true }
-pytest-asyncio = { version = "^0.20.2", optional = true }
-pytest-describe = { version = "^2.0.1", optional = true }
-pytest-mock = { version = "^3.7.0", optional = true }
-pytest-timeout = { version = "^2.1.0", optional = true }
+pytest = { version = ">=9.0.3", optional = true }
+pytest-asyncio = { version = "^1.0.0", optional = true }
+pytest-describe = { version = "^3.0.0", optional = true }
+pytest-mock = { version = "^3.14.0", optional = true }
+pytest-timeout = { version = "^2.3.0", optional = true }
 requests-mock = { version = "^1.9.3", optional = true }
 testcontainers = { version = "^3.7.0", optional = true }
 
 azure-eventhub = { version = "^5.11.2", optional = true }
 azure-eventhub-checkpointstoreblob-aio = { version = "^1.1.4", optional = true }
-aiohttp = { version = "^3.8.4", optional = true }
+aiohttp = { version = "^3.14.4", optional = true }
 cassandra-driver = { version = "^3.25.0", optional = true }
-fastparquet = { version = "^2023.2.0", optional = true, markers = "python_version >= '3.8'" }
+fastparquet = { version = ">=2023.2.0", optional = true }
 hiredis = { version = "^2.2.2", optional = true }
 ibm_db_sa = { version = "^0.4.0", optional = true }
 oracledb = { version = "^1.2.2", optional = true }
@@ -69,14 +70,12 @@ sqlserver = ["pymssql", "SQLAlchemy"]
 
 unit-test = [
         "aiohttp",
-        "aioresponses",
         "azure-eventhub",
         "azure-eventhub-checkpointstoreblob-aio",
         "fastparquet",
         "hypothesis",
         "mock",
         "pytest",
-        "pytest-aioresponses",
         "pytest-asyncio",
         "pytest-mock",
         "redis",
@@ -86,7 +85,6 @@ unit-test = [
 
 test = [
         "aiohttp",
-        "aioresponses",
         "azure-eventhub",
         "azure-eventhub-checkpointstoreblob-aio",
         "cassandra-driver",
@@ -99,7 +97,6 @@ test = [
         "pymssql",
         "PyMySQL",
         "pytest",
-        "pytest-aioresponses",
         "pytest-asyncio",
         "pytest-describe",
         "pytest-mock",
