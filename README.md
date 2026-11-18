@@ -75,3 +75,7 @@ If all goes well, you should see some startup logs, and eventually:
 ```
 
 That's it! You've created your first job that loads data from CSV, runs it through a series of transformation steps, and shows the data to the standard output. A good start. Read on for a more detailed tutorial or check out the [reference](https://datayoga-io.github.io/datayoga/reference/blocks.html) to see the different block types currently available.
+
+## Related projects
+
+- [tracemodel](https://github.com/datayoga-io/tracemodel) - Financial models in Python where each number has a source, formulas are traced, and checks find totals that do not tie. People or AI agents fill the model from filings and reports.
